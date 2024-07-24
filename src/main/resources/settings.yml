@@ -1,0 +1,18 @@
+join:
+    content: "<hover:show_text:'<yellow>Username</yellow><gray>:</gray> %player_name%'><gray>[<gray><green>+</green><gray>]</gray> %essentials_nickname%</hover>"
+motd:
+    contents:
+        - ""
+        - ""
+        - "                  ꐚꐧꐛ"
+        - " "
+        - " "
+        - "              <gray>Welcome to <#0096FF><bold>SkyBlock XYZ <reset><gray>Adventurer!"
+        - "                          <gray>While you were gone:"
+        - ""
+        - "         <#0096FF>     <u>ᴠᴏᴛᴇ ʀᴀɴᴋ<reset><gray>: <gray>%voteparty_placement_monthly%</gray><dark_green>                 <#BF40BF><u>ʙᴀʟᴀɴᴄᴇ<reset><gray>: <gray>%vault_eco_balance%</gray>"
+        - ""
+        - "         <#e1c4ff>                    <u>ɪꜱʟᴀɴᴅ ʟᴇᴠᴇʟ<reset><gray>: <gray>%Level_bskyblock_island_level%"
+        - ""
+quit:
+    content: "<hover:show_text:'<yellow>Username</yellow><gray>:</gray> %player_name%'><gray>[<gray><red>-</red><gray>]</gray> %essentials_nickname%</hover>"

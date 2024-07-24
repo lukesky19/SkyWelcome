@@ -1,0 +1,26 @@
+name: SkyWelcome
+version: '1.0.0'
+main: com.github.lukesky19.skywelcome.SkyWelcome
+api-version: '1.21'
+load: STARTUP
+author: lukeskywlker19
+
+commands:
+    skywelcome:
+        description: The base command.
+permissions:
+    skywelcome.command.reload:
+        description: Permission to reload the plugin.
+        default: op
+    skywelcome.command.toggle.join:
+        description: Toggle the individual player's join message.
+        default: op
+    skywelcome.command.toggle.leave:
+        description: Toggle the individual player's leave message.
+        default: op
+    skywelcome.command.toggle.quit:
+        description: Toggle the individual player's quit message.s
+        default: op
+    skywelcome.command.toggle.motd:
+        description: Toggle the individual player's motd message.
+        default: op
