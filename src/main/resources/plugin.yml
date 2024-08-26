@@ -1,5 +1,5 @@
 name: SkyWelcome
-version: '1.0.1'
+version: '1.1.0-DEV-1'
 main: com.github.lukesky19.skywelcome.SkyWelcome
 api-version: '1.21'
 load: STARTUP
@@ -23,4 +23,13 @@ permissions:
         default: op
     skywelcome.command.toggle.motd:
         description: Toggle the individual player's motd message.
+        default: op
+    skywelcome.command.gui.join:
+        description: Permission to open the join message selection GUI.
+        default: op
+    skywelcome.command.gui.quit:
+        description: Permission to open the quit message selection GUI.
+        default: op
+    skywelcome.command.gui.leave:
+        description: Permission to open the leave message selection GUI.
         default: op

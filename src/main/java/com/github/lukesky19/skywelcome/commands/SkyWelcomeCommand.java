@@ -2,6 +2,8 @@ package com.github.lukesky19.skywelcome.commands;
 
 import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
+import com.github.lukesky19.skywelcome.gui.JoinMessageGUI;
+import com.github.lukesky19.skywelcome.gui.QuitMessageGUI;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,12 +18,17 @@ import java.util.List;
 public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
     final SkyWelcome skyWelcome;
     final PlayerManager playerManager;
+    final JoinMessageGUI joinMessageGUI;
+    final QuitMessageGUI quitMessageGUI;
 
-    public SkyWelcomeCommand(SkyWelcome skyWelcome, PlayerManager playerManager) {
+    public SkyWelcomeCommand(SkyWelcome skyWelcome, PlayerManager playerManager, JoinMessageGUI joinMessageGUI, QuitMessageGUI quitMessageGUI) {
         this.skyWelcome = skyWelcome;
         this.playerManager = playerManager;
+        this.joinMessageGUI = joinMessageGUI;
+        this.quitMessageGUI = quitMessageGUI;
     }
 
+    // TODO Configurable Messages
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!(sender instanceof Player)) {
@@ -35,6 +42,31 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
                     skyWelcome.reload();
                     sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>[</gray><aqua><bold>SkyWelcome</bold></aqua><gray>]</gray> <aqua>Plugin configuration reloaded.</aqua>"));
                     return true;
+                }
+            }
+
+            case "gui" -> {
+                switch(args[1]) {
+                    case "join" -> {
+                        if(sender.hasPermission("skywelcome.command.gui.join")) {
+                            joinMessageGUI.createGUI((Player) sender);
+                            joinMessageGUI.openGUI((Player) sender);
+                            return true;
+                        } else {
+                            sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>[</gray><aqua><bold>SkyWelcome</bold></aqua><gray>]</gray> <red>You do not have permission for this command.</red>"));
+                            return false;
+                        }
+                    }
+                    case "leave", "quit" -> {
+                        if(sender.hasPermission("skywelcome.command.gui.quit") || sender.hasPermission("skywelcome.command.gui.leave")) {
+                            quitMessageGUI.createGUI((Player) sender);
+                            quitMessageGUI.openGUI((Player) sender);
+                            return true;
+                        } else {
+                            sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>[</gray><aqua><bold>SkyWelcome</bold></aqua><gray>]</gray> <red>You do not have permission for this command.</red>"));
+                            return false;
+                        }
+                    }
                 }
             }
 
@@ -95,12 +127,25 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(args.length == 1) {
-            return List.of("toggle");
-        }
+        switch(args.length) {
+            case 1 -> {
+                // TODO Permission Checks
+                return List.of("gui", "toggle", "reload");
+            }
 
-        if(args.length == 2) {
-            return List.of("join", "leave", "quit", "motd");
+            case 2 -> {
+                switch(args[0].toLowerCase()) {
+                    case "gui" -> {
+                        // TODO Permission Checks
+                        return List.of("join", "leave", "quit");
+                    }
+
+                    case "toggle" -> {
+                        // TODO Permission Checks
+                        return List.of("join", "leave", "quit", "motd");
+                    }
+                }
+            }
         }
 
         return List.of();

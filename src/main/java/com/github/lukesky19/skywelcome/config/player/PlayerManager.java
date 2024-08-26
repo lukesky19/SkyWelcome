@@ -2,6 +2,8 @@ package com.github.lukesky19.skywelcome.config.player;
 
 import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.ConfigurationUtility;
+import com.github.lukesky19.skywelcome.config.settings.Settings;
+import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
@@ -14,10 +16,12 @@ import java.nio.file.Path;
 public class PlayerManager {
     final SkyWelcome skyWelcome;
     final ConfigurationUtility configurationUtility;
+    final SettingsManager settingsManager;
 
-    public PlayerManager(SkyWelcome skyWelcome, ConfigurationUtility configurationUtility) {
+    public PlayerManager(SkyWelcome skyWelcome, ConfigurationUtility configurationUtility, SettingsManager settingsManager) {
         this.skyWelcome = skyWelcome;
         this.configurationUtility = configurationUtility;
+        this.settingsManager = settingsManager;
     }
 
     /**
@@ -25,13 +29,13 @@ public class PlayerManager {
      * @param player A bukkit player.
      * @return A player's settings.
      */
-    public Player getPlayerSettings(org.bukkit.entity.Player player) {
-        Player playerSettings;
+    public PlayerSettings getPlayerSettings(org.bukkit.entity.Player player) {
+        PlayerSettings playerSettings;
         Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "playerdata" + File.separator + player.getUniqueId() + ".yml");
 
         YamlConfigurationLoader loader = configurationUtility.getYamlConfigurationLoader(path);
         try {
-            playerSettings = loader.load().get(Player.class);
+            playerSettings = loader.load().get(PlayerSettings.class);
         } catch (ConfigurateException e) {
             skyWelcome.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>Unable to load " + player.getName() + "'s settings.</red>"));
             throw new RuntimeException(e);
@@ -46,12 +50,22 @@ public class PlayerManager {
      */
     public void createPlayerSettings(org.bukkit.entity.Player player) {
         Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "playerdata" + File.separator + player.getUniqueId() + ".yml");
+        Settings settings = settingsManager.getSettings();
+
+        String joinMessage = settings.join().firstEntry().getValue().message();
+        String leaveMessage = settings.quit().firstEntry().getValue().message();
+
         if(!path.toFile().exists()) {
-            savePlayerSettings(player, new Player(true, true, true));
+            savePlayerSettings(player, new PlayerSettings(
+                    true,
+                    true,
+                    true,
+                    joinMessage,
+                    leaveMessage));
         }
     }
 
-    public void savePlayerSettings(org.bukkit.entity.Player player, Player playerSettings) {
+    public void savePlayerSettings(org.bukkit.entity.Player player, PlayerSettings playerSettings) {
         Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "playerdata" + File.separator + player.getUniqueId() + ".yml");
         YamlConfigurationLoader loader = configurationUtility.getYamlConfigurationLoader(path);
 
@@ -72,29 +86,57 @@ public class PlayerManager {
     }
 
     public void toggleJoin(org.bukkit.entity.Player player) {
-        Player playerSettings = getPlayerSettings(player);
-        savePlayerSettings(player, new Player(
+        PlayerSettings playerSettings = getPlayerSettings(player);
+        savePlayerSettings(player, new PlayerSettings(
                 !playerSettings.joinMessage(),
                 playerSettings.leaveMessage(),
-                playerSettings.motd()
+                playerSettings.motd(),
+                playerSettings.selectedJoinMessage(),
+                playerSettings.selectedLeaveMessage()
         ));
     }
 
     public void toggleLeave(org.bukkit.entity.Player player) {
-        Player playerSettings = getPlayerSettings(player);
-        savePlayerSettings(player, new Player(
+        PlayerSettings playerSettings = getPlayerSettings(player);
+        savePlayerSettings(player, new PlayerSettings(
                 playerSettings.joinMessage(),
                 !playerSettings.leaveMessage(),
-                playerSettings.motd()
+                playerSettings.motd(),
+                playerSettings.selectedJoinMessage(),
+                playerSettings.selectedLeaveMessage()
         ));
     }
 
     public void toggleMotd(org.bukkit.entity.Player player) {
-        Player playerSettings = getPlayerSettings(player);
-        savePlayerSettings(player, new Player(
+        PlayerSettings playerSettings = getPlayerSettings(player);
+        savePlayerSettings(player, new PlayerSettings(
                 playerSettings.joinMessage(),
                 playerSettings.leaveMessage(),
-                !playerSettings.motd()
+                !playerSettings.motd(),
+                playerSettings.selectedJoinMessage(),
+                playerSettings.selectedLeaveMessage()
+        ));
+    }
+
+    public void changeSelectedJoinMessage(org.bukkit.entity.Player player, String message) {
+        PlayerSettings playerSettings = getPlayerSettings(player);
+        savePlayerSettings(player, new PlayerSettings(
+                playerSettings.joinMessage(),
+                playerSettings.leaveMessage(),
+                playerSettings.motd(),
+                message,
+                playerSettings.selectedLeaveMessage()
+        ));
+    }
+
+    public void changeSelectedLeaveMessage(org.bukkit.entity.Player player, String message) {
+        PlayerSettings playerSettings = getPlayerSettings(player);
+        savePlayerSettings(player, new PlayerSettings(
+                playerSettings.joinMessage(),
+                playerSettings.leaveMessage(),
+                playerSettings.motd(),
+                playerSettings.selectedJoinMessage(),
+                message
         ));
     }
 }

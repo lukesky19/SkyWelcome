@@ -3,8 +3,9 @@ package com.github.lukesky19.skywelcome.config.player;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @ConfigSerializable
-public record Player(
+public record PlayerSettings(
         Boolean joinMessage,
         Boolean leaveMessage,
-        Boolean motd) {
-}
+        Boolean motd,
+        String selectedJoinMessage,
+        String selectedLeaveMessage) { }
