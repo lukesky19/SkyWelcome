@@ -1,7 +1,7 @@
 package com.github.lukesky19.skywelcome.gui;
 
-import com.github.lukesky19.skywelcome.config.gui.JoinQuitManager;
-import com.github.lukesky19.skywelcome.config.gui.QuitConfig;
+import com.github.lukesky19.skywelcome.config.gui.GUIManager;
+import com.github.lukesky19.skywelcome.config.gui.GUISettings;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerSettings;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
@@ -24,15 +24,15 @@ import java.util.*;
 public class QuitGUI {
     final SettingsManager settingsManager;
     final PlayerManager playerManager;
-    final JoinQuitManager joinQuitManager;
+    final GUIManager GUIManager;
 
     public QuitGUI(
             SettingsManager settingsManager,
             PlayerManager playerManager,
-            JoinQuitManager joinQuitManager) {
+            GUIManager GUIManager) {
         this.settingsManager = settingsManager;
         this.playerManager = playerManager;
-        this.joinQuitManager = joinQuitManager;
+        this.GUIManager = GUIManager;
     }
 
     ChestGui quitGUI;
@@ -40,7 +40,7 @@ public class QuitGUI {
     PaginatedPane pages;
 
     public void createGUI(Player player) {
-        QuitConfig quitConfig = joinQuitManager.getQuitGUIConfig();
+        GUISettings quitConfig = GUIManager.getQuitGUIConfig();
 
         quitGUI = new ChestGui(quitConfig.gui().size() / 9, ComponentHolder.of(FormatUtil.format(player, quitConfig.gui().name())));
 
@@ -51,12 +51,12 @@ public class QuitGUI {
                 quitConfig.gui().pagedSettings().length(),
                 quitConfig.gui().pagedSettings().height());
 
-        for(Map.Entry<Integer, LinkedHashMap<Integer, QuitConfig.Item>> rowsEntry : quitConfig.gui().background().entrySet()) {
+        for(Map.Entry<Integer, LinkedHashMap<Integer, GUISettings.Item>> rowsEntry : quitConfig.gui().background().entrySet()) {
             int rowNum = rowsEntry.getKey();
 
-            for(Map.Entry<Integer, QuitConfig.Item> itemEntry : rowsEntry.getValue().entrySet()) {
+            for(Map.Entry<Integer, GUISettings.Item> itemEntry : rowsEntry.getValue().entrySet()) {
                 Integer slotNum = itemEntry.getKey();
-                QuitConfig.Item item = itemEntry.getValue();
+                GUISettings.Item item = itemEntry.getValue();
                 switch(item.type()) {
 
                     case "FILLER" -> {
@@ -240,7 +240,7 @@ public class QuitGUI {
     }
 
     private List<GuiItem> getGuiItemsList(Player player) {
-        QuitConfig quitConfig = joinQuitManager.getQuitGUIConfig();
+        GUISettings quitConfig = GUIManager.getQuitGUIConfig();
 
         Settings settings = settingsManager.getSettings();
         PlayerSettings playerSettings = playerManager.getPlayerSettings(player);

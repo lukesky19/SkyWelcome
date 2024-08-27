@@ -7,7 +7,6 @@ import java.util.List;
 
 @ConfigSerializable
 public record Settings(
-        String configVersion,
         Options options,
         LinkedHashMap<String, Join> join,
         Motd motd,
@@ -24,6 +23,6 @@ public record Settings(
     public record Quit(String permission, String message) { }
 
     @ConfigSerializable
-    public record Options(Boolean joins, Boolean quits, Boolean motd) { }
+    public record Options(String locale, Boolean joins, Boolean quits, Boolean motd) { }
 }
 

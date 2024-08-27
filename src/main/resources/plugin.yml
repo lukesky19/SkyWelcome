@@ -1,5 +1,5 @@
 name: SkyWelcome
-version: '1.1.0-DEV-2'
+version: '1.1.0-DEV-3'
 main: com.github.lukesky19.skywelcome.SkyWelcome
 api-version: '1.21'
 load: STARTUP
@@ -13,6 +13,9 @@ commands:
 permissions:
     skywelcome.command.reload:
         description: Permission to reload the plugin.
+        default: op
+    skywelcome.command.help:
+        description: Permission to view the plugin's help message.
         default: op
     skywelcome.command.toggle.join:
         description: Toggle the individual player's join message.

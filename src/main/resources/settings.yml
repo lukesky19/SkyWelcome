@@ -1,5 +1,7 @@
-config-version: 1.1.0-DEV-2
 options:
+    # Locale
+    # The name of the locale file to use in skywelcome/locale, minus the file extension (.yml)
+    locale: en_US
     # Should join messages be enabled globally?
     joins: true
     # Should quit/leave messages be enabled globally?
@@ -10,7 +12,7 @@ join:
     # The first message will be used by default.
     0:
         permission: "skywelcome.join.default"
-        message: "<hover:show_text:'<yellow>Username</yellow><gray>:</gray> %player_name%'><gray>[<gray><green>+</green><gray>]</gray> %essentials_nickname%</hover>"
+        message: "<gray>[<gray><green>+</green><gray>]</gray> <papi:essentials_nickname></hover>"
 motd:
     contents:
         - "Welcome to the server, %essentials_nickname%!"
@@ -18,4 +20,4 @@ quit:
     # The first message will be used by default.
     0:
         permission: "skywelcome.leave.default"
-        message: "<hover:show_text:'<yellow>Username</yellow><gray>:</gray> %player_name%'><gray>[<gray><red>-</red><gray>]</gray> %essentials_nickname%</hover>"
+        message: "<gray>[<gray><red>-</red><gray>]</gray> <papi:essentials_nickname></hover>"

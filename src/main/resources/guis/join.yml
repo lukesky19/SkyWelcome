@@ -92,7 +92,7 @@ gui:
             4:
                 type: RETURN
                 material: BARRIER
-                name: " "
+                name: "<white>Click to exit this menu."
                 lore: [ ]
             5:
                 type: NEXT_PAGE

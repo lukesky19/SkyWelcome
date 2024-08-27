@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @ConfigSerializable
-public record JoinConfig(Placeholders placeholders, Gui gui) {
+public record GUISettings(Placeholders placeholders, Gui gui) {
 
     @ConfigSerializable
     public record Placeholders(

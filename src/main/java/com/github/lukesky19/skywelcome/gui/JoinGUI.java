@@ -1,7 +1,7 @@
 package com.github.lukesky19.skywelcome.gui;
 
-import com.github.lukesky19.skywelcome.config.gui.JoinConfig;
-import com.github.lukesky19.skywelcome.config.gui.JoinQuitManager;
+import com.github.lukesky19.skywelcome.config.gui.GUISettings;
+import com.github.lukesky19.skywelcome.config.gui.GUIManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerSettings;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
@@ -24,15 +24,15 @@ import java.util.*;
 public class JoinGUI {
     final SettingsManager settingsManager;
     final PlayerManager playerManager;
-    final JoinQuitManager joinQuitManager;
+    final GUIManager GUIManager;
 
     public JoinGUI(
             SettingsManager settingsManager,
             PlayerManager playerManager,
-            JoinQuitManager joinQuitManager) {
+            GUIManager GUIManager) {
         this.settingsManager = settingsManager;
         this.playerManager = playerManager;
-        this.joinQuitManager = joinQuitManager;
+        this.GUIManager = GUIManager;
     }
 
     ChestGui joinGUI;
@@ -40,23 +40,23 @@ public class JoinGUI {
     PaginatedPane pages;
 
     public void createGUI(Player player) {
-        JoinConfig joinConfig = joinQuitManager.getJoinGUIConfig();
+        GUISettings GUISettings = GUIManager.getJoinGUIConfig();
 
-        joinGUI = new ChestGui(joinConfig.gui().size() / 9, ComponentHolder.of(FormatUtil.format(player, joinConfig.gui().name())));
+        joinGUI = new ChestGui(GUISettings.gui().size() / 9, ComponentHolder.of(FormatUtil.format(player, GUISettings.gui().name())));
 
         background = new StaticPane(0, 0, 9, 6);
         pages = new PaginatedPane(
-                joinConfig.gui().pagedSettings().xOffset(),
-                joinConfig.gui().pagedSettings().yOffset(),
-                joinConfig.gui().pagedSettings().length(),
-                joinConfig.gui().pagedSettings().height());
+                GUISettings.gui().pagedSettings().xOffset(),
+                GUISettings.gui().pagedSettings().yOffset(),
+                GUISettings.gui().pagedSettings().length(),
+                GUISettings.gui().pagedSettings().height());
 
-        for(Map.Entry<Integer, LinkedHashMap<Integer, JoinConfig.Item>> rowsEntry : joinConfig.gui().background().entrySet()) {
+        for(Map.Entry<Integer, LinkedHashMap<Integer, GUISettings.Item>> rowsEntry : GUISettings.gui().background().entrySet()) {
             int rowNum = rowsEntry.getKey();
 
-            for(Map.Entry<Integer, JoinConfig.Item> itemEntry : rowsEntry.getValue().entrySet()) {
+            for(Map.Entry<Integer, GUISettings.Item> itemEntry : rowsEntry.getValue().entrySet()) {
                 Integer slotNum = itemEntry.getKey();
-                JoinConfig.Item item = itemEntry.getValue();
+                GUISettings.Item item = itemEntry.getValue();
                 switch(item.type()) {
 
                     case "FILLER" -> {
@@ -240,7 +240,7 @@ public class JoinGUI {
     }
 
     private List<GuiItem> getGuiItemsList(Player player) {
-        JoinConfig joinConfig = joinQuitManager.getJoinGUIConfig();
+        GUISettings GUISettings = GUIManager.getJoinGUIConfig();
 
         Settings settings = settingsManager.getSettings();
         PlayerSettings playerSettings = playerManager.getPlayerSettings(player);
@@ -252,11 +252,11 @@ public class JoinGUI {
             Settings.Join join = entry.getValue();
             if(player.hasPermission(join.permission())) {
                 if(Objects.equals(playerSettings.selectedJoinMessage(), join.message())) {
-                    itemStack = new ItemStack(Material.valueOf(joinConfig.placeholders().selected().material()));
+                    itemStack = new ItemStack(Material.valueOf(GUISettings.placeholders().selected().material()));
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     itemMeta.displayName(FormatUtil.format(player, join.message()));
                     List<Component> loreList = new ArrayList<>();
-                    for(String loreStr : joinConfig.placeholders().selected().lore()) {
+                    for(String loreStr : GUISettings.placeholders().selected().lore()) {
                         loreList.add(FormatUtil.format(player, loreStr));
                     }
                     itemMeta.lore(loreList);
@@ -264,11 +264,11 @@ public class JoinGUI {
                     GuiItem guiItem = new GuiItem(itemStack, event -> event.setCancelled(true));
                     guiItems.add(guiItem);
                 } else {
-                    itemStack = new ItemStack(Material.valueOf(joinConfig.placeholders().available().material()));
+                    itemStack = new ItemStack(Material.valueOf(GUISettings.placeholders().available().material()));
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     itemMeta.displayName(FormatUtil.format(player, join.message()));
                     List<Component> loreList = new ArrayList<>();
-                    for(String loreStr : joinConfig.placeholders().available().lore()) {
+                    for(String loreStr : GUISettings.placeholders().available().lore()) {
                         loreList.add(FormatUtil.format(player, loreStr));
                     }
                     itemMeta.lore(loreList);
@@ -281,11 +281,11 @@ public class JoinGUI {
                     guiItems.add(guiItem);
                 }
             } else {
-                itemStack = new ItemStack(Material.valueOf(joinConfig.placeholders().noPermission().material()));
+                itemStack = new ItemStack(Material.valueOf(GUISettings.placeholders().noPermission().material()));
                 ItemMeta itemMeta = itemStack.getItemMeta();
                 itemMeta.displayName(FormatUtil.format(player, join.message()));
                 List<Component> loreList = new ArrayList<>();
-                for(String loreStr : joinConfig.placeholders().noPermission().lore()) {
+                for(String loreStr : GUISettings.placeholders().noPermission().lore()) {
                     loreList.add(FormatUtil.format(player, loreStr));
                 }
                 itemMeta.lore(loreList);

@@ -9,22 +9,22 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import java.io.File;
 import java.nio.file.Path;
 
-public class JoinQuitManager {
+public class GUIManager {
     final SkyWelcome skyWelcome;
     final ConfigurationUtility configurationUtility;
-    JoinConfig joinConfig;
-    QuitConfig quitConfig;
+    GUISettings joinConfig;
+    GUISettings quitConfig;
 
-    public JoinQuitManager(SkyWelcome skyWelcome, ConfigurationUtility configurationUtility) {
+    public GUIManager(SkyWelcome skyWelcome, ConfigurationUtility configurationUtility) {
         this.skyWelcome = skyWelcome;
         this.configurationUtility = configurationUtility;
     }
 
-    public JoinConfig getJoinGUIConfig() {
+    public GUISettings getJoinGUIConfig() {
         return joinConfig;
     }
 
-    public QuitConfig getQuitGUIConfig() {
+    public GUISettings getQuitGUIConfig() {
         return quitConfig;
     }
 
@@ -44,7 +44,7 @@ public class JoinQuitManager {
 
         loader = configurationUtility.getYamlConfigurationLoader(joinPath);
         try {
-            joinConfig = loader.load().get(JoinConfig.class);
+            joinConfig = loader.load().get(GUISettings.class);
         } catch (ConfigurateException e) {
             skyWelcome.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>The join GUI configuration failed to load.</red>"));
             throw new RuntimeException(e);
@@ -52,7 +52,7 @@ public class JoinQuitManager {
 
         loader = configurationUtility.getYamlConfigurationLoader(quitPath);
         try {
-            quitConfig = loader.load().get(QuitConfig.class);
+            quitConfig = loader.load().get(GUISettings.class);
         } catch (ConfigurateException e) {
             skyWelcome.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>The quit GUI configuration failed to load.</red>"));
             throw new RuntimeException(e);
