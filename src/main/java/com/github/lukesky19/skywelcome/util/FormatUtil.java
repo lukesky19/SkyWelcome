@@ -1,3 +1,20 @@
+/*
+    SkyWelcome allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
+    Copyright (C) 2024  lukeskywlker19
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 package com.github.lukesky19.skywelcome.util;
 
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -90,6 +107,11 @@ public class FormatUtil {
         return MiniMessage.miniMessage().deserialize(handleLegacyCodes(message)).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
     }
 
+    /**
+     * A hacky way to support legacy color codes.
+     * @param message A String that has legacy color codes to replace
+     * @return A String with clean MiniMessage tags
+     */
     private static String handleLegacyCodes(String message) {
         StringBuilder builder = new StringBuilder(message);
 
