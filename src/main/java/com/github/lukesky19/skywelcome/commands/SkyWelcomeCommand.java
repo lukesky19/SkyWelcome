@@ -2,8 +2,8 @@ package com.github.lukesky19.skywelcome.commands;
 
 import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
-import com.github.lukesky19.skywelcome.gui.JoinMessageGUI;
-import com.github.lukesky19.skywelcome.gui.QuitMessageGUI;
+import com.github.lukesky19.skywelcome.gui.JoinGUI;
+import com.github.lukesky19.skywelcome.gui.QuitGUI;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,14 +18,14 @@ import java.util.List;
 public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
     final SkyWelcome skyWelcome;
     final PlayerManager playerManager;
-    final JoinMessageGUI joinMessageGUI;
-    final QuitMessageGUI quitMessageGUI;
+    final JoinGUI joinGUI;
+    final QuitGUI quitGUI;
 
-    public SkyWelcomeCommand(SkyWelcome skyWelcome, PlayerManager playerManager, JoinMessageGUI joinMessageGUI, QuitMessageGUI quitMessageGUI) {
+    public SkyWelcomeCommand(SkyWelcome skyWelcome, PlayerManager playerManager, JoinGUI joinGUI, QuitGUI quitGUI) {
         this.skyWelcome = skyWelcome;
         this.playerManager = playerManager;
-        this.joinMessageGUI = joinMessageGUI;
-        this.quitMessageGUI = quitMessageGUI;
+        this.joinGUI = joinGUI;
+        this.quitGUI = quitGUI;
     }
 
     // TODO Configurable Messages
@@ -45,12 +45,12 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
                 }
             }
 
-            case "gui" -> {
+            case "guis" -> {
                 switch(args[1]) {
                     case "join" -> {
                         if(sender.hasPermission("skywelcome.command.gui.join")) {
-                            joinMessageGUI.createGUI((Player) sender);
-                            joinMessageGUI.openGUI((Player) sender);
+                            joinGUI.createGUI((Player) sender);
+                            joinGUI.openGUI((Player) sender);
                             return true;
                         } else {
                             sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>[</gray><aqua><bold>SkyWelcome</bold></aqua><gray>]</gray> <red>You do not have permission for this command.</red>"));
@@ -59,8 +59,8 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
                     }
                     case "leave", "quit" -> {
                         if(sender.hasPermission("skywelcome.command.gui.quit") || sender.hasPermission("skywelcome.command.gui.leave")) {
-                            quitMessageGUI.createGUI((Player) sender);
-                            quitMessageGUI.openGUI((Player) sender);
+                            quitGUI.createGUI((Player) sender);
+                            quitGUI.openGUI((Player) sender);
                             return true;
                         } else {
                             sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>[</gray><aqua><bold>SkyWelcome</bold></aqua><gray>]</gray> <red>You do not have permission for this command.</red>"));
@@ -130,12 +130,12 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
         switch(args.length) {
             case 1 -> {
                 // TODO Permission Checks
-                return List.of("gui", "toggle", "reload");
+                return List.of("guis", "toggle", "reload");
             }
 
             case 2 -> {
                 switch(args[0].toLowerCase()) {
-                    case "gui" -> {
+                    case "guis" -> {
                         // TODO Permission Checks
                         return List.of("join", "leave", "quit");
                     }

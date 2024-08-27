@@ -1,0 +1,116 @@
+placeholders:
+    selected:
+        material: GREEN_WOOL
+        lore:
+            - "<green>This is your current leave message.</green>"
+    available:
+        material: YELLOW_WOOL
+        lore:
+            - "<yellow>Click to change to this leave message.</yellow>"
+    no-permission:
+        material: RED_WOOL
+        lore:
+            - "<red>You do not have permission to use this leave message.</red>"
+gui:
+    size: 54
+    name: "Choose a Leave Message"
+    # Will automatically populate this area with configured leave messages in settings.yml
+    # To change items, modify the placeholders section above.
+    paged-settings:
+        x-offset: 1
+        y-offset: 2
+        length: 7
+        height: 2
+    background:
+        0:
+            0:
+                type: FILLER
+                material: SHORT_GRASS
+                name: " "
+                lore: [ ]
+            1:
+                type: FILLER
+                material: FERN
+                name: " "
+                lore: [ ]
+            2:
+                type: FILLER
+                material: RED_MUSHROOM
+                name: " "
+                lore: [ ]
+            3:
+                type: FILLER
+                material: SHORT_GRASS
+                name: " "
+                lore: [ ]
+            4:
+                type: FILLER
+                material: MANGROVE_PROPAGULE
+                name: " "
+                lore: [ ]
+            5:
+                type: FILLER
+                material: SHORT_GRASS
+                name: " "
+                lore: [ ]
+            6:
+                type: FILLER
+                material: RED_MUSHROOM
+                name: " "
+                lore: [ ]
+            7:
+                type: FILLER
+                material: FERN
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: SHORT_GRASS
+                name: " "
+                lore: [ ]
+        5:
+            0:
+                type: FILLER
+                material: SHORT_GRASS
+                name: " "
+                lore: [ ]
+            1:
+                type: FILLER
+                material: FERN
+                name: " "
+                lore: [ ]
+            2:
+                type: FILLER
+                material: SHORT_GRASS
+                name: " "
+                lore: [ ]
+            3:
+                type: PREV_PAGE
+                hdb-id: 516
+                name: "<white>Click to navigate to the previous page.</white>"
+                lore: [ ]
+            4:
+                type: RETURN
+                material: BARRIER
+                name: " "
+                lore: [ ]
+            5:
+                type: NEXT_PAGE
+                hdb-id: 513
+                name: "<white>Click to navigate to the next page.</white>"
+                lore: [ ]
+            6:
+                type: FILLER
+                material: SHORT_GRASS
+                name: " "
+                lore: [ ]
+            7:
+                type: FILLER
+                material: FERN
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: SHORT_GRASS
+                name: " "
+                lore: [ ]

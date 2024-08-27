@@ -1,4 +1,4 @@
-config-version: 1.1.0-DEV-1
+config-version: 1.1.0-DEV-2
 options:
     # Should join messages be enabled globally?
     joins: true
