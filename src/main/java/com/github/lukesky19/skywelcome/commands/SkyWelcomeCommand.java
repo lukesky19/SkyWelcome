@@ -58,6 +58,25 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         Locale locale = localeManager.getLocale();
 
+        if(args.length == 0) {
+            if (sender instanceof Player) {
+                sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
+                if(sender.hasPermission("skywelcome.command.help")) {
+                    for (String str : locale.help()) {
+                        sender.sendMessage(FormatUtil.format((Player) sender, str));
+                    }
+                    return false;
+                }
+                return false;
+            } else {
+                skyWelcome.getComponentLogger().info(FormatUtil.format(locale.unknownCommand()));
+                for (String str : locale.help()) {
+                    skyWelcome.getComponentLogger().info(FormatUtil.format(str));
+                }
+            }
+            return false;
+        }
+
         switch(args[0]) {
             case "reload" -> {
                 if(sender instanceof Player) {
@@ -71,30 +90,48 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
                     }
                 } else {
                     skyWelcome.reload();
-                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.prefix() + locale.reload()));
+                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.reload()));
                     return true;
                 }
             }
 
             case "help" -> {
-                if(sender.hasPermission("skywelcome.command." + args[0])) {
+                if(sender instanceof Player) {
+                    if(sender.hasPermission("skywelcome.command." + args[0])) {
+                        for (String str : locale.help()) {
+                            sender.sendMessage(FormatUtil.format((Player) sender, str));
+                        }
+                        return true;
+                    } else {
+                        sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.noPermission()));
+                        return false;
+                    }
+                } else {
                     for(String str : locale.help()) {
-                        sender.sendMessage(FormatUtil.format((Player) sender, str));
+                        skyWelcome.getComponentLogger().info(FormatUtil.format(str));
                     }
                     return true;
-                } else {
-                    sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.noPermission()));
-                    return false;
                 }
             }
 
             case "gui" -> {
                 if(!(sender instanceof Player)) {
-                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.prefix() + locale.playerOnly()));
+                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.playerOnly()));
                     return false;
                 }
 
-                switch (args[1].toLowerCase()) {
+                if(args.length == 1) {
+                    sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
+                    if(sender.hasPermission("skywelcome.command.help")) {
+                        for (String str : locale.help()) {
+                            sender.sendMessage(FormatUtil.format((Player) sender, str));
+                        }
+                        return false;
+                    }
+                    return false;
+                }
+
+                switch(args[1].toLowerCase()) {
                     case "join" -> {
                         if(sender.hasPermission("skywelcome.command.gui." + args[1].toLowerCase())) {
                             joinGUI.createGUI((Player) sender);
@@ -121,11 +158,22 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
 
             case "toggle" -> {
                 if(!(sender instanceof Player)) {
-                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.prefix() + locale.playerOnly()));
+                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.playerOnly()));
                     return false;
                 }
 
-                switch (args[1].toLowerCase()) {
+                if(args.length == 1) {
+                    sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
+                    if(sender.hasPermission("skywelcome.command.help")) {
+                        for (String str : locale.help()) {
+                            sender.sendMessage(FormatUtil.format((Player) sender, str));
+                        }
+                        return false;
+                    }
+                    return false;
+                }
+
+                switch(args[1].toLowerCase()) {
                     case "join" -> {
                         if(sender.hasPermission("skywelcome.command.toggle." + args[1].toLowerCase())) {
                             playerManager.toggleJoin((Player) sender);
@@ -170,15 +218,44 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
                             return false;
                         }
                     }
+
+                    default -> {
+                        sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
+                        if(sender.hasPermission("skywelcome.command.help")) {
+                            for (String str : locale.help()) {
+                                sender.sendMessage(FormatUtil.format((Player) sender, str));
+                            }
+                            return false;
+                        }
+                        return false;
+                    }
                 }
             }
 
             default -> {
-                sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
-                return false;
+                if(sender instanceof Player) {
+                    sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
+                    if(sender.hasPermission("skywelcome.command.help")) {
+                        for (String str : locale.help()) {
+                            sender.sendMessage(FormatUtil.format((Player) sender, str));
+                        }
+                        return false;
+                    }
+                    return false;
+                } else {
+                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.unknownCommand()));
+                    for (String str : locale.help()) {
+                        skyWelcome.getComponentLogger().info(FormatUtil.format(str));
+                    }
+                    return false;
+                }
             }
         }
 
+        sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
+        for (String str : locale.help()) {
+            sender.sendMessage(FormatUtil.format((Player) sender, str));
+        }
         return false;
     }
 

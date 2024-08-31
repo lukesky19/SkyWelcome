@@ -79,10 +79,10 @@ public class LocaleManager {
     /**
      * Copies the default locale files that come bundled with the plugin, if they do not exist at least.
      */
-    private void copyDefaultLocales() {
+    public void copyDefaultLocales() {
         Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "locale" + File.separator + "en_US.yml");
         if (!path.toFile().exists()) {
-            skyWelcome.saveResource("locale/en_US.yml", false);
+            skyWelcome.saveResource("locale" + File.separator + "en_US.yml", false);
         }
     }
 

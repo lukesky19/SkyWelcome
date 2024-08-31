@@ -28,18 +28,22 @@ import com.github.lukesky19.skywelcome.gui.QuitGUI;
 import com.github.lukesky19.skywelcome.listeners.JoinListener;
 import com.github.lukesky19.skywelcome.listeners.QuitListener;
 import com.github.lukesky19.skywelcome.util.HeadDatabaseUtil;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
-public final class SkyWelcome extends JavaPlugin {
+public class SkyWelcome extends JavaPlugin {
     SettingsManager settingsManager;
     GUIManager GUIManager;
     LocaleManager localeManager;
 
     @Override
     public void onEnable() {
+        // Set up bstats
+        setupBStats();
+
         // Initialize Classes
         ConfigurationUtility configurationUtility = new ConfigurationUtility(this);
         settingsManager = new SettingsManager(this, configurationUtility);
@@ -67,5 +71,13 @@ public final class SkyWelcome extends JavaPlugin {
         settingsManager.reload();
         GUIManager.reload();
         localeManager.reload();
+    }
+
+    /**
+     * Sets up bstats
+     */
+    private void setupBStats() {
+        int pluginId = 23211;
+        new Metrics(this, pluginId);
     }
 }

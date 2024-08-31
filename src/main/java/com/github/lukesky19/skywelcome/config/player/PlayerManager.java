@@ -24,7 +24,6 @@ import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
-import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
@@ -89,14 +88,8 @@ public class PlayerManager {
         CommentedConfigurationNode playerNode = loader.createNode();
         try {
             playerNode.set(playerSettings);
-        } catch (SerializationException e) {
-            skyWelcome.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>Unable to change " + player.getName() + "'s settings.</red>"));
-            throw new RuntimeException(e);
-        }
-
-        try {
             loader.save(playerNode);
-        } catch (ConfigurateException e) {
+        } catch(ConfigurateException e) {
             skyWelcome.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>Unable to save " + player.getName() + "'s settings.</red>"));
             throw new RuntimeException(e);
         }
