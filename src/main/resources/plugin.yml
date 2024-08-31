@@ -6,7 +6,7 @@ load: STARTUP
 author: lukeskywlker19
 softdepend:
     - HeadDatabase
-
+    - PlaceholderAPI
 commands:
     skywelcome:
         description: The base command.

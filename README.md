@@ -1,23 +1,35 @@
-# SkyShop
+# SkyWelcome
 ## Description
 * A plugin that allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
 ## Features
 * Player togglable join, leave, and MOTD messages.
 * Player selectable join and leave messages via a GUI.
-* Custom permissions per join and leave message.
+* Custom permissions per custom join and leave message.
 * Global toggle for join, leave, and MOTD messages.
+* HeadDatabaseAPI and PlaceholderAPI support.
 ## Soft Dependencies
 * HeadDatabaseAPI
+* PlaceholderAPI
 ## Commands
 - /skywelcome help - Displays the help message.
 - /skywelcome reload - Reloads the plugin.
-- /skyshop gui join - The GUI to select custom join messages.
-- /skyshop gui leave - The GUI to select custom leave messages.
-- /skyshop gui quit - The GUI to select custom leave messages.
+- /skywelcome toggle join - Toggles a player's individual join message.
+- /skywelcome toggle quit - Toggles a player's individual quit message.
+- /skywelcome toggle leave - Toggles a player's individual leave message.
+- /skywelcome toggle motd - Toggles the player seeing the MOTD message.
+- /skywelcome gui join - The GUI to select custom join messages.
+- /skywelcome gui leave - The GUI to select custom leave messages.
+- /skywelcome gui quit - The GUI to select custom quit messages.
 ## Permisisons
-- `skyshop.commands.shop` - The permission to access the shop.
-- `skyshop.commands.sellall` - The permission to access the sellall GUI.
-- `skyshop.commands.reload` - The permission to reload the plugin.
+- `skywelcome.command.reload` - The permission to use /skywelcome reload.
+- `skywelcome.command.help` - The permission to use /skywelcome help.
+- `skywelcome.command.toggle.join` - The permission to use /skywelcome toggle join.
+- `skywelcome.command.toggle.leave` - The permission to use /skywelcome toggle leave.
+- `skywelcome.command.toggle.quit` - The permission to use /skywelcome toggle quit.
+- `skywelcome.command.toggle.motd` - The permission to use /skywelcome toggle motd.
+- `skywelcome.command.gui.join` -  The permission to use /skywelcome gui join.
+- `skywelcome.command.gui.leave` - The permission to use /skywelcome gui leave.
+- `skywelcome.command.gui.quit` - The permission to use /skywelcome gui quit.
 ## Issues, Bugs, or Suggestions
 * Please create a new [Github Issue](https://github.com/lukesky19/SkyWelcome/issues) with your issue, bug, or suggestion.
 * If an issue or bug, please post any relevant logs containing errors related to SkyShop and your configuration files.
