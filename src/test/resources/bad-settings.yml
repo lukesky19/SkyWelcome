@@ -1,0 +1,23 @@
+options:
+    # Locale
+    # The name of the locale file to use in skywelcome/locale, minus the file extension (.yml)
+    locale: en_US
+    # Should join messages be enabled globally?
+    joins: true
+    # Should quit/leave messages be enabled globally?
+    quits: true
+    # Should the MOTD message be enabled?
+    motd: true
+join:
+    # The first message will be used by default.
+    0:
+        permission: "skywelcome.join.default"
+        message: "<gray>[<gray><green>+</green><gray>]</gray> <papi:essentials_nickname></hover>
+motd:
+    contents:
+        - "Welcome to the server, %essentials_nickname%!"
+quit:
+    # The first message will be used by default.
+    0:
+        permission: "skywelcome.leave.default"
+        message: "<gray>[<gray><red>-</red><gray>]</gray> <papi:essentials_nickname></hover>"

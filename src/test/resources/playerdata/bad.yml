@@ -1,0 +1,6 @@
+# This file is used to cause a ConfigurateException.
+join-message: true
+leave-message: true
+motd: true
+selected-join-message: "<gray>[<gray><green>+</green><gray>]</gray> <papi:essentials_nickname>
+selected-leave-message: "<gray>[<gray><red>-</red><gray>]</gray> <papi:essentials_nickname>"

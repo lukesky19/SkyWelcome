@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id("io.github.goooler.shadow") version "8.1.7"
+    id 'jacoco'
 }
 
 group = 'com.github.lukesky19'
@@ -25,6 +26,7 @@ repositories {
 }
 
 dependencies {
+    // Build dependencies
     compileOnly 'io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly 'com.arcaniax:HeadDatabase-API:1.3.2'
@@ -33,6 +35,26 @@ dependencies {
     implementation 'org.spongepowered:configurate-yaml:4.1.2'
     implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.17'
     implementation "org.bstats:bstats-bukkit:3.0.2"
+    implementation "org.bstats:bstats-bukkit:3.0.2"
+
+    // Test Dependencies
+    testCompileOnly('io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT')
+    testCompileOnly('me.clip:placeholderapi:2.11.6')
+    testCompileOnly('com.arcaniax:HeadDatabase-API:1.3.2')
+    testCompileOnly('net.kyori:adventure-api:4.17.0')
+    testCompileOnly('net.kyori:adventure-text-minimessage:4.17.0')
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // Runtime Dependencies
+    runtimeOnly('io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT')
+    runtimeOnly('me.clip:placeholderapi:2.11.6')
+    runtimeOnly('com.arcaniax:HeadDatabase-API:1.3.2')
+    runtimeOnly('net.kyori:adventure-api:4.17.0')
+    runtimeOnly('net.kyori:adventure-text-minimessage:4.17.0')
 }
 
 def targetJavaVersion = 21
@@ -51,6 +73,19 @@ processResources {
     filteringCharset 'UTF-8'
     filesMatching('plugin.yml') {
         expand props
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
     }
 }
 
