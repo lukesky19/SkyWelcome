@@ -23,6 +23,7 @@ import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerSettings;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
+import com.github.lukesky19.skywelcome.util.ActionType;
 import com.github.lukesky19.skywelcome.util.FormatUtil;
 import com.github.lukesky19.skywelcome.util.HeadDatabaseUtil;
 import com.github.stefvanschie.inventoryframework.adventuresupport.ComponentHolder;
@@ -74,12 +75,12 @@ public class JoinGUI {
             for(Map.Entry<Integer, GUISettings.Item> itemEntry : rowsEntry.getValue().entrySet()) {
                 Integer slotNum = itemEntry.getKey();
                 GUISettings.Item item = itemEntry.getValue();
-                switch(item.type()) {
-
-                    case "FILLER" -> {
+                switch(ActionType.valueOf(item.type())) {
+                    case FILLER -> {
                         ItemStack itemStack;
                         if(item.hdbId() != null) {
                             itemStack = HeadDatabaseUtil.getSkullItem(item.hdbId());
+                            if(itemStack == null) return;
                             ItemMeta itemMeta = itemStack.getItemMeta();
                             itemMeta.displayName(FormatUtil.format(player, item.name()));
                             List<Component> loreList = new ArrayList<>();
@@ -107,10 +108,11 @@ public class JoinGUI {
                         }
                     }
 
-                    case "PREV_PAGE" -> {
+                    case PREV_PAGE -> {
                          ItemStack itemStack;
                          if(item.hdbId() != null) {
                              itemStack = HeadDatabaseUtil.getSkullItem(item.hdbId());
+                             if(itemStack == null) return;
                              ItemMeta itemMeta = itemStack.getItemMeta();
                              itemMeta.displayName(FormatUtil.format(player, item.name()));
                              List<Component> loreList = new ArrayList<>();
@@ -152,10 +154,11 @@ public class JoinGUI {
                          }
                     }
 
-                    case "NEXT_PAGE" -> {
+                    case NEXT_PAGE -> {
                          ItemStack itemStack;
                          if(item.hdbId() != null) {
                              itemStack = HeadDatabaseUtil.getSkullItem(item.hdbId());
+                             if(itemStack == null) return;
                              ItemMeta itemMeta = itemStack.getItemMeta();
                              itemMeta.displayName(FormatUtil.format(player, item.name()));
                              List<Component> loreList = new ArrayList<>();
@@ -197,10 +200,11 @@ public class JoinGUI {
                          }
                     }
 
-                    case "RETURN" -> {
+                    case RETURN -> {
                          ItemStack itemStack;
                          if(item.hdbId() != null) {
                              itemStack = HeadDatabaseUtil.getSkullItem(item.hdbId());
+                             if(itemStack == null) return;
                              ItemMeta itemMeta = itemStack.getItemMeta();
                              itemMeta.displayName(FormatUtil.format(player, item.name()));
                              List<Component> loreList = new ArrayList<>();

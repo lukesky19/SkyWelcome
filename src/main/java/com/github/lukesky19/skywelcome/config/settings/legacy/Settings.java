@@ -15,46 +15,20 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skywelcome.config.gui;
+package com.github.lukesky19.skywelcome.config.settings.legacy;
 
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @ConfigSerializable
-public record GUISettings(String configVersion, Placeholders placeholders, Gui gui) {
+public record Settings(Join join, Motd motd, Quit quit) {
+    @ConfigSerializable
+    public record Join(String content) { }
 
     @ConfigSerializable
-    public record Placeholders(
-            PlaceholderItem selected,
-            PlaceholderItem available,
-            PlaceholderItem noPermission) { }
+    public record Motd(List<String> contents) { }
 
     @ConfigSerializable
-    public record Gui(
-            Integer size,
-            String name,
-            PagedSettings pagedSettings,
-            LinkedHashMap<Integer, LinkedHashMap<Integer, Item>> background) { }
-
-    @ConfigSerializable
-    public record PagedSettings(
-            Integer xOffset,
-            Integer yOffset,
-            Integer length,
-            Integer height) { }
-
-    @ConfigSerializable
-    public record PlaceholderItem(
-            String material,
-            List<String> lore) { }
-
-    @ConfigSerializable
-    public record Item(
-            String type,
-            String hdbId,
-            String material,
-            String name,
-            List<String> lore) { }
+    public record Quit(String content) { }
 }

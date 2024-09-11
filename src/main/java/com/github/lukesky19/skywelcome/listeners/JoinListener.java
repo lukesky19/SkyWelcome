@@ -22,6 +22,8 @@ import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
+import com.github.lukesky19.skywelcome.util.FormatUtil;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -47,6 +49,11 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onLogin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        if(skyWelcome.isPluginDisabled()) {
+            skyWelcome.getComponentLogger().warn(FormatUtil.format("<red>Unable to send join message for <yellow>" + MiniMessage.miniMessage().serialize(event.getPlayer().displayName()) + "</yellow> since the plugin is soft-disabled due to a configuration error.</red>"));
+            return;
+        }
+
         Settings settings = settingsManager.getSettings();
         playerManager.createPlayerSettings(player);
 

@@ -24,6 +24,7 @@ import java.util.List;
 
 @ConfigSerializable
 public record Settings(
+        String configVersion,
         Options options,
         LinkedHashMap<String, Join> join,
         Motd motd,

@@ -58,9 +58,53 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         Locale locale = localeManager.getLocale();
 
+        if(skyWelcome.isPluginDisabled()) {
+            if(args[0].equalsIgnoreCase("reload")) {
+                if(sender instanceof Player player) {
+                    if(sender.hasPermission("skywelcome.command." + args[0])) {
+                        skyWelcome.reload();
+                        if(skyWelcome.isPluginDisabled()) {
+                            sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin was reloaded, but is still soft-disabled due to a configuration error.</red>"));
+                            return false;
+                        } else {
+                            sender.sendMessage(FormatUtil.format(player, locale.prefix() + locale.reload()));
+                            return true;
+                        }
+                    } else {
+                        if(skyWelcome.isPluginDisabled()) {
+                            sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>You do not have permission for this command.</red>"));
+                            sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin is currently is soft-disabled due to a configuration error.</red>"));
+                            sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>Please report this to your server's system administrator.</red>"));
+                        } else {
+                            sender.sendMessage(FormatUtil.format(player, locale.prefix() + locale.noPermission()));
+                        }
+                        return false;
+                    }
+                } else {
+                    skyWelcome.reload();
+                    if(skyWelcome.isPluginDisabled()) {
+                        skyWelcome.getComponentLogger().warn(FormatUtil.format("<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin was reloaded, but is still soft-disabled due to a configuration error.</red>"));
+                        return false;
+                    } else {
+                        skyWelcome.getComponentLogger().info(FormatUtil.format(locale.reload()));
+                        return true;
+                    }
+                }
+            } else {
+                if(sender instanceof Player player) {
+                    sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin is currently is soft-disabled due to a configuration error.</red>"));
+                    sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>Please report this to your server's system administrator.</red>"));
+                } else {
+                    skyWelcome.getComponentLogger().warn(FormatUtil.format("<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin is currently is soft-disabled due to a configuration error.</red>"));
+                    skyWelcome.getComponentLogger().warn(FormatUtil.format("<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>Please report this to your server's system administrator.</red>"));
+                }
+                return false;
+            }
+        }
+
         if(args.length == 0) {
-            if (sender instanceof Player) {
-                sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
+            if(sender instanceof Player player) {
+                sender.sendMessage(FormatUtil.format(player, locale.prefix() + locale.unknownCommand()));
                 if(sender.hasPermission("skywelcome.command.help")) {
                     for (String str : locale.help()) {
                         sender.sendMessage(FormatUtil.format((Player) sender, str));
@@ -191,7 +235,7 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
 
                     case "leave", "quit" -> {
                         if(sender.hasPermission("skywelcome.command.toggle." + args[1].toLowerCase())) {
-                            playerManager.toggleLeave((Player) sender);
+                            playerManager.toggleQuit((Player) sender);
                             if(playerManager.getPlayerSettings((Player) sender).leaveMessage()) {
                                 sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.quitEnabled()));
                             } else {
@@ -241,14 +285,13 @@ public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
                         }
                         return false;
                     }
-                    return false;
                 } else {
                     skyWelcome.getComponentLogger().info(FormatUtil.format(locale.unknownCommand()));
                     for (String str : locale.help()) {
                         skyWelcome.getComponentLogger().info(FormatUtil.format(str));
                     }
-                    return false;
                 }
+                return false;
             }
         }
 

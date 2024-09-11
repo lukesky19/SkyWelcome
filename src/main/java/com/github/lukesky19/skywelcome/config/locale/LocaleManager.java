@@ -24,6 +24,7 @@ import com.github.lukesky19.skywelcome.config.player.PlayerSettings;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import com.github.lukesky19.skywelcome.util.FormatUtil;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.spongepowered.configurate.ConfigurateException;
@@ -57,7 +58,12 @@ public class LocaleManager {
     public void reload() {
         locale = null;
 
-        copyDefaultLocales();
+        ComponentLogger logger = skyWelcome.getComponentLogger();
+        if(skyWelcome.isPluginDisabled()) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Locale settings cannot be loaded due to a previous plugin error.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Please check your server's console.</red>"));
+            return;
+        }
 
         Path path = Path.of(
                 skyWelcome.getDataFolder()
@@ -70,20 +76,9 @@ public class LocaleManager {
 
         try {
             locale = loader.load().get(Locale.class);
-        } catch (ConfigurateException e) {
-            skyWelcome.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>The locale configuration failed to load.</red>"));
-            throw new RuntimeException(e);
-        }
-    }
+        } catch (ConfigurateException ignored) { }
 
-    /**
-     * Copies the default locale files that come bundled with the plugin, if they do not exist at least.
-     */
-    public void copyDefaultLocales() {
-        Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "locale" + File.separator + "en_US.yml");
-        if (!path.toFile().exists()) {
-            skyWelcome.saveResource("locale" + File.separator + "en_US.yml", false);
-        }
+        validateLocale();
     }
 
     public void sendJoinMessage(Player joiningPlayer) {
@@ -98,7 +93,7 @@ public class LocaleManager {
         }
     }
 
-    public void sendLeaveMessage(Player leavingPlayer) {
+    public void sendQuitMessage(Player leavingPlayer) {
         PlayerSettings playerSettings = playerManager.getPlayerSettings(leavingPlayer);
 
         if(playerSettings.leaveMessage()) {
@@ -116,6 +111,102 @@ public class LocaleManager {
             for(String message : motd.contents()) {
                 player.sendMessage(FormatUtil.format(player, message));
             }
+        }
+    }
+
+    private void validateLocale() {
+        ComponentLogger logger = skyWelcome.getComponentLogger();
+        String localeString = settingsManager.getSettings().options().locale();
+        if(locale == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Failed to load <yellow>" + localeString + ".yml</yellow>.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.configVersion() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>config-version</yellow> setting in <yellow>" + localeString + ".yml</yellow> does exist.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>This means your config did not migrate properly or you modified the config-version setting.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.prefix() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>prefix</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.help() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>help</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        for(String msg : locale.help()) {
+            if(msg == null) {
+                logger.error(MiniMessage.miniMessage().deserialize("<red>One of the Strings in the help setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+                skyWelcome.setPluginState(false);
+                return;
+            }
+        }
+
+        if(locale.playerOnly() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>player-only</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.reload() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>reload</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.noPermission() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>no-permission</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.unknownCommand() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>unknown-command</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.joinEnabled() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>join-enabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.joinDisabled() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>join-disabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.quitEnabled() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>quit-enabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.quitDisabled() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>quit-disabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.motdEnabled() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>motd-enabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(locale.motdDisabled() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>motd-disabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
         }
     }
 }

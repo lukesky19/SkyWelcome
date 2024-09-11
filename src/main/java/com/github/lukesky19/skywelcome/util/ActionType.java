@@ -15,15 +15,11 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skywelcome.config.player;
+package com.github.lukesky19.skywelcome.util;
 
-import org.spongepowered.configurate.objectmapping.ConfigSerializable;
-
-@ConfigSerializable
-public record PlayerSettings(
-        String configVersion,
-        Boolean joinMessage,
-        Boolean leaveMessage,
-        Boolean motd,
-        String selectedJoinMessage,
-        String selectedLeaveMessage) { }
+public enum ActionType {
+    FILLER,
+    RETURN,
+    NEXT_PAGE,
+    PREV_PAGE
+}

@@ -1,3 +1,4 @@
+config-version: 1.0.0
 placeholders:
     selected:
         material: GREEN_WOOL
@@ -14,74 +15,116 @@ placeholders:
 gui:
     size: 54
     name: "Choose a Leave Message"
-    # Will automatically populate this area with configured leave messages in settings.yml
-    # To change items, modify the placeholders section above.
     paged-settings:
         x-offset: 1
-        y-offset: 2
+        y-offset: 1
         length: 7
-        height: 2
+        height: 4
     background:
         0:
             0:
                 type: FILLER
-                material: SHORT_GRASS
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             1:
                 type: FILLER
-                material: FERN
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             2:
                 type: FILLER
-                material: RED_MUSHROOM
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             3:
                 type: FILLER
-                material: SHORT_GRASS
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             4:
                 type: FILLER
-                material: MANGROVE_PROPAGULE
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             5:
                 type: FILLER
-                material: SHORT_GRASS
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             6:
                 type: FILLER
-                material: RED_MUSHROOM
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             7:
                 type: FILLER
-                material: FERN
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             8:
                 type: FILLER
-                material: SHORT_GRASS
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+        1:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+        2:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+        3:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+        4:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
         5:
             0:
                 type: FILLER
-                material: SHORT_GRASS
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             1:
                 type: FILLER
-                material: FERN
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             2:
                 type: FILLER
-                material: SHORT_GRASS
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             3:
@@ -101,16 +144,16 @@ gui:
                 lore: [ ]
             6:
                 type: FILLER
-                material: SHORT_GRASS
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             7:
                 type: FILLER
-                material: FERN
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]
             8:
                 type: FILLER
-                material: SHORT_GRASS
+                material: GRAY_STAINED_GLASS_PANE
                 name: " "
                 lore: [ ]

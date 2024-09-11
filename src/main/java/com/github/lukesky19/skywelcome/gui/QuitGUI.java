@@ -23,6 +23,7 @@ import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerSettings;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
+import com.github.lukesky19.skywelcome.util.ActionType;
 import com.github.lukesky19.skywelcome.util.FormatUtil;
 import com.github.lukesky19.skywelcome.util.HeadDatabaseUtil;
 import com.github.stefvanschie.inventoryframework.adventuresupport.ComponentHolder;
@@ -74,12 +75,12 @@ public class QuitGUI {
             for(Map.Entry<Integer, GUISettings.Item> itemEntry : rowsEntry.getValue().entrySet()) {
                 Integer slotNum = itemEntry.getKey();
                 GUISettings.Item item = itemEntry.getValue();
-                switch(item.type()) {
-
-                    case "FILLER" -> {
+                switch(ActionType.valueOf(item.type())) {
+                    case FILLER -> {
                         ItemStack itemStack;
                         if(item.hdbId() != null) {
                             itemStack = HeadDatabaseUtil.getSkullItem(item.hdbId());
+                            if(itemStack == null) return;
                             ItemMeta itemMeta = itemStack.getItemMeta();
                             itemMeta.displayName(FormatUtil.format(player, item.name()));
                             List<Component> loreList = new ArrayList<>();
@@ -107,10 +108,11 @@ public class QuitGUI {
                         }
                     }
 
-                    case "PREV_PAGE" -> {
+                    case PREV_PAGE -> {
                         ItemStack itemStack;
                         if(item.hdbId() != null) {
                             itemStack = HeadDatabaseUtil.getSkullItem(item.hdbId());
+                            if(itemStack == null) return;
                             ItemMeta itemMeta = itemStack.getItemMeta();
                             itemMeta.displayName(FormatUtil.format(player, item.name()));
                             List<Component> loreList = new ArrayList<>();
@@ -152,10 +154,11 @@ public class QuitGUI {
                         }
                     }
 
-                    case "NEXT_PAGE" -> {
+                    case NEXT_PAGE -> {
                         ItemStack itemStack;
                         if(item.hdbId() != null) {
                             itemStack = HeadDatabaseUtil.getSkullItem(item.hdbId());
+                            if(itemStack == null) return;
                             ItemMeta itemMeta = itemStack.getItemMeta();
                             itemMeta.displayName(FormatUtil.format(player, item.name()));
                             List<Component> loreList = new ArrayList<>();
@@ -197,10 +200,11 @@ public class QuitGUI {
                         }
                     }
 
-                    case "RETURN" -> {
+                    case RETURN -> {
                         ItemStack itemStack;
                         if(item.hdbId() != null) {
                             itemStack = HeadDatabaseUtil.getSkullItem(item.hdbId());
+                            if(itemStack == null) return;
                             ItemMeta itemMeta = itemStack.getItemMeta();
                             itemMeta.displayName(FormatUtil.format(player, item.name()));
                             List<Component> loreList = new ArrayList<>();
@@ -292,7 +296,7 @@ public class QuitGUI {
                     itemStack.setItemMeta(itemMeta);
                     GuiItem guiItem = new GuiItem(itemStack, event -> {
                         event.setCancelled(true);
-                        playerManager.changeSelectedLeaveMessage(player, quit.message());
+                        playerManager.changeSelectedQuitMessage(player, quit.message());
                         updateGUI(player);
                     });
                     guiItems.add(guiItem);

@@ -23,6 +23,7 @@ import java.util.List;
 
 @ConfigSerializable
 public record Locale(
+        String configVersion,
         String prefix,
         List<String> help,
         String playerOnly,

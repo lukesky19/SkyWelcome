@@ -21,13 +21,16 @@ import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.ConfigurationUtility;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.entity.Player;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.UUID;
 
 public class PlayerManager {
     final SkyWelcome skyWelcome;
@@ -45,18 +48,17 @@ public class PlayerManager {
      * @param player A bukkit player.
      * @return A player's settings.
      */
-    public PlayerSettings getPlayerSettings(org.bukkit.entity.Player player) {
-        PlayerSettings playerSettings;
+    public PlayerSettings getPlayerSettings(Player player) {
+        PlayerSettings playerSettings = null;
         Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "playerdata" + File.separator + player.getUniqueId() + ".yml");
 
         YamlConfigurationLoader loader = configurationUtility.getYamlConfigurationLoader(path);
         try {
             playerSettings = loader.load().get(PlayerSettings.class);
-        } catch (ConfigurateException e) {
-            skyWelcome.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>Unable to load " + player.getName() + "'s settings.</red>"));
-            throw new RuntimeException(e);
-        }
+        } catch (ConfigurateException ignored) { }
 
+        playerSettings = migratePlayerSettings(player, playerSettings);
+        validatePlayerSettings(player.getUniqueId(), playerSettings);
         return playerSettings;
     }
 
@@ -64,24 +66,42 @@ public class PlayerManager {
      * Creates a player's settings file if it doesn't exist.
      * @param player A bukkit player
      */
-    public void createPlayerSettings(org.bukkit.entity.Player player) {
+    public void createPlayerSettings(Player player) {
+        ComponentLogger logger = skyWelcome.getComponentLogger();
+        if(skyWelcome.isPluginDisabled()) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Player settings cannot be created due to a previous plugin error.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Please check your server's console.</red>"));
+            return;
+        }
+
         Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "playerdata" + File.separator + player.getUniqueId() + ".yml");
         Settings settings = settingsManager.getSettings();
 
-        String joinMessage = settings.join().firstEntry().getValue().message();
-        String leaveMessage = settings.quit().firstEntry().getValue().message();
+        Settings.Join defaultJoin = settings.join().firstEntry().getValue();
+        Settings.Quit defaultQuit = settings.quit().firstEntry().getValue();
+        String joinMessage = "";
+        String quitMessage = "";
+
+        if(player.hasPermission(defaultJoin.permission())) {
+            joinMessage = defaultJoin.message();
+        }
+
+        if(player.hasPermission(defaultQuit.permission())) {
+            quitMessage = defaultQuit.message();
+        }
 
         if(!path.toFile().exists()) {
             savePlayerSettings(player, new PlayerSettings(
+                    "1.1.0",
                     true,
                     true,
                     true,
                     joinMessage,
-                    leaveMessage));
+                    quitMessage));
         }
     }
 
-    public void savePlayerSettings(org.bukkit.entity.Player player, PlayerSettings playerSettings) {
+    public void savePlayerSettings(Player player, PlayerSettings playerSettings) {
         Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "playerdata" + File.separator + player.getUniqueId() + ".yml");
         YamlConfigurationLoader loader = configurationUtility.getYamlConfigurationLoader(path);
 
@@ -95,9 +115,14 @@ public class PlayerManager {
         }
     }
 
-    public void toggleJoin(org.bukkit.entity.Player player) {
+    public void toggleJoin(Player player) {
         PlayerSettings playerSettings = getPlayerSettings(player);
+
+        migratePlayerSettings(player, playerSettings);
+        validatePlayerSettings(player.getUniqueId(), playerSettings);
+
         savePlayerSettings(player, new PlayerSettings(
+                playerSettings.configVersion(),
                 !playerSettings.joinMessage(),
                 playerSettings.leaveMessage(),
                 playerSettings.motd(),
@@ -106,9 +131,14 @@ public class PlayerManager {
         ));
     }
 
-    public void toggleLeave(org.bukkit.entity.Player player) {
+    public void toggleQuit(Player player) {
         PlayerSettings playerSettings = getPlayerSettings(player);
+
+        migratePlayerSettings(player, playerSettings);
+        validatePlayerSettings(player.getUniqueId(), playerSettings);
+
         savePlayerSettings(player, new PlayerSettings(
+                playerSettings.configVersion(),
                 playerSettings.joinMessage(),
                 !playerSettings.leaveMessage(),
                 playerSettings.motd(),
@@ -117,9 +147,14 @@ public class PlayerManager {
         ));
     }
 
-    public void toggleMotd(org.bukkit.entity.Player player) {
+    public void toggleMotd(Player player) {
         PlayerSettings playerSettings = getPlayerSettings(player);
+
+        migratePlayerSettings(player, playerSettings);
+        validatePlayerSettings(player.getUniqueId(), playerSettings);
+
         savePlayerSettings(player, new PlayerSettings(
+                playerSettings.configVersion(),
                 playerSettings.joinMessage(),
                 playerSettings.leaveMessage(),
                 !playerSettings.motd(),
@@ -128,9 +163,14 @@ public class PlayerManager {
         ));
     }
 
-    public void changeSelectedJoinMessage(org.bukkit.entity.Player player, String message) {
+    public void changeSelectedJoinMessage(Player player, String message) {
         PlayerSettings playerSettings = getPlayerSettings(player);
+
+        migratePlayerSettings(player, playerSettings);
+        validatePlayerSettings(player.getUniqueId(), playerSettings);
+
         savePlayerSettings(player, new PlayerSettings(
+                playerSettings.configVersion(),
                 playerSettings.joinMessage(),
                 playerSettings.leaveMessage(),
                 playerSettings.motd(),
@@ -139,14 +179,106 @@ public class PlayerManager {
         ));
     }
 
-    public void changeSelectedLeaveMessage(org.bukkit.entity.Player player, String message) {
+    public void changeSelectedQuitMessage(Player player, String message) {
         PlayerSettings playerSettings = getPlayerSettings(player);
+
+        migratePlayerSettings(player, playerSettings);
+        validatePlayerSettings(player.getUniqueId(), playerSettings);
+
         savePlayerSettings(player, new PlayerSettings(
+                playerSettings.configVersion(),
                 playerSettings.joinMessage(),
                 playerSettings.leaveMessage(),
                 playerSettings.motd(),
                 playerSettings.selectedJoinMessage(),
                 message
         ));
+    }
+
+    private void validatePlayerSettings(UUID uuid, PlayerSettings playerSettings) {
+        ComponentLogger logger = skyWelcome.getComponentLogger();
+        if(skyWelcome.isPluginDisabled()) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Player settings cannot be validated due to a previous plugin error.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Please check your server's console.</red>"));
+            return;
+        }
+
+        if(playerSettings == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Failed to load <yellow>" + uuid + ".yml</yellow>.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(playerSettings.configVersion() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>config-version</yellow> setting in <yellow>" + uuid + ".yml</yellow> does not exist.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>This means your config did not migrate properly or you modified the <yellow>config-version</yellow> setting.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(playerSettings.joinMessage() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>join-message</yellow> setting in <yellow>" + uuid + ".yml</yellow> does exist.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>This should not happen unless you modified a player's file manually.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(playerSettings.leaveMessage() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>leave-message</yellow> setting in <yellow>" + uuid + ".yml</yellow> does exist.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>This should not happen unless you modified a player's file manually.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(playerSettings.motd() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>motd</yellow> setting in <yellow>" + uuid + ".yml</yellow> does exist.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>This should not happen unless you modified a player's file manually.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(playerSettings.selectedJoinMessage() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>selected-join-message</yellow> setting in <yellow>" + uuid + ".yml</yellow> does exist.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>This means your config did not migrate properly or you modified the <yellow>selected-join-message</yellow> setting.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(playerSettings.selectedLeaveMessage() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>selected-leave-message</yellow> setting in <yellow>" + uuid + ".yml</yellow> does exist.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>This means your config did not migrate properly or you modified the <yellow>selected-leave-message</yellow> setting.</red>"));
+            skyWelcome.setPluginState(false);
+        }
+    }
+
+    private PlayerSettings migratePlayerSettings(Player player, PlayerSettings playerSettings) {
+        ComponentLogger logger = skyWelcome.getComponentLogger();
+        if(playerSettings == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Failed to load <yellow>" + player.getUniqueId() + ".yml</yellow>.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Invalid legacy configuration cannot be migrated. </red>"));
+            skyWelcome.setPluginState(false);
+            return null;
+        }
+
+        if(playerSettings.configVersion() == null) {
+            if (skyWelcome.isPluginDisabled()) {
+                logger.error(MiniMessage.miniMessage().deserialize("<red>Player settings cannot be migrated due to a previous plugin error.</red>"));
+                logger.error(MiniMessage.miniMessage().deserialize("<red>Please check your server's console.</red>"));
+                return null;
+            }
+
+            PlayerSettings newPlayerSettings = new PlayerSettings(
+                    "1.1.0",
+                    playerSettings.joinMessage(),
+                    playerSettings.leaveMessage(),
+                    playerSettings.motd(),
+                    settingsManager.getSettings().join().firstEntry().getValue().message(),
+                    settingsManager.getSettings().quit().firstEntry().getValue().message());
+
+            savePlayerSettings(player, newPlayerSettings);
+            return newPlayerSettings;
+        }
+
+        return playerSettings;
     }
 }

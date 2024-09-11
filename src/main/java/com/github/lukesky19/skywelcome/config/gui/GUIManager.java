@@ -19,12 +19,18 @@ package com.github.lukesky19.skywelcome.config.gui;
 
 import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.ConfigurationUtility;
+import com.github.lukesky19.skywelcome.util.ActionType;
+import com.github.lukesky19.skywelcome.util.HeadDatabaseUtil;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Material;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class GUIManager {
     final SkyWelcome skyWelcome;
@@ -59,20 +65,251 @@ public class GUIManager {
             skyWelcome.saveResource("guis" + File.separator + "quit.yml", false);
         }
 
+        ComponentLogger logger = skyWelcome.getComponentLogger();
+        if(skyWelcome.isPluginDisabled()) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>GUI settings cannot be loaded due to a previous plugin error.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Please check your server's console.</red>"));
+            return;
+        }
+
         loader = configurationUtility.getYamlConfigurationLoader(joinPath);
         try {
             joinConfig = loader.load().get(GUISettings.class);
-        } catch (ConfigurateException e) {
-            skyWelcome.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>The join GUI configuration failed to load.</red>"));
-            throw new RuntimeException(e);
-        }
+        } catch (ConfigurateException ignored) { }
 
         loader = configurationUtility.getYamlConfigurationLoader(quitPath);
         try {
             quitConfig = loader.load().get(GUISettings.class);
-        } catch (ConfigurateException e) {
-            skyWelcome.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>The quit GUI configuration failed to load.</red>"));
-            throw new RuntimeException(e);
+        } catch (ConfigurateException ignored) { }
+
+        validateGUI(joinConfig, "join");
+        validateGUI(quitConfig, "quit");
+    }
+
+    public void validateGUI(GUISettings guiSettings, String fileName) {
+        ComponentLogger logger = skyWelcome.getComponentLogger();
+        if(guiSettings == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>Failed to load <yellow>" + fileName + ".yml</yellow>.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(guiSettings.configVersion() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>config-version</yellow> setting in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+            logger.error(MiniMessage.miniMessage().deserialize("<red>This means your config did not migrate properly or you modified the config-version setting.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        GUISettings.Placeholders placeholderItemConfig = guiSettings.placeholders();
+        if(placeholderItemConfig == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>placeholders</yellow> settings in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(placeholderItemConfig.selected() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>selected</yellow> item configuration under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        try {
+            Material.valueOf(placeholderItemConfig.selected().material()); 
+        } catch (IllegalArgumentException e) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>selected</yellow> item configuration's <yellow>material</yellow> under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(placeholderItemConfig.selected().lore() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>selected</yellow> item configuration's <yellow>lore</yellow> under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        for(String msg : placeholderItemConfig.selected().lore()) {
+            if(msg == null) {
+                logger.error(MiniMessage.miniMessage().deserialize("<red>One of the Strings in the <yellow>selected</yellow> item configuration's <yellow>lore</yellow> under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+                skyWelcome.setPluginState(false);
+                return;
+            }
+        }
+
+        // Available Placeholder Item
+        if(placeholderItemConfig.available() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>available</yellow> item configuration under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        try {
+            Material.valueOf(placeholderItemConfig.available().material());
+        } catch (IllegalArgumentException e) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>available</yellow> item configuration's <yellow>material</yellow> under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(placeholderItemConfig.available().lore() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>available</yellow> item configuration's <yellow>lore</yellow> under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        for(String msg : placeholderItemConfig.available().lore()) {
+            if(msg == null) {
+                logger.error(MiniMessage.miniMessage().deserialize("<red>One of the Strings in the <yellow>available</yellow> item configuration's <yellow>lore</yellow> under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+                skyWelcome.setPluginState(false);
+                return;
+            }
+        }
+
+        // No Permission Placeholder Item
+        if(placeholderItemConfig.noPermission() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>no-permission</yellow> item configuration under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        try {
+            Material.valueOf(placeholderItemConfig.noPermission().material());
+        } catch (IllegalArgumentException e) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>no-permission</yellow> item configuration's <yellow>material</yellow> under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(placeholderItemConfig.noPermission().lore() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>no-permission</yellow> item configuration's <yellow>lore</yellow> under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        for(String msg : placeholderItemConfig.noPermission().lore()) {
+            if(msg == null) {
+                logger.error(MiniMessage.miniMessage().deserialize("<red>One of the Strings in the <yellow>no-permission</yellow> item configuration's <yellow>lore</yellow> under <yellow>placeholders</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+                skyWelcome.setPluginState(false);
+                return;
+            }
+        }
+
+        GUISettings.Gui gui = guiSettings.gui();
+        if(gui == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>gui</yellow> settings in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(gui.size() == null || gui.size() % 9 != 0) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>size</yellow> setting under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(gui.name() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>name</yellow> setting under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        GUISettings.PagedSettings pagedSettings = gui.pagedSettings();
+        if(pagedSettings == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>paged-settings</yellow> settings under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(pagedSettings.xOffset() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>x-offset</yellow> setting under <yellow>paged-settings</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(pagedSettings.yOffset() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>y-offset</yellow> setting under <yellow>paged-settings</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(pagedSettings.length() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>length</yellow> setting under <yellow>paged-settings</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(pagedSettings.height() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>height</yellow> setting under <yellow>paged-settings</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        for(Map.Entry<Integer, LinkedHashMap<Integer, GUISettings.Item>> pagesEntry : gui.background().entrySet()) {
+            int pageNum = pagesEntry.getKey();
+            for(Map.Entry<Integer, GUISettings.Item> itemEntry : pagesEntry.getValue().entrySet()) {
+                int itemNum = itemEntry.getKey();
+                GUISettings.Item item = itemEntry.getValue();
+
+                if(item.type() == null) {
+                    logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>type</yellow> setting for page <yellow>" + pageNum + "</yellow> and item <yellow>" + itemNum + "</yellow> under <yellow>background</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+                    skyWelcome.setPluginState(false);
+                    return;
+                }
+                
+                try {
+                    ActionType.valueOf(item.type());
+                } catch (IllegalArgumentException e) {
+                    logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>type</yellow> setting for page <yellow>" + pageNum + "</yellow> and item <yellow>" + itemNum + "</yellow> under <yellow>background</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+                    skyWelcome.setPluginState(false);
+                    return;
+                }
+
+                if(item.material() == null && item.hdbId() == null) {
+                    logger.error(MiniMessage.miniMessage().deserialize("<red>There is no <yellow>material</yellow> or <yellow>hdb-id</yellow> setting for page <yellow>" + pageNum + "</yellow> and item <yellow>" + itemNum + "</yellow> under <yellow>background</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow>.</red>"));
+                    skyWelcome.setPluginState(false);
+                    return;
+                }
+
+                if(item.material() != null && item.hdbId() != null) {
+                    logger.warn(MiniMessage.miniMessage().deserialize("<red>Both <yellow>material</yellow> and <yellow>hdb-id</yellow> settings for page <yellow>" + pageNum + "</yellow> and item <yellow>" + itemNum + "</yellow> under <yellow>background</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> are configured.</red>"));
+                }
+
+                if(item.hdbId() != null) {
+                    if(HeadDatabaseUtil.getSkullItem(item.hdbId()) == null) {
+                        logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>hdb-id</yellow> setting for page <yellow>" + pageNum + "</yellow> and item <yellow>" + itemNum + "</yellow> under <yellow>background</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+                        skyWelcome.setPluginState(false);
+                        return;
+                    }
+                }
+
+                if(item.material() != null) {
+                    if(Material.getMaterial(item.material()) == null) {
+                        logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>material</yellow> setting for page <yellow>" + pageNum + "</yellow> and item <yellow>" + itemNum + "</yellow> under <yellow>background</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+                        skyWelcome.setPluginState(false);
+                        return;
+                    }
+                }
+
+                if(item.name() == null) {
+                    logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>name</yellow> setting for page <yellow>" + pageNum + "</yellow> and item <yellow>" + itemNum + "</yellow> under <yellow>background</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+                    skyWelcome.setPluginState(false);
+                    return;
+                }
+
+                if(item.lore() == null) {
+                    logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>lore</yellow> setting for page <yellow>" + pageNum + "</yellow> and item <yellow>" + itemNum + "</yellow> under <yellow>background</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> does not exist.</red>"));
+                    skyWelcome.setPluginState(false);
+                    return;
+                }
+                
+                for(String msg : item.lore()) {
+                    if(msg == null) {
+                        logger.error(MiniMessage.miniMessage().deserialize("<red>One of the Strings in the <yellow>lore</yellow> setting for page <yellow>" + pageNum + "</yellow> and item <yellow>" + itemNum + "</yellow> under <yellow>background</yellow> under <yellow>gui</yellow> in <yellow>" + fileName + ".yml</yellow> is invalid.</red>"));
+                        skyWelcome.setPluginState(false);
+                        return;
+                    }
+                }
+            }
         }
     }
 }

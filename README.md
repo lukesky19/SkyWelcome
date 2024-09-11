@@ -31,7 +31,7 @@
 - `skywelcome.command.gui.leave` - The permission to use /skywelcome gui leave.
 - `skywelcome.command.gui.quit` - The permission to use /skywelcome gui quit.
 ## Issues, Bugs, or Suggestions
-* Please create a new [Github Issue](https://github.com/lukesky19/SkyWelcome/issues) with your issue, bug, or suggestion.
+* Please create a new [GitHub Issue](https://github.com/lukesky19/SkyWelcome/issues) with your issue, bug, or suggestion.
 * If an issue or bug, please post any relevant logs containing errors related to SkyShop and your configuration files.
 * I will attempt to solve any issues or implement features to the best of my ability.
 ## FAQ

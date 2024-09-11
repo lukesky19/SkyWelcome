@@ -1,3 +1,4 @@
+config-version: 1.1.0
 options:
     # Locale
     # The name of the locale file to use in skywelcome/locale, minus the file extension (.yml)
@@ -12,12 +13,12 @@ join:
     # The first message will be used by default.
     0:
         permission: "skywelcome.join.default"
-        message: "<gray>[<gray><green>+</green><gray>]</gray> <papi:essentials_nickname></hover>"
+        message: "<gray>[<gray><green>+</green><gray>]</gray> <papi:essentials_nickname>"
 motd:
     contents:
-        - "Welcome to the server, %essentials_nickname%!"
+        - "Welcome to the server, <papi:essentials_nickname>!"
 quit:
     # The first message will be used by default.
     0:
         permission: "skywelcome.leave.default"
-        message: "<gray>[<gray><red>-</red><gray>]</gray> <papi:essentials_nickname></hover>"
+        message: "<gray>[<gray><red>-</red><gray>]</gray> <papi:essentials_nickname>"

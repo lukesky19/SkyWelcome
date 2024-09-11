@@ -17,23 +17,29 @@
 */
 package com.github.lukesky19.skywelcome.listeners;
 
+import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
+import com.github.lukesky19.skywelcome.util.FormatUtil;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class QuitListener implements Listener {
+    final SkyWelcome skyWelcome;
     final PlayerManager playerManager;
     final SettingsManager settingsManager;
     final LocaleManager localeManager;
 
     public QuitListener(
+            SkyWelcome skyWelcome,
             PlayerManager playerManager,
             SettingsManager settingsManager,
             LocaleManager localeManager) {
+        this.skyWelcome = skyWelcome;
         this.playerManager = playerManager;
         this.settingsManager = settingsManager;
         this.localeManager = localeManager;
@@ -41,11 +47,16 @@ public class QuitListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        if(skyWelcome.isPluginDisabled()) {
+            skyWelcome.getComponentLogger().warn(FormatUtil.format("<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>Unable to send join message for <yellow>" + MiniMessage.miniMessage().serialize(event.getPlayer().displayName()) + "</yellow> since the plugin is soft-disabled due to a configuration error.</red>"));
+            return;
+        }
+
         Settings settings = settingsManager.getSettings();
 
         if(settings.options().quits()) {
             if(playerManager.getPlayerSettings(event.getPlayer()).leaveMessage()) {
-                localeManager.sendLeaveMessage(event.getPlayer());
+                localeManager.sendQuitMessage(event.getPlayer());
             }
         }
     }
