@@ -7,7 +7,7 @@
 * Custom permissions per custom join and leave message.
 * Global toggle for join, leave, and MOTD messages.
 * HeadDatabaseAPI and PlaceholderAPI support.
-## Soft Dependencies
+## Dependencies
 * HeadDatabaseAPI
 * PlaceholderAPI
 ## Commands
