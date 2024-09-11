@@ -1,5 +1,5 @@
 /*
-    SkyShop is a simple inventory based shop plugin with page support, error checking, and configuration validation.
+    SkyWelcome allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
     Copyright (C) 2024  lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
@@ -15,16 +15,20 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skywelcome.util;
+package com.github.lukesky19.skywelcome.config.settings.legacy;
 
-import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.entity.Player;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
-/**
- * This class is used to parse placeholders from PlaceholderAPI.
-*/
-public class PlaceholderAPIUtil {
-    public static String parsePlaceholders(Player player, String str) {
-        return PlaceholderAPI.setPlaceholders(player, str);
-    }
+import java.util.List;
+
+@ConfigSerializable
+public record Settings(Join join, Motd motd, Quit quit) {
+    @ConfigSerializable
+    public record Join(String content) { }
+
+    @ConfigSerializable
+    public record Motd(List<String> contents) { }
+
+    @ConfigSerializable
+    public record Quit(String content) { }
 }

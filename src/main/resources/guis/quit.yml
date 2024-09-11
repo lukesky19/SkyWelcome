@@ -1,0 +1,159 @@
+config-version: 1.0.0
+placeholders:
+    selected:
+        material: GREEN_WOOL
+        lore:
+            - "<green>This is your current leave message.</green>"
+    available:
+        material: YELLOW_WOOL
+        lore:
+            - "<yellow>Click to change to this leave message.</yellow>"
+    no-permission:
+        material: RED_WOOL
+        lore:
+            - "<red>You do not have permission to use this leave message.</red>"
+gui:
+    size: 54
+    name: "Choose a Leave Message"
+    paged-settings:
+        x-offset: 1
+        y-offset: 1
+        length: 7
+        height: 4
+    background:
+        0:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            1:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            2:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            3:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            4:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            5:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            6:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            7:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+        1:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+        2:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+        3:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+        4:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+        5:
+            0:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            1:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            2:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            3:
+                type: PREV_PAGE
+                hdb-id: 516
+                name: "<white>Click to navigate to the previous page.</white>"
+                lore: [ ]
+            4:
+                type: RETURN
+                material: BARRIER
+                name: "<white>Click to exit this menu."
+                lore: [ ]
+            5:
+                type: NEXT_PAGE
+                hdb-id: 513
+                name: "<white>Click to navigate to the next page.</white>"
+                lore: [ ]
+            6:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            7:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]
+            8:
+                type: FILLER
+                material: GRAY_STAINED_GLASS_PANE
+                name: " "
+                lore: [ ]

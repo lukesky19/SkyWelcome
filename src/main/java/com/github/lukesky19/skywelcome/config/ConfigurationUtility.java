@@ -1,5 +1,5 @@
 /*
-    SkyShop is a graphical shop plugin.
+    SkyWelcome allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
     Copyright (C) 2024  lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify

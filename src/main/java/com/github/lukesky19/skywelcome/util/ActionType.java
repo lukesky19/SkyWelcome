@@ -15,32 +15,11 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skywelcome.config.settings;
+package com.github.lukesky19.skywelcome.util;
 
-import org.spongepowered.configurate.objectmapping.ConfigSerializable;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-
-@ConfigSerializable
-public record Settings(
-        String configVersion,
-        Options options,
-        LinkedHashMap<String, Join> join,
-        Motd motd,
-        LinkedHashMap<String, Quit> quit) {
-
-
-    @ConfigSerializable
-    public record Join(String permission, String message) { }
-
-    @ConfigSerializable
-    public record Motd(List<String> contents) { }
-
-    @ConfigSerializable
-    public record Quit(String permission, String message) { }
-
-    @ConfigSerializable
-    public record Options(String locale, Boolean joins, Boolean quits, Boolean motd) { }
+public enum ActionType {
+    FILLER,
+    RETURN,
+    NEXT_PAGE,
+    PREV_PAGE
 }
-

@@ -15,32 +15,33 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skywelcome.config.settings;
+package com.github.lukesky19.skywelcome.util;
 
-import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import com.github.lukesky19.skywelcome.SkyWelcome;
+import me.arcaniax.hdb.api.DatabaseLoadEvent;
+import me.arcaniax.hdb.api.HeadDatabaseAPI;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.LinkedHashMap;
-import java.util.List;
+import javax.annotation.CheckForNull;
 
-@ConfigSerializable
-public record Settings(
-        String configVersion,
-        Options options,
-        LinkedHashMap<String, Join> join,
-        Motd motd,
-        LinkedHashMap<String, Quit> quit) {
+public class HeadDatabaseUtil implements Listener {
+    final SkyWelcome skyWelcome;
+    static HeadDatabaseAPI hdbApi;
 
+    public HeadDatabaseUtil(SkyWelcome skyWelcome) {
+        this.skyWelcome = skyWelcome;
+    }
 
-    @ConfigSerializable
-    public record Join(String permission, String message) { }
+    @EventHandler
+    public void onDatabaseLoad(DatabaseLoadEvent e) {
+        hdbApi = new HeadDatabaseAPI();
+        skyWelcome.postHeadDatabaseAPI();
+    }
 
-    @ConfigSerializable
-    public record Motd(List<String> contents) { }
-
-    @ConfigSerializable
-    public record Quit(String permission, String message) { }
-
-    @ConfigSerializable
-    public record Options(String locale, Boolean joins, Boolean quits, Boolean motd) { }
+    @CheckForNull
+    public static ItemStack getSkullItem(String id) {
+        return hdbApi.getItemHead(id);
+    }
 }
-
