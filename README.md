@@ -1,6 +1,6 @@
 # SkyWelcome
 ## Description
-* A plugin that allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
+* A plugin that offers toggleable join, leave, and motd messages, the ability to custom join and leave messages, and welcome rewards.
 
 ## Features
 * Player togglable join, leave, and MOTD messages.
@@ -8,6 +8,7 @@
 * Custom permissions per custom join and leave message.
 * Global toggle for join, leave, and MOTD messages.
 * HeadDatabaseAPI and PlaceholderAPI support.
+* Welcome rewards for saying "welcome" to a new player.
 
 ## Dependencies
 * HeadDatabaseAPI
