@@ -17,36 +17,33 @@
 */
 package com.github.lukesky19.skywelcome.config.locale;
 
+import com.github.lukesky19.skylib.config.ConfigurationUtility;
+import com.github.lukesky19.skylib.format.FormatUtil;
+import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
+import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
 import com.github.lukesky19.skywelcome.SkyWelcome;
-import com.github.lukesky19.skywelcome.config.ConfigurationUtility;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerSettings;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
-import com.github.lukesky19.skywelcome.util.FormatUtil;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
-import org.spongepowered.configurate.ConfigurateException;
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
 import java.nio.file.Path;
 
 public class LocaleManager {
-    final SkyWelcome skyWelcome;
-    final ConfigurationUtility configurationUtility;
-    final SettingsManager settingsManager;
-    final PlayerManager playerManager;
-    Locale locale;
+    private final SkyWelcome skyWelcome;
+    private final SettingsManager settingsManager;
+    private final PlayerManager playerManager;
+    private Locale locale;
 
     public LocaleManager(
             SkyWelcome skyWelcome,
-            ConfigurationUtility configurationUtility,
             SettingsManager settingsManager,
             PlayerManager playerManager) {
         this.skyWelcome = skyWelcome;
-        this.configurationUtility = configurationUtility;
         this.settingsManager = settingsManager;
         this.playerManager = playerManager;
     }
@@ -72,7 +69,7 @@ public class LocaleManager {
                         + File.separator
                         + settingsManager.getSettings().options().locale()
                         + ".yml");
-        YamlConfigurationLoader loader = configurationUtility.getYamlConfigurationLoader(path);
+        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
 
         try {
             locale = loader.load().get(Locale.class);

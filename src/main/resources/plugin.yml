@@ -4,10 +4,12 @@ main: com.github.lukesky19.skywelcome.SkyWelcome
 api-version: '1.21'
 load: STARTUP
 author: lukeskywlker19
-depend: [HeadDatabase, PlaceholderAPI]
+depend: [SkyLib, HeadDatabase]
 commands:
     skywelcome:
         description: The base command.
+        aliases:
+            - welcome
 permissions:
     skywelcome.command.reload:
         description: Permission to reload the plugin.
@@ -35,4 +37,7 @@ permissions:
         default: op
     skywelcome.command.gui.leave:
         description: Permission to open the leave message selection GUI.
+        default: op
+    skywelcome.invulnerable:
+        description: Permission to make the player invulnerable on login.
         default: op

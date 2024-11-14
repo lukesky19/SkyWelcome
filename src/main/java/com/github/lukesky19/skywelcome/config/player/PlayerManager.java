@@ -17,29 +17,27 @@
 */
 package com.github.lukesky19.skywelcome.config.player;
 
+import com.github.lukesky19.skylib.config.ConfigurationUtility;
+import com.github.lukesky19.skylib.libs.configurate.CommentedConfigurationNode;
+import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
+import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
 import com.github.lukesky19.skywelcome.SkyWelcome;
-import com.github.lukesky19.skywelcome.config.ConfigurationUtility;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
-import org.spongepowered.configurate.CommentedConfigurationNode;
-import org.spongepowered.configurate.ConfigurateException;
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.UUID;
 
 public class PlayerManager {
-    final SkyWelcome skyWelcome;
-    final ConfigurationUtility configurationUtility;
-    final SettingsManager settingsManager;
+    private final SkyWelcome skyWelcome;
+    private final SettingsManager settingsManager;
 
-    public PlayerManager(SkyWelcome skyWelcome, ConfigurationUtility configurationUtility, SettingsManager settingsManager) {
+    public PlayerManager(SkyWelcome skyWelcome, SettingsManager settingsManager) {
         this.skyWelcome = skyWelcome;
-        this.configurationUtility = configurationUtility;
         this.settingsManager = settingsManager;
     }
 
@@ -52,7 +50,7 @@ public class PlayerManager {
         PlayerSettings playerSettings = null;
         Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "playerdata" + File.separator + player.getUniqueId() + ".yml");
 
-        YamlConfigurationLoader loader = configurationUtility.getYamlConfigurationLoader(path);
+        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
         try {
             playerSettings = loader.load().get(PlayerSettings.class);
         } catch (ConfigurateException ignored) { }
@@ -103,7 +101,7 @@ public class PlayerManager {
 
     public void savePlayerSettings(Player player, PlayerSettings playerSettings) {
         Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "playerdata" + File.separator + player.getUniqueId() + ".yml");
-        YamlConfigurationLoader loader = configurationUtility.getYamlConfigurationLoader(path);
+        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
 
         CommentedConfigurationNode playerNode = loader.createNode();
         try {

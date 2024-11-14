@@ -17,15 +17,15 @@
 */
 package com.github.lukesky19.skywelcome.config.gui;
 
+import com.github.lukesky19.skylib.config.ConfigurationUtility;
+import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
+import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
 import com.github.lukesky19.skywelcome.SkyWelcome;
-import com.github.lukesky19.skywelcome.config.ConfigurationUtility;
-import com.github.lukesky19.skywelcome.util.ActionType;
+import com.github.lukesky19.skywelcome.enums.ActionType;
 import com.github.lukesky19.skywelcome.util.HeadDatabaseUtil;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
-import org.spongepowered.configurate.ConfigurateException;
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -34,13 +34,11 @@ import java.util.Map;
 
 public class GUIManager {
     final SkyWelcome skyWelcome;
-    final ConfigurationUtility configurationUtility;
     GUISettings joinConfig;
     GUISettings quitConfig;
 
-    public GUIManager(SkyWelcome skyWelcome, ConfigurationUtility configurationUtility) {
+    public GUIManager(SkyWelcome skyWelcome) {
         this.skyWelcome = skyWelcome;
-        this.configurationUtility = configurationUtility;
     }
 
     public GUISettings getJoinGUIConfig() {
@@ -72,12 +70,12 @@ public class GUIManager {
             return;
         }
 
-        loader = configurationUtility.getYamlConfigurationLoader(joinPath);
+        loader = ConfigurationUtility.getYamlConfigurationLoader(joinPath);
         try {
             joinConfig = loader.load().get(GUISettings.class);
         } catch (ConfigurateException ignored) { }
 
-        loader = configurationUtility.getYamlConfigurationLoader(quitPath);
+        loader = ConfigurationUtility.getYamlConfigurationLoader(quitPath);
         try {
             quitConfig = loader.load().get(GUISettings.class);
         } catch (ConfigurateException ignored) { }

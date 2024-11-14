@@ -1,4 +1,4 @@
-config-version: 1.0.0
+config-version: 1.1.0
 prefix: "<gray>[</gray><aqua><bold>SkyWelcome</bold></aqua><gray>]</gray> "
 help:
     - "<aqua>SkyWelcome is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>"

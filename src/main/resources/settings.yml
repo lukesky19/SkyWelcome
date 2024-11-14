@@ -1,4 +1,4 @@
-config-version: 1.1.0
+config-version: 1.2.0
 options:
     # Locale
     # The name of the locale file to use in skywelcome/locale, minus the file extension (.yml)
@@ -22,3 +22,15 @@ quit:
     0:
         permission: "skywelcome.leave.default"
         message: "<gray>[<gray><red>-</red><gray>]</gray> <papi:essentials_nickname>"
+welcome-rewards:
+    enabled: true
+    # ITEM, CASH, COMMANDS
+    type: CASH
+    cash: 50
+    item:
+        material: DIAMOND
+        amount: 1
+    commands:
+        - "give %player_name% emerald 1"
+    messages:
+        - "<aqua>Thanks for welcoming a new player. Enjoy this reward: <green>$50</green></aqua>"

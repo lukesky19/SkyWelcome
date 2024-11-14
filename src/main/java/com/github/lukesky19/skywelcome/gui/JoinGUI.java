@@ -17,14 +17,14 @@
 */
 package com.github.lukesky19.skywelcome.gui;
 
-import com.github.lukesky19.skywelcome.config.gui.GUISettings;
+import com.github.lukesky19.skylib.format.FormatUtil;
 import com.github.lukesky19.skywelcome.config.gui.GUIManager;
+import com.github.lukesky19.skywelcome.config.gui.GUISettings;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerSettings;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
-import com.github.lukesky19.skywelcome.util.ActionType;
-import com.github.lukesky19.skywelcome.util.FormatUtil;
+import com.github.lukesky19.skywelcome.enums.ActionType;
 import com.github.lukesky19.skywelcome.util.HeadDatabaseUtil;
 import com.github.stefvanschie.inventoryframework.adventuresupport.ComponentHolder;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
@@ -62,6 +62,7 @@ public class JoinGUI {
 
         joinGUI = new ChestGui(GUISettings.gui().size() / 9, ComponentHolder.of(FormatUtil.format(player, GUISettings.gui().name())));
 
+        // TODO Background Pane doesn't match GUI size
         background = new StaticPane(0, 0, 9, 6);
         pages = new PaginatedPane(
                 GUISettings.gui().pagedSettings().xOffset(),
