@@ -17,13 +17,13 @@
 */
 package com.github.lukesky19.skywelcome.commands;
 
+import com.github.lukesky19.skylib.format.FormatUtil;
 import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.locale.Locale;
 import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.gui.JoinGUI;
 import com.github.lukesky19.skywelcome.gui.QuitGUI;
-import com.github.lukesky19.skywelcome.util.FormatUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

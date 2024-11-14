@@ -17,30 +17,44 @@
 */
 package com.github.lukesky19.skywelcome;
 
+import com.github.lukesky19.skylib.libs.bstats.bukkit.Metrics;
 import com.github.lukesky19.skywelcome.commands.SkyWelcomeCommand;
-import com.github.lukesky19.skywelcome.config.ConfigurationUtility;
 import com.github.lukesky19.skywelcome.config.gui.GUIManager;
 import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
 import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import com.github.lukesky19.skywelcome.gui.JoinGUI;
 import com.github.lukesky19.skywelcome.gui.QuitGUI;
-import com.github.lukesky19.skywelcome.listeners.JoinListener;
-import com.github.lukesky19.skywelcome.listeners.QuitListener;
+import com.github.lukesky19.skywelcome.listener.JoinListener;
+import com.github.lukesky19.skywelcome.listener.QuitListener;
+import com.github.lukesky19.skywelcome.listener.RewardListener;
+import com.github.lukesky19.skywelcome.manager.RewardManager;
 import com.github.lukesky19.skywelcome.util.HeadDatabaseUtil;
-import org.bstats.bukkit.Metrics;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
 public class SkyWelcome extends JavaPlugin {
-    ConfigurationUtility configurationUtility;
     SettingsManager settingsManager;
     PlayerManager playerManager;
     LocaleManager localeManager;
+    RewardManager rewardManager;
     GUIManager GUIManager;
+    JoinListener joinListener;
     boolean pluginState;
+
+    Economy economy;
+
+    /**
+     * @return The server's economy.
+     */
+    public Economy getEconomy() {
+        return this.economy;
+    }
 
     public void setPluginState(boolean pluginState) {
         this.pluginState = pluginState;
@@ -54,17 +68,21 @@ public class SkyWelcome extends JavaPlugin {
     public void onEnable() {
         // Set up bstats
         setupBStats();
+        // Set up Economy
+        setupEconomy();
 
         // Initialize Classes
-        configurationUtility = new ConfigurationUtility(this);
-        settingsManager = new SettingsManager(this, configurationUtility);
-        playerManager = new PlayerManager(this, configurationUtility, settingsManager);
-        localeManager = new LocaleManager(this, configurationUtility, settingsManager, playerManager);
+        settingsManager = new SettingsManager(this);
+        playerManager = new PlayerManager(this, settingsManager);
+        localeManager = new LocaleManager(this, settingsManager, playerManager);
+        rewardManager = new RewardManager(this, settingsManager, localeManager);
+        joinListener = new JoinListener(this, playerManager, settingsManager, localeManager);
 
         // Register Listeners
         this.getServer().getPluginManager().registerEvents(new HeadDatabaseUtil(this), this);
-        this.getServer().getPluginManager().registerEvents(new JoinListener(this, playerManager, settingsManager, localeManager), this);
+        this.getServer().getPluginManager().registerEvents(joinListener, this);
         this.getServer().getPluginManager().registerEvents(new QuitListener(this, playerManager, settingsManager, localeManager), this);
+        this.getServer().getPluginManager().registerEvents(new RewardListener(rewardManager), this);
     }
 
     public void reload() {
@@ -72,6 +90,8 @@ public class SkyWelcome extends JavaPlugin {
         settingsManager.reload();
         localeManager.reload();
         GUIManager.reload();
+        rewardManager.reload();
+        joinListener.reload();
     }
 
     /**
@@ -83,7 +103,7 @@ public class SkyWelcome extends JavaPlugin {
     }
 
     public void postHeadDatabaseAPI() {
-        GUIManager = new GUIManager(this, configurationUtility);
+        GUIManager = new GUIManager(this);
         SkyWelcomeCommand skyWelcomeCommand = new SkyWelcomeCommand(
                 this, playerManager, localeManager,
                 new JoinGUI(settingsManager, playerManager, GUIManager),
@@ -94,5 +114,20 @@ public class SkyWelcome extends JavaPlugin {
         Objects.requireNonNull(Bukkit.getPluginCommand("skywelcome")).setTabCompleter(skyWelcomeCommand);
 
         reload();
+    }
+
+    /**
+     * Checks for Vault as a dependency and sets up the Economy instance.
+     */
+    private void setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+            if (rsp != null) {
+                this.economy = rsp.getProvider();
+            }
+        } else {
+            getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>SkyWelcome has been disabled due to no Vault dependency found!</red>"));
+            getServer().getPluginManager().disablePlugin(this);
+        }
     }
 }

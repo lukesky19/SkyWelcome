@@ -17,33 +17,29 @@
 */
 package com.github.lukesky19.skywelcome.config.settings;
 
+import com.github.lukesky19.skylib.config.ConfigurationUtility;
+import com.github.lukesky19.skylib.format.FormatUtil;
+import com.github.lukesky19.skylib.libs.configurate.CommentedConfigurationNode;
+import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
+import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
 import com.github.lukesky19.skywelcome.SkyWelcome;
-import com.github.lukesky19.skywelcome.config.ConfigurationUtility;
+import com.github.lukesky19.skywelcome.enums.RewardType;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.configurate.CommentedConfigurationNode;
-import org.spongepowered.configurate.ConfigurateException;
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SettingsManager {
-    final SkyWelcome skyWelcome;
-    final ConfigurationUtility configurationUtility;
-    Settings settings;
+    private final SkyWelcome skyWelcome;
+    private Settings settings;
 
-    public SettingsManager(SkyWelcome skyWelcome, ConfigurationUtility configurationUtility) {
+    public SettingsManager(SkyWelcome skyWelcome) {
         this.skyWelcome = skyWelcome;
-        this.configurationUtility = configurationUtility;
     }
 
     public Settings getSettings() {
@@ -60,7 +56,7 @@ public class SettingsManager {
             skyWelcome.saveResource("settings.yml", false);
         }
 
-        YamlConfigurationLoader loader = configurationUtility.getYamlConfigurationLoader(path);
+        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
         try {
             settings = loader.load().get(Settings.class);
         } catch (ConfigurateException ignored) {}
@@ -72,27 +68,27 @@ public class SettingsManager {
     private void validateSettings() {
         ComponentLogger logger = skyWelcome.getComponentLogger();
         if(settings == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>Failed to load <yellow>settings.yml</yellow>.</red>"));
+            logger.error(FormatUtil.format("<red>Failed to load <yellow>settings.yml</yellow>.</red>"));
             skyWelcome.setPluginState(false);
             return;
         }
 
         if(settings.configVersion() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>config-version</yellow> setting in <yellow>settings.yml</yellow> does exist.</red>"));
-            logger.error(MiniMessage.miniMessage().deserialize("<red>This means your config did not migrate properly or you modified the config-version setting.</red>"));
+            logger.error(FormatUtil.format("<red>The <yellow>config-version</yellow> setting in <yellow>settings.yml</yellow> does exist.</red>"));
+            logger.error(FormatUtil.format("<red>This means your config did not migrate properly or you modified the config-version setting.</red>"));
             skyWelcome.setPluginState(false);
             return;
         }
 
         Settings.Options options = settings.options();
         if(options == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The options configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
+            logger.error(FormatUtil.format("<red>The options configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
             skyWelcome.setPluginState(false);
             return;
         }
 
         if(options.locale() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>locale</yellow> setting in <yellow>settings.yml</yellow> is invalid.</red>"));
+            logger.error(FormatUtil.format("<red>The <yellow>locale</yellow> setting in <yellow>settings.yml</yellow> is invalid.</red>"));
             skyWelcome.setPluginState(false);
             return;
         }
@@ -105,25 +101,25 @@ public class SettingsManager {
                         + options.locale()
                         + ".yml");
         if(Files.notExists(path)) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>locale</yellow> setting under <yellow>options</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
+            logger.error(FormatUtil.format("<red>The <yellow>locale</yellow> setting under <yellow>options</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
             skyWelcome.setPluginState(false);
             return;
         }
 
         if(options.joins() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>joins</yellow> setting under <yellow>options</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
+            logger.error(FormatUtil.format("<red>The <yellow>joins</yellow> setting under <yellow>options</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
             skyWelcome.setPluginState(false);
             return;
         }
 
         if(options.quits() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>quits</yellow> setting under <yellow>options</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
+            logger.error(FormatUtil.format("<red>The <yellow>quits</yellow> setting under <yellow>options</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
             skyWelcome.setPluginState(false);
             return;
         }
 
         if(options.motd() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>motd</yellow> setting under <yellow>options</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
+            logger.error(FormatUtil.format("<red>The <yellow>motd</yellow> setting under <yellow>options</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
             skyWelcome.setPluginState(false);
             return;
         }
@@ -133,19 +129,19 @@ public class SettingsManager {
             Settings.Join joinSettings = entry.getValue();
 
             if(joinSettings == null) {
-                logger.error(MiniMessage.miniMessage().deserialize("<red>The join configuration of id <yellow> " + id + " </yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
+                logger.error(FormatUtil.format("<red>The join configuration of id <yellow> " + id + " </yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
                 skyWelcome.setPluginState(false);
                 return;
             }
 
             if(joinSettings.permission() == null) {
-                logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>permission</yellow> for the join configuration of id <yellow>" + id + "</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
+                logger.error(FormatUtil.format("<red>The <yellow>permission</yellow> for the join configuration of id <yellow>" + id + "</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
                 skyWelcome.setPluginState(false);
                 return;
             }
 
             if(joinSettings.message() == null) {
-                logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>message</yellow> for the join configuration of id <yellow>" + id + "</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
+                logger.error(FormatUtil.format("<red>The <yellow>message</yellow> for the join configuration of id <yellow>" + id + "</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
                 skyWelcome.setPluginState(false);
                 return;
             }
@@ -153,14 +149,14 @@ public class SettingsManager {
 
         Settings.Motd motdSettings = settings.motd();
         if(motdSettings == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The motd configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
+            logger.error(FormatUtil.format("<red>The motd configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
             skyWelcome.setPluginState(false);
             return;
         }
 
         for(String string : motdSettings.contents()) {
             if(string == null) {
-                logger.error(MiniMessage.miniMessage().deserialize("<red>A String in the <yellow>contents</yellow> of the motd configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
+                logger.error(FormatUtil.format("<red>A String in the <yellow>contents</yellow> of the motd configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
                 skyWelcome.setPluginState(false);
                 return;
             }
@@ -171,63 +167,136 @@ public class SettingsManager {
             Settings.Quit quitSettings = entry.getValue();
 
             if(quitSettings == null) {
-                logger.error(MiniMessage.miniMessage().deserialize("<red>The quit configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
+                logger.error(FormatUtil.format("<red>The quit configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
                 skyWelcome.setPluginState(false);
                 return;
             }
 
             if(quitSettings.permission() == null) {
-                logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>permission</yellow> for the quit configuration of id <yellow>" + id + "</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
+                logger.error(FormatUtil.format("<red>The <yellow>permission</yellow> for the quit configuration of id <yellow>" + id + "</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
                 skyWelcome.setPluginState(false);
                 return;
             }
 
             if(quitSettings.message() == null) {
-                logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>message</yellow> for the join configuration of id <yellow>" + id + "</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
+                logger.error(FormatUtil.format("<red>The <yellow>message</yellow> for the join configuration of id <yellow>" + id + "</yellow> in <yellow>settings.yml</yellow> is invalid.</red>"));
                 skyWelcome.setPluginState(false);
                 return;
             }
         }
-    }
 
-    private void migrateSettings() {
-        if(settings.configVersion() == null) {
-            com.github.lukesky19.skywelcome.config.settings.legacy.Settings legacySettings;
-            Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "settings.yml");
-            YamlConfigurationLoader loader = configurationUtility.getYamlConfigurationLoader(path);
-            try {
-                legacySettings = loader.load().get(com.github.lukesky19.skywelcome.config.settings.legacy.Settings.class);
-            } catch (ConfigurateException e) {
-                throw new RuntimeException(e);
-            }
+        if(settings.welcomeRewards() == null) {
+            logger.error(FormatUtil.format("<red>The <yellow>welcome-rewards</yellow> configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
 
-            assert legacySettings != null;
-            Settings newSettings = createNewSettings(legacySettings);
+        RewardType type = RewardType.getType(settings.welcomeRewards().type());
+        if(type == null) {
+            logger.error(FormatUtil.format("<red>The <yellow>type</yellow> for the <yellow>welcome-rewards</yellow> configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
 
-            CommentedConfigurationNode node = loader.createNode();
-            try {
-                node.set(newSettings);
-                loader.save(node);
-                settings = newSettings;
-            } catch (ConfigurateException e) {
-                throw new RuntimeException(e);
-            }
+        if(type.equals(RewardType.ITEM) && settings.welcomeRewards().item() == null) {
+            logger.error(FormatUtil.format("<red>The <yellow>cash</yellow> for the <yellow>welcome-rewards</yellow> configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(type.equals(RewardType.CASH) && settings.welcomeRewards().cash() == null) {
+            logger.error(FormatUtil.format("<red>The <yellow>cash</yellow> for the <yellow>welcome-rewards</yellow> configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+            return;
+        }
+
+        if(type.equals(RewardType.COMMANDS) && settings.welcomeRewards().commands() == null) {
+            logger.error(FormatUtil.format("<red>The <yellow>commands</yellow> for the <yellow>welcome-rewards</yellow> configuration in <yellow>settings.yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
         }
     }
 
-    private static @NotNull Settings createNewSettings(com.github.lukesky19.skywelcome.config.settings.legacy.Settings legacySettings) {
+    private void migrateSettings() {
+        Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "settings.yml");
+        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
+
+        switch(settings.configVersion()) {
+            case "1.2.0" -> {
+                // Current Version, do nothing
+            }
+
+            case "1.1.0" -> {
+                Settings oldSettings;
+                try {
+                    oldSettings = loader.load().get(Settings.class);
+                } catch (ConfigurateException e) {
+                    throw new RuntimeException(e);
+                }
+
+                Settings newSettings = updateSettings(Objects.requireNonNull(oldSettings));
+                CommentedConfigurationNode node = loader.createNode();
+                try {
+                    node.set(newSettings);
+                    loader.save(node);
+                    settings = newSettings;
+                } catch (ConfigurateException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            case null -> {
+                com.github.lukesky19.skywelcome.config.settings.legacy.Settings legacySettings;
+                try {
+                    legacySettings = loader.load().get(com.github.lukesky19.skywelcome.config.settings.legacy.Settings.class);
+                } catch (ConfigurateException e) {
+                    throw new RuntimeException(e);
+                }
+
+                assert legacySettings != null;
+                Settings newSettings = migrateLegacySettings(legacySettings);
+
+                CommentedConfigurationNode node = loader.createNode();
+                try {
+                    node.set(newSettings);
+                    loader.save(node);
+                    settings = newSettings;
+                } catch (ConfigurateException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            default -> throw new IllegalStateException("Unexpected value: " + settings.configVersion());
+        }
+    }
+
+    private static @NotNull Settings updateSettings(Settings oldSettings) {
+        ArrayList<String> rewardCommands = new ArrayList<>();
+        ArrayList<String> rewardMessages = new ArrayList<>();
+        rewardCommands.add("give %player_name% emerald 1");
+        rewardMessages.add("<aqua>Thanks for welcoming a new player. Enjoy this reward: $50</aqua>");
+
+        return new Settings("1.2.0", oldSettings.options(), oldSettings.join(), oldSettings.motd(), oldSettings.quit(), new Settings.WelcomeRewards(true,"CASH", 50.0, new Settings.Item("DIAMOND", 1), rewardCommands, rewardMessages));
+    }
+
+    private static @NotNull Settings migrateLegacySettings(com.github.lukesky19.skywelcome.config.settings.legacy.Settings legacySettings) {
         LinkedHashMap<String, Settings.Join> joinMap = new LinkedHashMap<>();
         LinkedHashMap<String, Settings.Quit> quitMap = new LinkedHashMap<>();
         joinMap.put("0", new Settings.Join("skywelcome.join.default", migratePlaceholderAPIFormat(legacySettings.join().content())));
         quitMap.put("0", new Settings.Quit("skywelcome.quit.default", migratePlaceholderAPIFormat(legacySettings.quit().content())));
 
+        ArrayList<String> rewardCommands = new ArrayList<>();
+        ArrayList<String> rewardMessages = new ArrayList<>();
+        rewardCommands.add("give %player_name% emerald 1");
+        rewardMessages.add("<aqua>Thanks for welcoming a new player. Enjoy this reward: $50</aqua>");
+
         List<String> motdList = new ArrayList<>();
         for(String msg : legacySettings.motd().contents()) {
             motdList.add(migratePlaceholderAPIFormat(msg));
         }
+
         Settings.Motd motdSettings = new Settings.Motd(motdList);
 
-        return new Settings("1.1.0", new Settings.Options("en_US", true, true, true), joinMap, motdSettings, quitMap);
+        return new Settings("1.2.0", new Settings.Options("en_US", true, true, true), joinMap, motdSettings, quitMap, new Settings.WelcomeRewards(true,"CASH", 50.0, new Settings.Item("DIAMOND", 1), rewardCommands, rewardMessages));
     }
 
     /**

@@ -17,7 +17,7 @@
 */
 package com.github.lukesky19.skywelcome.config.settings.legacy;
 
-import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
 
 import java.util.List;
 

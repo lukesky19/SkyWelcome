@@ -17,7 +17,7 @@
 */
 package com.github.lukesky19.skywelcome.config.settings;
 
-import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,8 +28,8 @@ public record Settings(
         Options options,
         LinkedHashMap<String, Join> join,
         Motd motd,
-        LinkedHashMap<String, Quit> quit) {
-
+        LinkedHashMap<String, Quit> quit,
+        WelcomeRewards welcomeRewards) {
 
     @ConfigSerializable
     public record Join(String permission, String message) { }
@@ -42,5 +42,11 @@ public record Settings(
 
     @ConfigSerializable
     public record Options(String locale, Boolean joins, Boolean quits, Boolean motd) { }
+
+    @ConfigSerializable
+    public record WelcomeRewards(Boolean enabled, String type, Double cash, Item item, List<String> commands, List<String> messages) {}
+
+    @ConfigSerializable
+    public record Item(String material, Integer amount) {}
 }
 

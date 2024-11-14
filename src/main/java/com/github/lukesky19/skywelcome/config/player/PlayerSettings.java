@@ -17,7 +17,7 @@
 */
 package com.github.lukesky19.skywelcome.config.player;
 
-import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
 
 @ConfigSerializable
 public record PlayerSettings(
@@ -26,4 +26,4 @@ public record PlayerSettings(
         Boolean leaveMessage,
         Boolean motd,
         String selectedJoinMessage,
-        String selectedLeaveMessage) { }
+        String selectedLeaveMessage) {}
