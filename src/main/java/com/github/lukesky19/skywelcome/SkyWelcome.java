@@ -82,7 +82,7 @@ public class SkyWelcome extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new HeadDatabaseUtil(this), this);
         this.getServer().getPluginManager().registerEvents(joinListener, this);
         this.getServer().getPluginManager().registerEvents(new QuitListener(this, playerManager, settingsManager, localeManager), this);
-        this.getServer().getPluginManager().registerEvents(new RewardListener(rewardManager), this);
+        this.getServer().getPluginManager().registerEvents(new RewardListener(this, settingsManager, localeManager, rewardManager), this);
     }
 
     public void reload() {

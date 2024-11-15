@@ -19,6 +19,7 @@ package com.github.lukesky19.skywelcome.config.locale;
 
 import com.github.lukesky19.skylib.config.ConfigurationUtility;
 import com.github.lukesky19.skylib.format.FormatUtil;
+import com.github.lukesky19.skylib.libs.configurate.CommentedConfigurationNode;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
 import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
 import com.github.lukesky19.skywelcome.SkyWelcome;
@@ -75,6 +76,7 @@ public class LocaleManager {
             locale = loader.load().get(Locale.class);
         } catch (ConfigurateException ignored) { }
 
+        migrateLocale();
         validateLocale();
     }
 
@@ -204,6 +206,59 @@ public class LocaleManager {
         if(locale.motdDisabled() == null) {
             logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>motd-disabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
             skyWelcome.setPluginState(false);
+            return;
+        }
+
+
+        if(locale.welcomeBroadcast() == null) {
+            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>welcome-broadcast</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
+            skyWelcome.setPluginState(false);
+        }
+    }
+
+    private void migrateLocale() {
+        switch(locale.configVersion()) {
+            case "1.2.0" -> {
+                // Latest version, do nothing.
+            }
+
+            case "1.1.0" -> {
+                Locale newLocale = new Locale(
+                        "1.2.0",
+                        locale.prefix(),
+                        locale.help(),
+                        locale.playerOnly(),
+                        locale.reload(),
+                        locale.noPermission(),
+                        locale.unknownCommand(),
+                        locale.joinEnabled(),
+                        locale.joinDisabled(),
+                        locale.quitEnabled(),
+                        locale.quitDisabled(),
+                        locale.motdEnabled(),
+                        locale.motdDisabled(),
+                        "<aqua><white><welcome_player></white> welcomed <white><new_player></white> to the server!</aqua>");
+
+                Path path = Path.of(
+                        skyWelcome.getDataFolder()
+                                + File.separator
+                                + "locale"
+                                + File.separator
+                                + settingsManager.getSettings().options().locale()
+                                + ".yml");
+                YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
+
+                CommentedConfigurationNode node = loader.createNode();
+                try {
+                    node.set(newLocale);
+                    loader.save(node);
+                    locale = newLocale;
+                } catch (ConfigurateException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            default -> throw new IllegalStateException("Unexpected value: " + locale.configVersion());
         }
     }
 }
