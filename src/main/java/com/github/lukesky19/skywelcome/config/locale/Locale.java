@@ -35,4 +35,5 @@ public record Locale(
         String quitEnabled,
         String quitDisabled,
         String motdEnabled,
-        String motdDisabled) { }
+        String motdDisabled,
+        String welcomeBroadcast) { }
