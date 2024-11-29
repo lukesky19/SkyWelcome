@@ -221,8 +221,27 @@ public class SettingsManager {
         YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
 
         switch(settings.configVersion()) {
-            case "1.2.0" -> {
+            case "1.3.0" -> {
                 // Current Version, do nothing
+            }
+
+            case "1.2.0" -> {
+                Settings oldSettings;
+                try {
+                    oldSettings = loader.load().get(Settings.class);
+                } catch (ConfigurateException e) {
+                    throw new RuntimeException(e);
+                }
+
+                Settings newSettings = updateSettings120To130(Objects.requireNonNull(oldSettings));
+                CommentedConfigurationNode node = loader.createNode();
+                try {
+                    node.set(newSettings);
+                    loader.save(node);
+                    settings = newSettings;
+                } catch (ConfigurateException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             case "1.1.0" -> {
@@ -233,7 +252,7 @@ public class SettingsManager {
                     throw new RuntimeException(e);
                 }
 
-                Settings newSettings = updateSettings(Objects.requireNonNull(oldSettings));
+                Settings newSettings = updateSettings110To130(Objects.requireNonNull(oldSettings));
                 CommentedConfigurationNode node = loader.createNode();
                 try {
                     node.set(newSettings);
@@ -269,13 +288,24 @@ public class SettingsManager {
         }
     }
 
-    private static @NotNull Settings updateSettings(Settings oldSettings) {
+    private static @NotNull Settings updateSettings120To130(Settings oldSettings) {
+        return new Settings("1.3.0", oldSettings.options(), oldSettings.join(), oldSettings.motd(),
+                oldSettings.quit(), new Settings.WelcomeRewards(oldSettings.welcomeRewards().enabled(),
+                false, oldSettings.welcomeRewards().type(), oldSettings.welcomeRewards().cash(),
+                oldSettings.welcomeRewards().item(), oldSettings.welcomeRewards().commands(),
+                oldSettings.welcomeRewards().messages()));
+    }
+
+
+    private static @NotNull Settings updateSettings110To130(Settings oldSettings) {
         ArrayList<String> rewardCommands = new ArrayList<>();
         ArrayList<String> rewardMessages = new ArrayList<>();
         rewardCommands.add("give %player_name% emerald 1");
         rewardMessages.add("<aqua>Thanks for welcoming a new player. Enjoy this reward: $50</aqua>");
 
-        return new Settings("1.2.0", oldSettings.options(), oldSettings.join(), oldSettings.motd(), oldSettings.quit(), new Settings.WelcomeRewards(true,"CASH", 50.0, new Settings.Item("DIAMOND", 1), rewardCommands, rewardMessages));
+        return new Settings("1.2.0", oldSettings.options(), oldSettings.join(), oldSettings.motd(),
+                oldSettings.quit(), new Settings.WelcomeRewards(true, false,"CASH",
+                50.0, new Settings.Item("DIAMOND", 1), rewardCommands, rewardMessages));
     }
 
     private static @NotNull Settings migrateLegacySettings(com.github.lukesky19.skywelcome.config.settings.legacy.Settings legacySettings) {
@@ -296,7 +326,7 @@ public class SettingsManager {
 
         Settings.Motd motdSettings = new Settings.Motd(motdList);
 
-        return new Settings("1.2.0", new Settings.Options("en_US", true, true, true), joinMap, motdSettings, quitMap, new Settings.WelcomeRewards(true,"CASH", 50.0, new Settings.Item("DIAMOND", 1), rewardCommands, rewardMessages));
+        return new Settings("1.3.0", new Settings.Options("en_US", true, true, true), joinMap, motdSettings, quitMap, new Settings.WelcomeRewards(true, false,"CASH", 50.0, new Settings.Item("DIAMOND", 1), rewardCommands, rewardMessages));
     }
 
     /**
