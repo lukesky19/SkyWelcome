@@ -1,4 +1,4 @@
-config-version: 1.2.0
+config-version: 1.3.0
 options:
     # Locale
     # The name of the locale file to use in skywelcome/locale, minus the file extension (.yml)
@@ -24,6 +24,8 @@ quit:
         message: "<gray>[<gray><red>-</red><gray>]</gray> <papi:essentials_nickname>"
 welcome-rewards:
     enabled: true
+    # Should players who welcome a new player who has logged out be rewarded?
+    reward-offline-joins: false
     # ITEM, CASH, COMMANDS
     type: CASH
     cash: 50

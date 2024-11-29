@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,8 @@ public class RewardListener implements Listener {
             String message = PlainTextComponentSerializer.plainText().serialize(event.message()).toLowerCase();
             if(message.contains("welcome")) {
                 reward = false;
+                newPlayerName = null;
+
                 rewardManager.giveReward(event.getPlayer());
 
                 Locale locale = localeManager.getLocale();
@@ -59,13 +62,21 @@ public class RewardListener implements Listener {
     }
 
     @EventHandler
-    public void onNewPlayer(PlayerJoinEvent event) {
+    public void onNewPlayerJoin(PlayerJoinEvent event) {
         if(skyWelcome.isPluginDisabled()) return;
         if(!settingsManager.getSettings().welcomeRewards().enabled()) return;
 
         if(!event.getPlayer().hasPlayedBefore()) {
             reward = true;
             newPlayerName = event.getPlayer().getName();
+        }
+    }
+
+    @EventHandler
+    public void onNewPlayerQuit(PlayerQuitEvent event) {
+        if(!settingsManager.getSettings().welcomeRewards().rewardOfflineJoins()) {
+            reward = false;
+            newPlayerName = null;
         }
     }
 }

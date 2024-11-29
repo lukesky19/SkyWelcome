@@ -44,7 +44,7 @@ public record Settings(
     public record Options(String locale, Boolean joins, Boolean quits, Boolean motd) { }
 
     @ConfigSerializable
-    public record WelcomeRewards(Boolean enabled, String type, Double cash, Item item, List<String> commands, List<String> messages) {}
+    public record WelcomeRewards(Boolean enabled, Boolean rewardOfflineJoins, String type, Double cash, Item item, List<String> commands, List<String> messages) {}
 
     @ConfigSerializable
     public record Item(String material, Integer amount) {}
