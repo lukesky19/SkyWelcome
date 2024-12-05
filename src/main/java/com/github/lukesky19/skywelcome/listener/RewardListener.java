@@ -73,9 +73,11 @@ public class RewardListener implements Listener {
 
     @EventHandler
     public void onNewPlayerQuit(PlayerQuitEvent event) {
-        if(!settingsManager.getSettings().welcomeRewards().rewardOfflineJoins()) {
-            reward = false;
-            newPlayerName = null;
+        if(event.getPlayer().getName().equals(newPlayerName)) {
+            if (!settingsManager.getSettings().welcomeRewards().rewardOfflineJoins()) {
+                reward = false;
+                newPlayerName = null;
+            }
         }
     }
 }
