@@ -16,7 +16,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RewardListener implements Listener {
@@ -42,6 +41,10 @@ public class RewardListener implements Listener {
         if(reward) {
             String message = PlainTextComponentSerializer.plainText().serialize(event.message()).toLowerCase();
             if(message.contains("welcome")) {
+                List<TagResolver.Single> placeholders = List.of(
+                        Placeholder.parsed("welcome_player", event.getPlayer().getName()),
+                        Placeholder.parsed("new_player", newPlayerName));
+
                 reward = false;
                 newPlayerName = null;
 
@@ -50,10 +53,6 @@ public class RewardListener implements Listener {
                 Locale locale = localeManager.getLocale();
                 for(Player player : skyWelcome.getServer().getOnlinePlayers()) {
                     if(player.isOnline() && player.isConnected()) {
-                        List<TagResolver.Single> placeholders = new ArrayList<>();
-                        placeholders.add(Placeholder.parsed("welcome_player", event.getPlayer().getName()));
-                        placeholders.add(Placeholder.parsed("new_player", newPlayerName));
-
                         player.sendMessage(FormatUtil.format(player, locale.prefix() + locale.welcomeBroadcast(), placeholders));
                     }
                 }
