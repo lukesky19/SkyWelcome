@@ -1,6 +1,6 @@
 /*
     SkyWelcome allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
-    Copyright (C) 2024  lukeskywlker19
+    Copyright (C) 2024 lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -17,49 +17,85 @@
 */
 package com.github.lukesky19.skywelcome.config.locale;
 
-import com.github.lukesky19.skylib.config.ConfigurationUtility;
-import com.github.lukesky19.skylib.format.FormatUtil;
+import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.api.configurate.ConfigurationUtility;
 import com.github.lukesky19.skylib.libs.configurate.CommentedConfigurationNode;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
 import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
 import com.github.lukesky19.skywelcome.SkyWelcome;
-import com.github.lukesky19.skywelcome.config.player.PlayerManager;
-import com.github.lukesky19.skywelcome.config.player.PlayerSettings;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
 
+/**
+ * This class manages the plugin's locale.
+ */
 public class LocaleManager {
-    private final SkyWelcome skyWelcome;
-    private final SettingsManager settingsManager;
-    private final PlayerManager playerManager;
-    private Locale locale;
+    private final @NotNull SkyWelcome skyWelcome;
+    private final @NotNull SettingsManager settingsManager;
+    private final @NotNull Locale DEFAULT_LOCALE = new Locale(
+            "1.5.0.0",
+            "<gray>[</gray><aqua><bold>SkyWelcome</bold></aqua><gray>]</gray> ",
+            List.of(
+                    "<aqua>SkyWelcome is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>",
+                    "<aqua>Source code is released on GitHub: <click:OPEN_URL:https://github.com/lukesky19><yellow><underlined><bold>https://github.com/lukesky19</bold></underlined></yellow></click></aqua>",
+                    " ",
+                    "<aqua><bold>List of Commands:</bold></aqua>",
+                    "<white>/<aqua>skywelcome <yellow>help</yellow></white>",
+                    "<white>/<aqua>skywelcome <yellow>reload</yellow></white>",
+                    "<white>/<aqua>skywelcome <yellow>toggle</yellow> <yellow><join | leave | quit | motd></yellow></white>",
+                    "<white>/<aqua>skywelcome <yellow>gui</yellow> <yellow><join | leave | quit></yellow></white>"),
+            "<aqua>Plugin configuration reloaded.</aqua>",
+            "<red>Unable to open this GUI because of a configuration error.</red>",
+            "<aqua>You have enabled your join message.</aqua>",
+            "<aqua>You have disabled your join message.</aqua>",
+            "<aqua>You have enabled your leave message.</aqua>",
+            "<aqua>You have disabled your leave message.</aqua>",
+            "<aqua>You have enabled your MOTD message.</aqua>",
+            "<aqua>You have disabled your MOTD message.</aqua>",
+            "<aqua><white><welcome_player></white> welcomed <white><new_player></white> to the server!</aqua>");
+    private @Nullable Locale locale;
 
+    /**
+     * Constructor
+     * @param skyWelcome A {@link SkyWelcome} instance.
+     * @param settingsManager A {@link SettingsManager} instance.
+     */
     public LocaleManager(
-            SkyWelcome skyWelcome,
-            SettingsManager settingsManager,
-            PlayerManager playerManager) {
+            @NotNull SkyWelcome skyWelcome,
+            @NotNull SettingsManager settingsManager) {
         this.skyWelcome = skyWelcome;
         this.settingsManager = settingsManager;
-        this.playerManager = playerManager;
     }
 
-    public Locale getLocale() {
+    /**
+     * Get the plugin's {@link Locale} or the default {@link Locale} if the user-configured version failed to load.
+     * @return The {@link Locale}.
+     */
+    public @NotNull Locale getLocale() {
+        if(locale == null) return DEFAULT_LOCALE;
+
         return locale;
     }
 
+    /**
+     * Reloads the plugin's locale.
+     */
     public void reload() {
+        ComponentLogger logger = skyWelcome.getComponentLogger();
         locale = null;
 
-        ComponentLogger logger = skyWelcome.getComponentLogger();
-        if (skyWelcome.isPluginDisabled()) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>Locale settings cannot be loaded due to a previous plugin error.</red>"));
-            logger.error(MiniMessage.miniMessage().deserialize("<red>Please check your server's console.</red>"));
+        copyDefaultLocales();
+
+        Settings settings = settingsManager.getSettings();
+        if(settings == null) {
+            logger.error(AdventureUtil.serialize("Unable to load the plugin's locale due to invalid plugin settings. The default locale will be used."));
             return;
         }
 
@@ -68,170 +104,175 @@ public class LocaleManager {
                         + File.separator
                         + "locale"
                         + File.separator
-                        + settingsManager.getSettings().options().locale()
+                        + settingsManager.getSettings().locale()
                         + ".yml");
         YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
 
         try {
             locale = loader.load().get(Locale.class);
-        } catch (ConfigurateException ignored) {
+        } catch (ConfigurateException e) {
+            logger.error(AdventureUtil.serialize("Failed to load the locale configuration. Error: " + e.getMessage()));
         }
 
         migrateLocale();
         validateLocale();
     }
 
-    public void sendJoinMessage(Player joiningPlayer) {
-        PlayerSettings playerSettings = playerManager.getPlayerSettings(joiningPlayer);
-
-        if (playerSettings.joinMessage()) {
-            for (Player player : skyWelcome.getServer().getOnlinePlayers()) {
-                if (player.isOnline()) {
-                    player.sendMessage(FormatUtil.format(joiningPlayer, playerSettings.selectedJoinMessage()));
-                }
-            }
+    /**
+     * Copies the default locale files that come bundled with the plugin, if they do not exist at least.
+     */
+    private void copyDefaultLocales() {
+        Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "locale" + File.separator + "en_US.yml");
+        if (!path.toFile().exists()) {
+            skyWelcome.saveResource("locale" + File.separator + "en_US.yml", false);
         }
     }
 
-    public void sendQuitMessage(Player leavingPlayer) {
-        PlayerSettings playerSettings = playerManager.getPlayerSettings(leavingPlayer);
-
-        if (playerSettings.leaveMessage()) {
-            for (Player player : skyWelcome.getServer().getOnlinePlayers()) {
-                if (player.isOnline()) {
-                    player.sendMessage(FormatUtil.format(leavingPlayer, playerSettings.selectedLeaveMessage()));
-                }
-            }
-        }
-    }
-
-    public void sendMotd(Player player) {
-        if (playerManager.getPlayerSettings(player).motd()) {
-            Settings.Motd motd = settingsManager.getSettings().motd();
-            for (String message : motd.contents()) {
-                player.sendMessage(FormatUtil.format(player, message));
-            }
-        }
-    }
-
+    /**
+     * Validates the plugin's locale.
+     */
     private void validateLocale() {
         ComponentLogger logger = skyWelcome.getComponentLogger();
-        String localeString = settingsManager.getSettings().options().locale();
-        if (locale == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>Failed to load <yellow>" + localeString + ".yml</yellow>.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale == null) {
+            logger.warn(AdventureUtil.serialize("Unable to validate locale as the locale configuration failed to load. The default locale will be used."));
             return;
         }
 
-        if (locale.configVersion() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>config-version</yellow> setting in <yellow>" + localeString + ".yml</yellow> does exist.</red>"));
-            logger.error(MiniMessage.miniMessage().deserialize("<red>This means your config did not migrate properly or you modified the config-version setting.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.configVersion() == null) {
+            logger.warn(AdventureUtil.serialize("The locale's config version is invalid. The default locale will be used. This means your config did not migrate properly or you modified the config-version setting."));
+            locale = null;
             return;
         }
 
-        if (locale.prefix() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>prefix</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.prefix() == null) {
+            logger.warn(AdventureUtil.serialize("The prefix in the locale is invalid. The default locale will be used."));
+            locale = null;
             return;
         }
 
-        if (locale.help() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>help</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
-            return;
-        }
-
-        for (String msg : locale.help()) {
-            if (msg == null) {
-                logger.error(MiniMessage.miniMessage().deserialize("<red>One of the Strings in the help setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-                skyWelcome.setPluginState(false);
+        for(String msg : locale.help()) {
+            if(msg == null) {
+                logger.warn(AdventureUtil.serialize("A line in the help message is invalid. The default locale will be used."));
+                locale = null;
                 return;
             }
         }
 
-        if (locale.playerOnly() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>player-only</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.reload() == null) {
+            logger.warn(AdventureUtil.serialize("The reload message is invalid. The default locale will be used."));
+            locale = null;
             return;
         }
 
-        if (locale.reload() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>reload</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.guiOpenError() == null) {
+            logger.warn(AdventureUtil.serialize("The gui open error message is invalid. The default locale will be used."));
+            locale = null;
             return;
         }
 
-        if (locale.noPermission() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>no-permission</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.joinEnabled() == null) {
+            logger.warn(AdventureUtil.serialize("The join enabled message is invalid. The default locale will be used."));
+            locale = null;
             return;
         }
 
-        if (locale.unknownCommand() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>unknown-command</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.joinDisabled() == null) {
+            logger.warn(AdventureUtil.serialize("The join disabled message is invalid. The default locale will be used."));
+            locale = null;
             return;
         }
 
-        if (locale.joinEnabled() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>join-enabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
-            return;
-        }
-
-        if (locale.joinDisabled() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>join-disabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
-            return;
-        }
-
-        if (locale.quitEnabled() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>quit-enabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.quitEnabled() == null) {
+            logger.warn(AdventureUtil.serialize("The quit enabled message is invalid. The default locale will be used."));
+            locale = null;
             return;
         }
 
         if (locale.quitDisabled() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>quit-disabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+            logger.warn(AdventureUtil.serialize("The quit disabled message is invalid. The default locale will be used."));
+            locale = null;
             return;
         }
 
-        if (locale.motdEnabled() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>motd-enabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.motdEnabled() == null) {
+            logger.warn(AdventureUtil.serialize("The motd enabled message is invalid. The default locale will be used."));
+            locale = null;
             return;
         }
 
-        if (locale.motdDisabled() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>motd-disabled</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.motdDisabled() == null) {
+            logger.warn(AdventureUtil.serialize("The motd disabled message is invalid. The default locale will be used."));
+            locale = null;
             return;
         }
 
-
-        if (locale.welcomeBroadcast() == null) {
-            logger.error(MiniMessage.miniMessage().deserialize("<red>The <yellow>welcome-broadcast</yellow> setting in <yellow>" + localeString + ".yml</yellow> is invalid.</red>"));
-            skyWelcome.setPluginState(false);
+        if(locale.welcomeBroadcast() == null) {
+            logger.warn(AdventureUtil.serialize("The welcome broadcast message is invalid. The default locale will be used."));
+            locale = null;
         }
     }
 
+    /**
+     * Migrates the plugin's locale from legacy versions to the current version.
+     */
     private void migrateLocale() {
-        switch (locale.configVersion()) {
-            case "1.2.0" -> {
+        ComponentLogger logger = skyWelcome.getComponentLogger();
+        Settings settings = settingsManager.getSettings();
+        if(settings == null) {
+            logger.error(AdventureUtil.serialize("Unable to migrate the plugin's locale due to invalid plugin settings. The default locale will be used."));
+            return;
+        }
+        if(locale == null) {
+            logger.error(AdventureUtil.serialize("Unable to migrate the plugin's locale due to invalid locale. The default locale will be used."));
+            return;
+        }
+
+        switch(locale.configVersion()) {
+            case "1.5.0.0" -> {
                 // Latest version, do nothing.
+            }
+
+            case "1.2.0" -> {
+                Locale newLocale = new Locale(
+                        "1.5.0.0",
+                        locale.prefix(),
+                        locale.help(),
+                        locale.reload(),
+                        "<red>Unable to open this GUI because of a configuration error.</red>",
+                        locale.joinEnabled(),
+                        locale.joinDisabled(),
+                        locale.quitEnabled(),
+                        locale.quitDisabled(),
+                        locale.motdEnabled(),
+                        locale.motdDisabled(),
+                        locale.welcomeBroadcast());
+
+                Path path = Path.of(
+                        skyWelcome.getDataFolder()
+                                + File.separator
+                                + "locale"
+                                + File.separator
+                                + settingsManager.getSettings().locale()
+                                + ".yml");
+                YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
+
+                CommentedConfigurationNode node = loader.createNode();
+                try {
+                    node.set(newLocale);
+                    loader.save(node);
+                    locale = newLocale;
+                } catch (ConfigurateException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             case "1.1.0", "1.0.0" -> {
                 Locale newLocale = new Locale(
-                        "1.2.0",
+                        "1.5.0.0",
                         locale.prefix(),
                         locale.help(),
-                        locale.playerOnly(),
                         locale.reload(),
-                        locale.noPermission(),
-                        locale.unknownCommand(),
+                        "<red>Unable to open this GUI because of a configuration error.</red>",
                         locale.joinEnabled(),
                         locale.joinDisabled(),
                         locale.quitEnabled(),
@@ -245,7 +286,7 @@ public class LocaleManager {
                                 + File.separator
                                 + "locale"
                                 + File.separator
-                                + settingsManager.getSettings().options().locale()
+                                + settingsManager.getSettings().locale()
                                 + ".yml");
                 YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
 

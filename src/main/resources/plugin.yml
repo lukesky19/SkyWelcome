@@ -2,40 +2,35 @@ name: SkyWelcome
 version: '${version}'
 main: com.github.lukesky19.skywelcome.SkyWelcome
 api-version: '1.21'
-load: STARTUP
 author: lukeskywlker19
-depend: [SkyLib, HeadDatabase]
-commands:
-    skywelcome:
-        description: The base command.
-        aliases:
-            - welcome
+depend: [HeadDatabase, SkyLib]
+
 permissions:
-    skywelcome.command.reload:
+    skywelcome.command.skywelcome.reload:
         description: Permission to reload the plugin.
         default: op
-    skywelcome.command.help:
+    skywelcome.command.skywelcome.help:
         description: Permission to view the plugin's help message.
         default: op
-    skywelcome.command.toggle.join:
+    skywelcome.command.skywelcome.toggle.join:
         description: Toggle the individual player's join message.
         default: op
-    skywelcome.command.toggle.leave:
+    skywelcome.command.skywelcome.toggle.leave:
         description: Toggle the individual player's leave message.
         default: op
-    skywelcome.command.toggle.quit:
+    skywelcome.command.skywelcome.toggle.quit:
         description: Toggle the individual player's quit message.s
         default: op
-    skywelcome.command.toggle.motd:
+    skywelcome.command.skywelcome.toggle.motd:
         description: Toggle the individual player's motd message.
         default: op
-    skywelcome.command.gui.join:
+    skywelcome.command.skywelcome.gui.join:
         description: Permission to open the join message selection GUI.
         default: op
-    skywelcome.command.gui.quit:
+    skywelcome.command.skywelcome.gui.quit:
         description: Permission to open the quit message selection GUI.
         default: op
-    skywelcome.command.gui.leave:
+    skywelcome.command.skywelcome.gui.leave:
         description: Permission to open the leave message selection GUI.
         default: op
     skywelcome.invulnerable:

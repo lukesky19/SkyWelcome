@@ -1,6 +1,6 @@
 /*
     SkyWelcome allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
-    Copyright (C) 2024  lukeskywlker19
+    Copyright (C) 2024 lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -17,47 +17,82 @@
 */
 package com.github.lukesky19.skywelcome.listener;
 
-import com.github.lukesky19.skylib.format.FormatUtil;
+import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
 import com.github.lukesky19.skywelcome.SkyWelcome;
-import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
-import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import com.github.lukesky19.skywelcome.data.player.PlayerData;
+import com.github.lukesky19.skywelcome.manager.PlayerDataManager;
+import com.github.lukesky19.skywelcome.util.PluginUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
+/**
+ * Listens to when a player disconnects from the server and sends their leave message if appropriate.
+ */
 public class QuitListener implements Listener {
-    private final SkyWelcome skyWelcome;
-    private final PlayerManager playerManager;
-    private final SettingsManager settingsManager;
-    private final LocaleManager localeManager;
+    private final @NotNull SkyWelcome skyWelcome;
+    private final @NotNull ComponentLogger logger;
+    private final @NotNull PlayerDataManager playerDataManager;
+    private final @NotNull SettingsManager settingsManager;
 
+    /**
+     * Constructor
+     * @param skyWelcome A {@link SkyWelcome} instance.
+     * @param settingsManager A {@link SettingsManager} instance.
+     * @param playerDataManager A {@link PlayerDataManager} instance.
+     */
     public QuitListener(
-            SkyWelcome skyWelcome,
-            PlayerManager playerManager,
-            SettingsManager settingsManager,
-            LocaleManager localeManager) {
+            @NotNull SkyWelcome skyWelcome,
+            @NotNull SettingsManager settingsManager,
+        @NotNull PlayerDataManager playerDataManager) {
         this.skyWelcome = skyWelcome;
-        this.playerManager = playerManager;
+        this.logger = skyWelcome.getComponentLogger();
+        this.playerDataManager = playerDataManager;
         this.settingsManager = settingsManager;
-        this.localeManager = localeManager;
     }
 
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        if(skyWelcome.isPluginDisabled()) {
-            skyWelcome.getComponentLogger().warn(FormatUtil.format("<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>Unable to send join message for <yellow>" + MiniMessage.miniMessage().serialize(event.getPlayer().displayName()) + "</yellow> since the plugin is soft-disabled due to a configuration error.</red>"));
+    /**
+     * Listens for a {@link PlayerQuitEvent} and sends the player's leave message if appropriate.
+     * @param playerQuitEvent A {@link PlayerQuitEvent}
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onQuit(PlayerQuitEvent playerQuitEvent) {
+        Player player = playerQuitEvent.getPlayer();
+        UUID uuid = player.getUniqueId();
+
+        Settings settings = settingsManager.getSettings();
+        if(settings == null) {
+            logger.warn(AdventureUtil.serialize("Unable to send a leave message to players due to invalid plugin settings."));
             return;
         }
 
-        Settings settings = settingsManager.getSettings();
+        if(settings.globalQuitToggle() == null) {
+            logger.warn(AdventureUtil.serialize("Unable to send a leave message to players due to an invalid global quit toggle setting."));
+            return;
+        }
 
-        if(settings.options().quits()) {
-            if(playerManager.getPlayerSettings(event.getPlayer()).leaveMessage()) {
-                localeManager.sendQuitMessage(event.getPlayer());
-            }
+        // Don't send a leave message if the player is vanished
+        if(PluginUtils.isPlayerVanished(player)) return;
+
+        PlayerData playerData = playerDataManager.getPlayerData(uuid);
+        if(playerData == null) {
+            logger.warn(AdventureUtil.serialize("Unable to send a leave message to players due due to no player data retrieved."));
+            return;
+        }
+
+        if(settings.globalQuitToggle() && playerData.isSendLeave()) {
+            Component joinMessage = AdventureUtil.serialize(player, playerData.getJoinMessage());
+            skyWelcome.getServer().getOnlinePlayers()
+                    .forEach(onlinePlayer -> onlinePlayer.sendMessage(joinMessage));
         }
     }
 }

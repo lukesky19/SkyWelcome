@@ -1,6 +1,6 @@
 /*
     SkyWelcome allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
-    Copyright (C) 2024  lukeskywlker19
+    Copyright (C) 2024 lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -15,15 +15,30 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skywelcome.config.player;
+package com.github.lukesky19.skywelcome.enums;
 
-import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
-
-@ConfigSerializable
-public record PlayerSettings(
-        String configVersion,
-        Boolean joinMessage,
-        Boolean leaveMessage,
-        Boolean motd,
-        String selectedJoinMessage,
-        String selectedLeaveMessage) {}
+/**
+ * This enum is used to identify button types.
+ */
+public enum ButtonType {
+    /**
+     * This type is used to identify the configuration for the filler buttons.
+     */
+    FILLER,
+    /**
+     * This type is used to identify the configuration for the dummy buttons.
+     */
+    DUMMY,
+    /**
+     * This type is used to identify the configuration for the return or exit button.
+     */
+    RETURN,
+    /**
+     * This type is used to identify the configuration for the next page button.
+     */
+    NEXT_PAGE,
+    /**
+     * This type is used to identify the configuration for the previous page button.
+     */
+    PREV_PAGE
+}

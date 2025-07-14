@@ -4,10 +4,11 @@ plugins {
 }
 
 group = "com.github.lukesky19"
-version = "1.4.1"
+version = "1.5.0.0"
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven("https://repo.papermc.io/repository/maven-public/") {
         name = "papermc-repo"
     }
@@ -17,41 +18,38 @@ repositories {
     maven("https://jitpack.io") {
         name = "jitpack"
     }
-
-    mavenLocal()
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
-    compileOnly("net.kyori:adventure-api:4.17.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
+    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
-    compileOnly("com.github.lukesky19:SkyLib:1.0.0")
-    implementation("com.github.stefvanschie.inventoryframework:IF:0.10.18")
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
+    compileOnly("com.github.lukesky19:SkyLib:1.3.0.0")
 }
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
-tasks.processResources {
-    val props = mapOf("version" to version)
-    inputs.properties(props)
-    filteringCharset = "UTF-8"
-    filesMatching("plugin.yml") {
-        expand(props)
+tasks {
+    processResources {
+        val props = mapOf("version" to version)
+        inputs.properties(props)
+        filteringCharset = "UTF-8"
+        filesMatching("plugin.yml") {
+            expand(props)
+        }
     }
-}
 
-tasks.build {
-    dependsOn(tasks.shadowJar)
-}
+    jar {
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
 
-tasks.shadowJar {
-    manifest {
-        attributes["paperweight-mappings-namespace"] = "mojang"
+        archiveClassifier.set("")
     }
-    archiveClassifier.set("")
-    relocate("com.github.stefvanschie.inventoryframework", "com.github.lukesky19.skywelcome.libs.inventoryframework")
+
+    build {
+        dependsOn(javadoc)
+    }
 }

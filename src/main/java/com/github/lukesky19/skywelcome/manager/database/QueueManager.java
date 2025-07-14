@@ -1,6 +1,6 @@
 /*
     SkyWelcome allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
-    Copyright (C) 2024  lukeskywlker19
+    Copyright (C) 2024 lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -15,11 +15,20 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skywelcome.enums;
+package com.github.lukesky19.skywelcome.manager.database;
 
-public enum ActionType {
-    FILLER,
-    RETURN,
-    NEXT_PAGE,
-    PREV_PAGE
+import com.github.lukesky19.skylib.api.database.queue.MultiThreadQueueManager;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * This class manages queuing reads and writes to the database.
+ */
+public class QueueManager extends MultiThreadQueueManager {
+    /**
+     * Constructor
+     * @param connectionManager A {@link ConnectionManager} instance.
+     */
+    public QueueManager(@NotNull ConnectionManager connectionManager) {
+        super(connectionManager);
+    }
 }

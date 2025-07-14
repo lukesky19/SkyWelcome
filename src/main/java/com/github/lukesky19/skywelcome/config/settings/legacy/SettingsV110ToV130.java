@@ -15,37 +15,33 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skywelcome.config.settings;
+package com.github.lukesky19.skywelcome.config.settings.legacy;
 
-import com.github.lukesky19.skylib.api.itemstack.ItemStackConfig;
 import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * This record contains the plugin's settings.
- * @param configVersion The config version of the file.
- * @param locale The plugin's locale to use.
- * @param globalJoinToggle Should join messages be enabled globally?
- * @param globalQuitToggle Should leave messages be enabled globally?
- * @param globalMotdToggle Should the server's motd be enabled globally?
- * @param joinMessages The {@link List} of {@link JoinMessageConfig}s for the available join messages.
- * @param motd The {@link List} of {@link String}s for the motd.
- * @param quitMessages The {@link List} of {@link QuitMessageConfig}s for the available leave messages.
+ * This record contains the settings configuration for version 1.1.0 through 1.3.0.
+ * @param configVersion The config version of the settings.
+ * @param options The {@link Options} config.
+ * @param join The map of join messages.
+ * @param motd The {@link Motd} config.
+ * @param quit The map of leave messages.
  * @param welcomeRewards The {@link WelcomeRewards} config.
  */
 @ConfigSerializable
-public record Settings(
+public record SettingsV110ToV130(
         @Nullable String configVersion,
-        @Nullable String locale,
-        @Nullable Boolean globalJoinToggle,
-        @Nullable Boolean globalQuitToggle,
-        @Nullable Boolean globalMotdToggle,
-        @NotNull List<JoinMessageConfig> joinMessages,
-        @NotNull List<String> motd,
-        @NotNull List<QuitMessageConfig> quitMessages,
+        @NotNull Options options,
+        @NotNull LinkedHashMap<String, Join> join,
+        @NotNull Motd motd,
+        @NotNull LinkedHashMap<String, Quit> quit,
         @NotNull WelcomeRewards welcomeRewards) {
     /**
      * This record contains the configuration for an individual join message.
@@ -53,30 +49,46 @@ public record Settings(
      * @param message The actual join message.
      */
     @ConfigSerializable
-    public record JoinMessageConfig(@Nullable String permission, @Nullable String message) {}
+    public record Join(@Nullable String permission, @Nullable String message) { }
+    /**
+     * This record contains the {@link List} of {@link String}s to send for the server's motd.
+     * @param contents The {@link List} of {@link String}s to send for the server's motd.
+     */
+    @ConfigSerializable
+    public record Motd(@NotNull List<String> contents) { }
     /**
      * This record contains the configuration for an individual leave message.
      * @param permission The leave message's permission.
      * @param message The actual leave message.
      */
     @ConfigSerializable
-    public record QuitMessageConfig(@Nullable String permission, @Nullable String message) {}
+    public record Quit(@Nullable String permission, @Nullable String message) { }
+    /**
+     * This record contains general plugin options.
+     * @param locale The plugin's locale to use.
+     * @param joins Should join messages be enabled globally?
+     * @param quits Should leave messages be enabled globally?
+     * @param motd Should the server's motd be enabled globally?
+     */
+    @ConfigSerializable
+    public record Options(String locale, Boolean joins, Boolean quits, Boolean motd) {}
     /**
      * The settings for welcome rewards.
      * @param enabled Are welcome rewards enabled?
      * @param rewardOfflineJoins Should offline new players give rewards?
+     * @param type The reward type.
      * @param cash The money to distribute to new players.
-     * @param items The {@link List} of {@link ItemStackConfig}s to give as rewards.
+     * @param item The {@link List} of {@link Item}s to give as rewards.
      * @param commands The {@link List} of {@link String}s for the commands to execute in console.
      * @param messages The {@link List} of {@link String}s for the messages to send when a welcome reward is given.
      */
     @ConfigSerializable
-    public record WelcomeRewards(
-            @Nullable Boolean enabled,
-            @Nullable Boolean rewardOfflineJoins,
-            @Nullable Double cash,
-            @NotNull List<ItemStackConfig> items,
-            @NotNull List<String> commands,
-            @NotNull List<String> messages) {}
+    public record WelcomeRewards(Boolean enabled, Boolean rewardOfflineJoins, String type, Double cash, Item item, List<String> commands, List<String> messages) {}
+    /**
+     * The configuration to create an {@link ItemStack}.
+     * @param material The {@link Material}'s name.
+     * @param amount The amount of items.
+     */
+    @ConfigSerializable
+    public record Item(String material, Integer amount) {}
 }
-

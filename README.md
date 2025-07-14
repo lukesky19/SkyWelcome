@@ -26,15 +26,15 @@
 - /skywelcome gui quit - The GUI to select custom quit messages.
 
 ## Permisisons
-- `skywelcome.command.reload` - The permission to use /skywelcome reload.
-- `skywelcome.command.help` - The permission to use /skywelcome help.
-- `skywelcome.command.toggle.join` - The permission to use /skywelcome toggle join.
-- `skywelcome.command.toggle.leave` - The permission to use /skywelcome toggle leave.
-- `skywelcome.command.toggle.quit` - The permission to use /skywelcome toggle quit.
-- `skywelcome.command.toggle.motd` - The permission to use /skywelcome toggle motd.
-- `skywelcome.command.gui.join` -  The permission to use /skywelcome gui join.
-- `skywelcome.command.gui.leave` - The permission to use /skywelcome gui leave.
-- `skywelcome.command.gui.quit` - The permission to use /skywelcome gui quit.
+- `skywelcome.commands.skywelcome.reload` - The permission to use /skywelcome reload.
+- `skywelcome.commands.skywelcome.help` - The permission to use /skywelcome help.
+- `skywelcome.commands.skywelcome.toggle.join` - The permission to use /skywelcome toggle join.
+- `skywelcome.commands.skywelcome.toggle.leave` - The permission to use /skywelcome toggle leave.
+- `skywelcome.commands.skywelcome.toggle.quit` - The permission to use /skywelcome toggle quit.
+- `skywelcome.commands.skywelcome.toggle.motd` - The permission to use /skywelcome toggle motd.
+- `skywelcome.commands.skywelcome.gui.join` -  The permission to use /skywelcome gui join.
+- `skywelcome.commands.skywelcome.gui.leave` - The permission to use /skywelcome gui leave.
+- `skywelcome.commands.skywelcome.gui.quit` - The permission to use /skywelcome gui quit.
 
 ## Issues, Bugs, or Suggestions
 * Please create a new [GitHub Issue](https://github.com/lukesky19/SkyWelcome/issues) with your issue, bug, or suggestion.
@@ -44,19 +44,15 @@
 ## FAQ
 Q: What versions does this plugin support?
 
-A: 1.21, 1.21.1, 1.21.2, 1.21.3
+A: 1.21.4, 1.21.5, 1.21.6, and 1.21.7.
 
 Q: Are there any plans to support any other versions?
 
-A: I will always support newer versions of the game. I have no plans to support any version older than 1.21 at this time.
+A: I will always do my best to support the latest versions of the game. I will sometimes support other versions until I no longer use them.
 
-Q: Does this work on Spigot and Paper?
+Q: Does this work on Spigot? Paper? (Insert other server software here)?
 
-A: This plugin only works with Paper, it makes use of many newer API features that don't exist in the Spigot API. There are no plans to support Spigot.
-
-Q: Is Folia supported?
-
-A: There is no Folia support at this time. I may look into it in the future though.
+A: I only support Paper, but this will likely also work on forks of Paper (untested). There are no plans to support any other server software (i.e., Spigot or Folia).
 
 ## For Server Admins/Owners
 * Download the plugin [SkyLib](https://github.com/lukesky19/SkyLib/releases).

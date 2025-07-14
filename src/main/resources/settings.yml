@@ -1,36 +1,31 @@
-config-version: 1.3.0
-options:
-    # Locale
-    # The name of the locale file to use in skywelcome/locale, minus the file extension (.yml)
-    locale: en_US
-    # Should join messages be enabled globally?
-    joins: true
-    # Should quit/leave messages be enabled globally?
-    quits: true
-    # Should the MOTD message be enabled?
-    motd: true
-join:
-    # The first message will be used by default.
-    0:
-        permission: "skywelcome.join.default"
+config-version: 1.5.0.0
+# The name of the locale file to use in skywelcome/locale, minus the file extension (.yml)
+locale: en_US
+# Should join messages be enabled globally?
+global-join-toggle: true
+# Should quit/leave messages be enabled globally?
+global-quit-toggle: true
+# Should the MOTD messages be enabled?
+global-motd-toggle: true
+# Join messages
+# The first message will be used by default.
+join-messages:
+    -   permission: "skywelcome.join.default"
         message: "<gray>[<gray><green>+</green><gray>]</gray> <papi:essentials_nickname>"
 motd:
-    contents:
-        - "Welcome to the server, <papi:essentials_nickname>!"
+    - "Welcome to the server, <papi:essentials_nickname>!"
+# Leave/Quit messages
+# The first message will be used by default.
 quit:
-    # The first message will be used by default.
-    0:
-        permission: "skywelcome.leave.default"
+    -   permission: "skywelcome.leave.default"
         message: "<gray>[<gray><red>-</red><gray>]</gray> <papi:essentials_nickname>"
 welcome-rewards:
     enabled: true
     # Should players who welcome a new player who has logged out be rewarded?
     reward-offline-joins: false
-    # ITEM, CASH, COMMANDS
-    type: CASH
     cash: 50
     item:
-        material: DIAMOND
+        item-type: DIAMOND
         amount: 1
     commands:
         - "give %player_name% emerald 1"

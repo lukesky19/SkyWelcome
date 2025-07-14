@@ -1,6 +1,6 @@
 /*
     SkyWelcome allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
-    Copyright (C) 2024  lukeskywlker19
+    Copyright (C) 2024 lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -17,81 +17,124 @@
 */
 package com.github.lukesky19.skywelcome;
 
+import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
 import com.github.lukesky19.skylib.libs.bstats.bukkit.Metrics;
 import com.github.lukesky19.skywelcome.commands.SkyWelcomeCommand;
-import com.github.lukesky19.skywelcome.config.gui.GUIManager;
+import com.github.lukesky19.skywelcome.commands.arguments.ToggleCommand;
+import com.github.lukesky19.skywelcome.config.gui.GUIConfigManager;
 import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
-import com.github.lukesky19.skywelcome.config.player.PlayerManager;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
-import com.github.lukesky19.skywelcome.gui.JoinGUI;
-import com.github.lukesky19.skywelcome.gui.QuitGUI;
+import com.github.lukesky19.skywelcome.listener.InventoryListener;
 import com.github.lukesky19.skywelcome.listener.JoinListener;
 import com.github.lukesky19.skywelcome.listener.QuitListener;
 import com.github.lukesky19.skywelcome.listener.RewardListener;
+import com.github.lukesky19.skywelcome.manager.GUIManager;
+import com.github.lukesky19.skywelcome.manager.HeadDatabaseManager;
+import com.github.lukesky19.skywelcome.manager.PlayerDataManager;
 import com.github.lukesky19.skywelcome.manager.RewardManager;
-import com.github.lukesky19.skywelcome.util.HeadDatabaseUtil;
+import com.github.lukesky19.skywelcome.manager.database.ConnectionManager;
+import com.github.lukesky19.skywelcome.manager.database.DatabaseManager;
+import com.github.lukesky19.skywelcome.manager.database.QueueManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
-
+/**
+ * The plugin's main class.
+ */
 public class SkyWelcome extends JavaPlugin {
-    SettingsManager settingsManager;
-    PlayerManager playerManager;
-    LocaleManager localeManager;
-    RewardManager rewardManager;
-    GUIManager GUIManager;
-    JoinListener joinListener;
-    boolean pluginState;
+    private SettingsManager settingsManager;
+    private LocaleManager localeManager;
+    private PlayerDataManager playerDataManager;
+    private GUIConfigManager guiConfigManager;
+    private DatabaseManager databaseManager;
+    private GUIManager guiManager;
 
-    Economy economy;
+    private Economy economy;
 
     /**
+     * Default Constructor.
+     */
+    public SkyWelcome() {}
+
+    /**
+     * Get the {@link Economy} for the server.
      * @return The server's economy.
      */
     public Economy getEconomy() {
         return this.economy;
     }
 
-    public void setPluginState(boolean pluginState) {
-        this.pluginState = pluginState;
-    }
-
-    public boolean isPluginDisabled() {
-        return !pluginState;
-    }
 
     @Override
     public void onEnable() {
         // Set up bstats
         setupBStats();
+        if(!checkSkyLibVersion()) return;
         // Set up Economy
-        setupEconomy();
+        if(!setupEconomy()) return;
 
         // Initialize Classes
         settingsManager = new SettingsManager(this);
-        playerManager = new PlayerManager(this, settingsManager);
-        localeManager = new LocaleManager(this, settingsManager, playerManager);
-        rewardManager = new RewardManager(this, settingsManager, localeManager);
-        joinListener = new JoinListener(this, playerManager, settingsManager, localeManager);
+        localeManager = new LocaleManager(this, settingsManager);
+        guiConfigManager = new GUIConfigManager(this);
+
+        ConnectionManager connectionManager = new ConnectionManager(this);
+        QueueManager queueManager = new QueueManager(connectionManager);
+        databaseManager = new DatabaseManager(connectionManager, queueManager);
+
+        playerDataManager = new PlayerDataManager(this, settingsManager, databaseManager);
+
+        RewardManager rewardManager = new RewardManager(this, settingsManager, localeManager);
+
+        HeadDatabaseManager headDatabaseManager = new HeadDatabaseManager();
+
+        guiManager = new GUIManager(this);
+
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
+                commands -> {
+                    SkyWelcomeCommand skyWelcomeCommand = new SkyWelcomeCommand(this, settingsManager, localeManager, guiConfigManager, playerDataManager, headDatabaseManager, guiManager);
+                    commands.registrar().register(skyWelcomeCommand.createCommand(), "Command to manage and use the SkyWelcome plugin.");
+
+                    ToggleCommand toggleCommand = new ToggleCommand(this, localeManager, playerDataManager);
+                    commands.registrar().register(toggleCommand.createCommand(), "Command shortcuts to toggle join, leave, and motd messages.");
+                });
 
         // Register Listeners
-        this.getServer().getPluginManager().registerEvents(new HeadDatabaseUtil(this), this);
-        this.getServer().getPluginManager().registerEvents(joinListener, this);
-        this.getServer().getPluginManager().registerEvents(new QuitListener(this, playerManager, settingsManager, localeManager), this);
+        this.getServer().getPluginManager().registerEvents(headDatabaseManager, this);
+        this.getServer().getPluginManager().registerEvents(new InventoryListener(guiManager), this);
+        this.getServer().getPluginManager().registerEvents(new JoinListener(this, settingsManager, playerDataManager), this);
+        this.getServer().getPluginManager().registerEvents(new QuitListener(this, settingsManager, playerDataManager), this);
         this.getServer().getPluginManager().registerEvents(new RewardListener(this, settingsManager, localeManager, rewardManager), this);
+
+        // Load player data for any online players that joined before the plugin was fully enabled.
+        // This is mostly for plugman edge cases, but 99% of the time is not necessary.
+        this.getServer().getOnlinePlayers().forEach(player -> playerDataManager.loadPlayerData(player.getUniqueId()));
+
+        reload();
     }
 
+    @Override
+    public void onDisable() {
+        if(guiManager != null) guiManager.closeOpenGUIs(true);
+
+        if(databaseManager != null) databaseManager.handlePluginDisable();
+    }
+
+    /**
+     * Main reload method that reloads all plugin data.
+     */
     public void reload() {
-        pluginState = true;
+        if(guiManager != null) guiManager.closeOpenGUIs(false);
+
         settingsManager.reload();
         localeManager.reload();
-        GUIManager.reload();
-        rewardManager.reload();
-        joinListener.reload();
+        guiConfigManager.reload();
+        playerDataManager.migrateLegacyPlayerSettings();
     }
 
     /**
@@ -102,32 +145,43 @@ public class SkyWelcome extends JavaPlugin {
         new Metrics(this, pluginId);
     }
 
-    public void postHeadDatabaseAPI() {
-        GUIManager = new GUIManager(this);
-        SkyWelcomeCommand skyWelcomeCommand = new SkyWelcomeCommand(
-                this, playerManager, localeManager,
-                new JoinGUI(settingsManager, playerManager, GUIManager),
-                new QuitGUI(settingsManager, playerManager, GUIManager));
+    /**
+     * Checks if the Server has the proper SkyLib version.
+     * @return true if it does, false if not.
+     */
+    private boolean checkSkyLibVersion() {
+        PluginManager pluginManager = this.getServer().getPluginManager();
+        Plugin skyLib = pluginManager.getPlugin("SkyLib");
+        if (skyLib != null) {
+            String version = skyLib.getPluginMeta().getVersion();
+            String[] splitVersion = version.split("\\.");
+            int second = Integer.parseInt(splitVersion[1]);
 
-        // Register Commands
-        Objects.requireNonNull(Bukkit.getPluginCommand("skywelcome")).setExecutor(skyWelcomeCommand);
-        Objects.requireNonNull(Bukkit.getPluginCommand("skywelcome")).setTabCompleter(skyWelcomeCommand);
+            if(second >= 3) {
+                return true;
+            }
+        }
 
-        reload();
+        this.getComponentLogger().error(AdventureUtil.serialize("SkyLib Version 1.3.0.0 or newer is required to run this plugin."));
+        this.getServer().getPluginManager().disablePlugin(this);
+        return false;
     }
 
     /**
      * Checks for Vault as a dependency and sets up the Economy instance.
      */
-    private void setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+    private boolean setupEconomy() {
+        if(getServer().getPluginManager().getPlugin("Vault") != null) {
             RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
             if (rsp != null) {
                 this.economy = rsp.getProvider();
+
+                return true;
             }
-        } else {
-            getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>SkyWelcome has been disabled due to no Vault dependency found!</red>"));
-            getServer().getPluginManager().disablePlugin(this);
         }
+
+        this.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>SkyShop has been disabled due to no Vault dependency found!</red>"));
+        this.getServer().getPluginManager().disablePlugin(this);
+        return false;
     }
 }
