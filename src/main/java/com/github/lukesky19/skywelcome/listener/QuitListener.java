@@ -90,9 +90,9 @@ public class QuitListener implements Listener {
         }
 
         if(settings.globalQuitToggle() && playerData.isSendLeave()) {
-            Component joinMessage = AdventureUtil.serialize(player, playerData.getJoinMessage());
+            Component leaveMessage = AdventureUtil.serialize(player, playerData.getLeaveMessage());
             skyWelcome.getServer().getOnlinePlayers()
-                    .forEach(onlinePlayer -> onlinePlayer.sendMessage(joinMessage));
+                    .forEach(onlinePlayer -> onlinePlayer.sendMessage(leaveMessage));
         }
     }
 }

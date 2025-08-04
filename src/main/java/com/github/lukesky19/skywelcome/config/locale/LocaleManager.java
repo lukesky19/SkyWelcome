@@ -98,13 +98,17 @@ public class LocaleManager {
             logger.error(AdventureUtil.serialize("Unable to load the plugin's locale due to invalid plugin settings. The default locale will be used."));
             return;
         }
+        if(settings.locale() == null) {
+            logger.error(AdventureUtil.serialize("Unable to load the plugin's locale due to a locale not being configured in settings.yml. The default locale will be used."));
+            return;
+        }
 
         Path path = Path.of(
                 skyWelcome.getDataFolder()
                         + File.separator
                         + "locale"
                         + File.separator
-                        + settingsManager.getSettings().locale()
+                        + settings.locale()
                         + ".yml");
         YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
 
