@@ -1,4 +1,4 @@
-config-version: 1.2.0
+config-version: 1.5.0.0
 prefix: "<gray>[</gray><aqua><bold>SkyWelcome</bold></aqua><gray>]</gray> "
 help:
     - "<aqua>SkyWelcome is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>"
@@ -9,10 +9,8 @@ help:
     - "<white>/<aqua>skywelcome <yellow>reload</yellow></white>"
     - "<white>/<aqua>skywelcome <yellow>toggle</yellow> <yellow><join | leave | quit | motd></yellow></white>"
     - "<white>/<aqua>skywelcome <yellow>gui</yellow> <yellow><join | leave | quit></yellow></white>"
-player-only: "<red>This command is only available in-game.</red>"
 reload: "<aqua>Plugin configuration reloaded.</aqua>"
-no-permission: "<red>You do not have permission for this command.</red>"
-unknown-command: "<red>Unknown command.</red>"
+gui-open-error: "<red>Unable to open this GUI because of a configuration error.</red>"
 join-enabled: "<aqua>You have enabled your join message.</aqua>"
 join-disabled: "<aqua>You have disabled your join message.</aqua>"
 quit-enabled: "<aqua>You have enabled your leave message.</aqua>"

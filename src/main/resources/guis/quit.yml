@@ -1,159 +1,67 @@
-config-version: 1.0.0
-placeholders:
-    selected:
-        material: GREEN_WOOL
-        lore:
-            - "<green>This is your current leave message.</green>"
-    available:
-        material: YELLOW_WOOL
-        lore:
-            - "<yellow>Click to change to this leave message.</yellow>"
-    no-permission:
-        material: RED_WOOL
-        lore:
-            - "<red>You do not have permission to use this leave message.</red>"
+config-version: 1.5.0.0
 gui:
-    size: 54
-    name: "Choose a Leave Message"
-    paged-settings:
-        x-offset: 1
-        y-offset: 1
-        length: 7
-        height: 4
-    background:
-        0:
-            0:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
+    gui-type: CHEST_54
+    gui-name: "Choose a Leave Message"
+    items-per-page: 28
+    placeholders:
+        selected:
+            item-type: GREEN_WOOL
+            lore:
+                - "<green>This is your current leave message.</green>"
+        available:
+            item-type: YELLOW_WOOL
+            lore:
+                - "<yellow>Click to change to this leave message.</yellow>"
+        no-permission:
+            item-type: RED_WOOL
+            lore:
+                - "<red>You do not have permission to use this leave message.</red>"
+    buttons:
+        -   button-type: FILLER
+            item:
+                item-type: GRAY_STAINED_GLASS_PANE
                 name: " "
-                lore: [ ]
-            1:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            2:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            3:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            4:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            5:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            6:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            7:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            8:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-        1:
-            0:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            8:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-        2:
-            0:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            8:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-        3:
-            0:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            8:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-        4:
-            0:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            8:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-        5:
-            0:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            1:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            2:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            3:
-                type: PREV_PAGE
-                hdb-id: 516
+        -   button-type: PREV_PAGE
+            slot: 47
+            hdb-id: 516
+            item:
                 name: "<white>Click to navigate to the previous page.</white>"
-                lore: [ ]
-            4:
-                type: RETURN
-                material: BARRIER
-                name: "<white>Click to exit this menu."
-                lore: [ ]
-            5:
-                type: NEXT_PAGE
-                hdb-id: 513
+        -   button-type: NEXT_PAGE
+            slot: 51
+            hdb-id: 513
+            item:
                 name: "<white>Click to navigate to the next page.</white>"
-                lore: [ ]
-            6:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            7:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
-            8:
-                type: FILLER
-                material: GRAY_STAINED_GLASS_PANE
-                name: " "
-                lore: [ ]
+        -   button-type: RETURN
+            slot: 49
+            item:
+                item-type: BARRIER
+                name: "<white>Click to exit this menu.</white>"
+    slots:
+        - 10
+        - 11
+        - 12
+        - 13
+        - 14
+        - 15
+        - 16
+        - 19
+        - 20
+        - 21
+        - 22
+        - 23
+        - 24
+        - 25
+        - 28
+        - 29
+        - 30
+        - 31
+        - 32
+        - 33
+        - 34
+        - 37
+        - 38
+        - 39
+        - 40
+        - 41
+        - 42
+        - 43

@@ -1,6 +1,6 @@
 /*
     SkyWelcome allows players to toggle join, leave, MOTD messages, and to choose custom join and leave messages.
-    Copyright (C) 2024  lukeskywlker19
+    Copyright (C) 2024 lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -17,311 +17,80 @@
 */
 package com.github.lukesky19.skywelcome.commands;
 
-import com.github.lukesky19.skylib.format.FormatUtil;
 import com.github.lukesky19.skywelcome.SkyWelcome;
-import com.github.lukesky19.skywelcome.config.locale.Locale;
+import com.github.lukesky19.skywelcome.commands.arguments.GuiCommand;
+import com.github.lukesky19.skywelcome.commands.arguments.HelpCommand;
+import com.github.lukesky19.skywelcome.commands.arguments.ReloadCommand;
+import com.github.lukesky19.skywelcome.commands.arguments.ToggleCommand;
+import com.github.lukesky19.skywelcome.config.gui.GUIConfigManager;
 import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
-import com.github.lukesky19.skywelcome.config.player.PlayerManager;
-import com.github.lukesky19.skywelcome.gui.JoinGUI;
-import com.github.lukesky19.skywelcome.gui.QuitGUI;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
+import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
+import com.github.lukesky19.skywelcome.manager.GUIManager;
+import com.github.lukesky19.skywelcome.manager.HeadDatabaseManager;
+import com.github.lukesky19.skywelcome.manager.PlayerDataManager;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+/**
+ * This class is used to create the skywelcome command.
+ */
+public class SkyWelcomeCommand {
+    private final @NotNull SkyWelcome skyWelcome;
+    private final @NotNull SettingsManager settingsManager;
+    private final @NotNull LocaleManager localeManager;
+    private final @NotNull GUIConfigManager guiConfigManager;
+    private final @NotNull PlayerDataManager playerDataManager;
+    private final @NotNull HeadDatabaseManager headDatabaseManager;
+    private final @NotNull GUIManager guiManager;
 
-public class SkyWelcomeCommand implements CommandExecutor, TabCompleter {
-    final SkyWelcome skyWelcome;
-    final PlayerManager playerManager;
-    final LocaleManager localeManager;
-    final JoinGUI joinGUI;
-    final QuitGUI quitGUI;
-
+    /**
+     * Constructor
+     * @param skyWelcome A {@link SkyWelcome} instance.
+     * @param settingsManager A {@link SettingsManager} instance.
+     * @param localeManager A {@link LocaleManager} instance.
+     * @param guiConfigManager A {@link GUIConfigManager} instance.
+     * @param playerDataManager A {@link PlayerDataManager} instance.
+     * @param headDatabaseManager A {@link HeadDatabaseManager} instance.
+     * @param guiManager A {@link GUIManager} instance.
+     */
     public SkyWelcomeCommand(
-            SkyWelcome skyWelcome,
-            PlayerManager playerManager,
-            LocaleManager localeManager,
-            JoinGUI joinGUI,
-            QuitGUI quitGUI) {
+            @NotNull SkyWelcome skyWelcome,
+            @NotNull SettingsManager settingsManager,
+            @NotNull LocaleManager localeManager,
+            @NotNull GUIConfigManager guiConfigManager,
+            @NotNull PlayerDataManager playerDataManager,
+            @NotNull HeadDatabaseManager headDatabaseManager,
+            @NotNull GUIManager guiManager) {
         this.skyWelcome = skyWelcome;
-        this.playerManager = playerManager;
+        this.settingsManager = settingsManager;
         this.localeManager = localeManager;
-        this.joinGUI = joinGUI;
-        this.quitGUI = quitGUI;
+        this.guiConfigManager = guiConfigManager;
+        this.playerDataManager = playerDataManager;
+        this.headDatabaseManager = headDatabaseManager;
+        this.guiManager = guiManager;
     }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        Locale locale = localeManager.getLocale();
+    /**
+     * Creates the {@link LiteralCommandNode} of type {@link CommandSourceStack} for the skywelcome command.
+     * @return A {@link LiteralCommandNode} of type {@link CommandSourceStack} for the skywelcome command.
+     */
+    public @NotNull LiteralCommandNode<CommandSourceStack> createCommand() {
+        LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("skywelcome")
+                .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome"));
 
-        if(skyWelcome.isPluginDisabled()) {
-            if(args[0].equalsIgnoreCase("reload")) {
-                if(sender instanceof Player player) {
-                    if(sender.hasPermission("skywelcome.command." + args[0])) {
-                        skyWelcome.reload();
-                        if(skyWelcome.isPluginDisabled()) {
-                            sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin was reloaded, but is still soft-disabled due to a configuration error.</red>"));
-                            return false;
-                        } else {
-                            sender.sendMessage(FormatUtil.format(player, locale.prefix() + locale.reload()));
-                            return true;
-                        }
-                    } else {
-                        if(skyWelcome.isPluginDisabled()) {
-                            sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>You do not have permission for this command.</red>"));
-                            sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin is currently is soft-disabled due to a configuration error.</red>"));
-                            sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>Please report this to your server's system administrator.</red>"));
-                        } else {
-                            sender.sendMessage(FormatUtil.format(player, locale.prefix() + locale.noPermission()));
-                        }
-                        return false;
-                    }
-                } else {
-                    skyWelcome.reload();
-                    if(skyWelcome.isPluginDisabled()) {
-                        skyWelcome.getComponentLogger().warn(FormatUtil.format("<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin was reloaded, but is still soft-disabled due to a configuration error.</red>"));
-                        return false;
-                    } else {
-                        skyWelcome.getComponentLogger().info(FormatUtil.format(locale.reload()));
-                        return true;
-                    }
-                }
-            } else {
-                if(sender instanceof Player player) {
-                    sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin is currently is soft-disabled due to a configuration error.</red>"));
-                    sender.sendMessage(FormatUtil.format(player, "<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>Please report this to your server's system administrator.</red>"));
-                } else {
-                    skyWelcome.getComponentLogger().warn(FormatUtil.format("<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>The plugin is currently is soft-disabled due to a configuration error.</red>"));
-                    skyWelcome.getComponentLogger().warn(FormatUtil.format("<gray>[</gray><aqua>SkyWelcome</aqua><gray>]</gray> <red>Please report this to your server's system administrator.</red>"));
-                }
-                return false;
-            }
-        }
+        GuiCommand guiCommand = new GuiCommand(skyWelcome, settingsManager, localeManager, guiConfigManager, playerDataManager, headDatabaseManager, guiManager);
+        HelpCommand helpCommand = new HelpCommand(localeManager);
+        ReloadCommand reloadCommand = new ReloadCommand(skyWelcome, localeManager);
+        ToggleCommand toggleCommand = new ToggleCommand(skyWelcome, localeManager, playerDataManager);
 
-        if(args.length == 0) {
-            if(sender instanceof Player player) {
-                sender.sendMessage(FormatUtil.format(player, locale.prefix() + locale.unknownCommand()));
-                if(sender.hasPermission("skywelcome.command.help")) {
-                    for (String str : locale.help()) {
-                        sender.sendMessage(FormatUtil.format((Player) sender, str));
-                    }
-                    return false;
-                }
-                return false;
-            } else {
-                skyWelcome.getComponentLogger().info(FormatUtil.format(locale.unknownCommand()));
-                for (String str : locale.help()) {
-                    skyWelcome.getComponentLogger().info(FormatUtil.format(str));
-                }
-            }
-            return false;
-        }
+        builder.then(guiCommand.createCommand());
+        builder.then(helpCommand.createCommand());
+        builder.then(reloadCommand.createCommand());
+        builder.then(toggleCommand.createCommand());
 
-        switch(args[0]) {
-            case "reload" -> {
-                if(sender instanceof Player) {
-                    if(sender.hasPermission("skywelcome.command." + args[0])) {
-                        skyWelcome.reload();
-                        sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.reload()));
-                        return true;
-                    } else {
-                        sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.noPermission()));
-                        return false;
-                    }
-                } else {
-                    skyWelcome.reload();
-                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.reload()));
-                    return true;
-                }
-            }
-
-            case "help" -> {
-                if(sender instanceof Player) {
-                    if(sender.hasPermission("skywelcome.command." + args[0])) {
-                        for (String str : locale.help()) {
-                            sender.sendMessage(FormatUtil.format((Player) sender, str));
-                        }
-                        return true;
-                    } else {
-                        sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.noPermission()));
-                        return false;
-                    }
-                } else {
-                    for(String str : locale.help()) {
-                        skyWelcome.getComponentLogger().info(FormatUtil.format(str));
-                    }
-                    return true;
-                }
-            }
-
-            case "gui" -> {
-                if(!(sender instanceof Player)) {
-                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.playerOnly()));
-                    return false;
-                }
-
-                if(args.length == 1) {
-                    sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
-                    if(sender.hasPermission("skywelcome.command.help")) {
-                        for (String str : locale.help()) {
-                            sender.sendMessage(FormatUtil.format((Player) sender, str));
-                        }
-                        return false;
-                    }
-                    return false;
-                }
-
-                switch(args[1].toLowerCase()) {
-                    case "join" -> {
-                        if(sender.hasPermission("skywelcome.command.gui." + args[1].toLowerCase())) {
-                            joinGUI.createGUI((Player) sender);
-                            joinGUI.openGUI((Player) sender);
-                            return true;
-                        } else {
-                            sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.noPermission()));
-                            return false;
-                        }
-                    }
-
-                    case "leave", "quit" -> {
-                        if(sender.hasPermission("skywelcome.command.gui." + args[1].toLowerCase())) {
-                            quitGUI.createGUI((Player) sender);
-                            quitGUI.openGUI((Player) sender);
-                            return true;
-                        } else {
-                            sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.noPermission()));
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            case "toggle" -> {
-                if(!(sender instanceof Player)) {
-                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.playerOnly()));
-                    return false;
-                }
-
-                if(args.length == 1) {
-                    sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
-                    if(sender.hasPermission("skywelcome.command.help")) {
-                        for (String str : locale.help()) {
-                            sender.sendMessage(FormatUtil.format((Player) sender, str));
-                        }
-                        return false;
-                    }
-                    return false;
-                }
-
-                switch(args[1].toLowerCase()) {
-                    case "join" -> {
-                        if(sender.hasPermission("skywelcome.command.toggle." + args[1].toLowerCase())) {
-                            playerManager.toggleJoin((Player) sender);
-                            if(playerManager.getPlayerSettings((Player) sender).joinMessage()) {
-                                sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.joinEnabled()));
-                            } else {
-                                sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.joinDisabled()));
-                            }
-                            return true;
-                        } else {
-                            sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.noPermission()));
-                            return false;
-                        }
-                    }
-
-                    case "leave", "quit" -> {
-                        if(sender.hasPermission("skywelcome.command.toggle." + args[1].toLowerCase())) {
-                            playerManager.toggleQuit((Player) sender);
-                            if(playerManager.getPlayerSettings((Player) sender).leaveMessage()) {
-                                sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.quitEnabled()));
-                            } else {
-                                sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.quitDisabled()));
-                            }
-                            return true;
-                        } else {
-                            sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.noPermission()));
-                            return false;
-                        }
-                    }
-
-                    case "motd" -> {
-                        if(sender.hasPermission("skywelcome.command.toggle." + args[1].toLowerCase())) {
-                            playerManager.toggleMotd((Player) sender);
-                            if(playerManager.getPlayerSettings((Player) sender).motd()) {
-                                sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.motdEnabled()));
-                            } else {
-                                sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.motdDisabled()));
-                            }
-                            return true;
-                        } else {
-                            sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.noPermission()));
-                            return false;
-                        }
-                    }
-
-                    default -> {
-                        sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
-                        if(sender.hasPermission("skywelcome.command.help")) {
-                            for (String str : locale.help()) {
-                                sender.sendMessage(FormatUtil.format((Player) sender, str));
-                            }
-                            return false;
-                        }
-                        return false;
-                    }
-                }
-            }
-
-            default -> {
-                if(sender instanceof Player) {
-                    sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
-                    if(sender.hasPermission("skywelcome.command.help")) {
-                        for (String str : locale.help()) {
-                            sender.sendMessage(FormatUtil.format((Player) sender, str));
-                        }
-                        return false;
-                    }
-                } else {
-                    skyWelcome.getComponentLogger().info(FormatUtil.format(locale.unknownCommand()));
-                    for (String str : locale.help()) {
-                        skyWelcome.getComponentLogger().info(FormatUtil.format(str));
-                    }
-                }
-                return false;
-            }
-        }
-
-        sender.sendMessage(FormatUtil.format((Player) sender, locale.prefix() + locale.unknownCommand()));
-        for (String str : locale.help()) {
-            sender.sendMessage(FormatUtil.format((Player) sender, str));
-        }
-        return false;
-    }
-
-    @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        switch(args.length) {
-            case 1 -> {
-                return List.of("help", "gui", "toggle", "reload");
-            }
-
-            case 2 -> {
-                switch(args[0].toLowerCase()) {
-                    case "gui" -> {
-                        return List.of("join", "leave", "quit");
-                    }
-
-                    case "toggle" -> {
-                        return List.of("join", "leave", "quit", "motd");
-                    }
-                }
-            }
-        }
-
-        return List.of();
+        return builder.build();
     }
 }
