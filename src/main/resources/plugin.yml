@@ -3,7 +3,8 @@ version: '${version}'
 main: com.github.lukesky19.skywelcome.SkyWelcome
 api-version: '1.21'
 author: lukeskywlker19
-depend: [HeadDatabase, SkyLib]
+depend: [SkyLib]
+softdepend: [HeadDatabase]
 
 permissions:
     skywelcome.command.skywelcome.reload:

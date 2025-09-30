@@ -105,7 +105,9 @@ public class SkyWelcome extends JavaPlugin {
                 });
 
         // Register Listeners
-        this.getServer().getPluginManager().registerEvents(headDatabaseManager, this);
+        if(this.getServer().getPluginManager().getPlugin("HeadDatabase") != null) {
+            this.getServer().getPluginManager().registerEvents(headDatabaseManager, this);
+        }
         this.getServer().getPluginManager().registerEvents(new InventoryListener(guiManager), this);
         this.getServer().getPluginManager().registerEvents(new JoinListener(this, settingsManager, playerDataManager), this);
         this.getServer().getPluginManager().registerEvents(new QuitListener(this, settingsManager, playerDataManager), this);

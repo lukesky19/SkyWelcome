@@ -40,6 +40,7 @@ public class PluginUtils {
      * @param player The {@link Player} to check if they are vanished.
      * @return true if vanished, false if not.
      */
+    @SuppressWarnings("deprecation")
     public static boolean isPlayerVanished(@NotNull Player player) {
         for(MetadataValue meta : player.getMetadata("vanished")) {
             if (meta.asBoolean()) return true;
