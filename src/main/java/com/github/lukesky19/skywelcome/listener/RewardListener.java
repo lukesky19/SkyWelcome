@@ -74,15 +74,15 @@ public class RewardListener implements Listener {
      * Listens to an {@link AsyncChatEvent} for when a player says welcome for a new player and distributes rewards.
      * @param asyncChatEvent An {@link AsyncChatEvent}.
      */
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onChat(AsyncChatEvent asyncChatEvent) {
         Settings settings = settingsManager.getSettings();
         if(settings == null) {
-            logger.error(AdventureUtil.serialize("Unable to process welcome reward for new player due to invalid plugin settings."));
+            logger.error(AdventureUtil.deserialize("Unable to process welcome reward for new player due to invalid plugin settings."));
             return;
         }
         if(settings.welcomeRewards().enabled() == null) {
-            logger.error(AdventureUtil.serialize("Unable to process welcome reward for new player due to invalid plugin settings. The boolean whether welcome rewards should be enabled is not configured."));
+            logger.error(AdventureUtil.deserialize("Unable to process welcome reward for new player due to invalid plugin settings. The boolean whether welcome rewards should be enabled is not configured."));
             return;
         }
 
@@ -101,7 +101,7 @@ public class RewardListener implements Listener {
                 Locale locale = localeManager.getLocale();
                 for(Player player : skyWelcome.getServer().getOnlinePlayers()) {
                     if(player.isOnline() && player.isConnected()) {
-                        player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.welcomeBroadcast(), placeholders));
+                        player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.welcomeBroadcast(), placeholders));
                     }
                 }
             }
@@ -116,11 +116,11 @@ public class RewardListener implements Listener {
     public void onNewPlayerJoin(PlayerJoinEvent playerJoinEvent) {
         Settings settings = settingsManager.getSettings();
         if(settings == null) {
-            logger.error(AdventureUtil.serialize("Unable to process new player due to invalid plugin settings."));
+            logger.error(AdventureUtil.deserialize("Unable to process new player due to invalid plugin settings."));
             return;
         }
         if(settings.welcomeRewards().enabled() == null) {
-            logger.error(AdventureUtil.serialize("Unable to process new player due to invalid plugin settings. The boolean whether welcome rewards should be enabled is not configured."));
+            logger.error(AdventureUtil.deserialize("Unable to process new player due to invalid plugin settings. The boolean whether welcome rewards should be enabled is not configured."));
             return;
         }
 

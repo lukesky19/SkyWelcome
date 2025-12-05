@@ -83,7 +83,7 @@ public class SettingsManager {
                 migrateSettings(settingsVersionOnly.configVersion());
             }
         } catch (ConfigurateException e) {
-            skyWelcome.getComponentLogger().error(AdventureUtil.serialize("Failed to load plugin settings: " + e.getMessage()));
+            skyWelcome.getComponentLogger().error(AdventureUtil.deserialize("Failed to load plugin settings: " + e.getMessage()));
             return;
         }
 
@@ -99,13 +99,13 @@ public class SettingsManager {
         if(settings == null) return;
 
         if(settings.configVersion() == null) {
-            logger.error(AdventureUtil.serialize("The config version in settings.yml is invalid."));
+            logger.error(AdventureUtil.deserialize("The config version in settings.yml is invalid."));
             settings = null;
             return;
         }
 
         if(!settings.configVersion().equals("1.5.0.0")) {
-            logger.error(AdventureUtil.serialize("Your settings.yml configuration is outdated and needs to be updated."));
+            logger.error(AdventureUtil.deserialize("Your settings.yml configuration is outdated and needs to be updated."));
             settings = null;
         }
     }
@@ -133,7 +133,7 @@ public class SettingsManager {
                 }
 
                 if(oldSettings == null) {
-                    logger.warn(AdventureUtil.serialize("Unable to migrate settings due to the old settings failing to load."));
+                    logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load."));
                     return;
                 }
 
@@ -159,7 +159,7 @@ public class SettingsManager {
                 }
 
                 if(oldSettings == null) {
-                    logger.warn(AdventureUtil.serialize("Unable to migrate settings due to the old settings failing to load."));
+                    logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load."));
                     return;
                 }
 
@@ -185,7 +185,7 @@ public class SettingsManager {
                 }
 
                 if(oldSettings == null) {
-                    logger.warn(AdventureUtil.serialize("Unable to migrate settings due to the old settings failing to load."));
+                    logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load."));
                     return;
                 }
 
@@ -209,7 +209,7 @@ public class SettingsManager {
                 }
 
                 if(legacySettings == null) {
-                    logger.warn(AdventureUtil.serialize("Unable to migrate settings due to the legacy settings failing to load."));
+                    logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the legacy settings failing to load."));
                     return;
                 }
                 Settings newSettings = migrateLegacySettings(legacySettings);
@@ -238,17 +238,17 @@ public class SettingsManager {
 
         Material material = Material.getMaterial(oldSettings.welcomeRewards().item().material());
         if(material == null) {
-            logger.error(AdventureUtil.serialize("Unable to migrate settings 1.3.0 to 1.5.0.0 due to the reward item material being invalid."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.3.0 to 1.5.0.0 due to the reward item material being invalid."));
             return null;
         }
         ItemType itemType = material.asItemType();
         if(itemType == null) {
-            logger.error(AdventureUtil.serialize("Unable to migrate settings 1.3.0 to 1.5.0.0 due to being unable to find the ItemType that corresponds to the Material."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.3.0 to 1.5.0.0 due to being unable to find the ItemType that corresponds to the Material."));
             return null;
         }
         Integer amount = oldSettings.welcomeRewards().item().amount();
         if(amount == null || amount <= 0) {
-            logger.error(AdventureUtil.serialize("Unable to migrate settings 1.3.0 to 1.5.0.0 due to the amount being invalid."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.3.0 to 1.5.0.0 due to the amount being invalid."));
             return null;
         }
 
@@ -291,17 +291,17 @@ public class SettingsManager {
 
         Material material = Material.getMaterial(oldSettings.welcomeRewards().item().material());
         if(material == null) {
-            logger.error(AdventureUtil.serialize("Unable to migrate settings 1.2.0 to 1.5.0.0 due to the reward item material being invalid."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.2.0 to 1.5.0.0 due to the reward item material being invalid."));
             return null;
         }
         ItemType itemType = material.asItemType();
         if(itemType == null) {
-            logger.error(AdventureUtil.serialize("Unable to migrate settings 1.2.0 to 1.5.0.0 due to being unable to find the ItemType that corresponds to the Material."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.2.0 to 1.5.0.0 due to being unable to find the ItemType that corresponds to the Material."));
             return null;
         }
         Integer amount = oldSettings.welcomeRewards().item().amount();
         if(amount == null || amount <= 0) {
-            logger.error(AdventureUtil.serialize("Unable to migrate settings 1.2.0 to 1.5.0.0 due to the amount being invalid."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.2.0 to 1.5.0.0 due to the amount being invalid."));
             return null;
         }
 

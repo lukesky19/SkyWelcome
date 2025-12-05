@@ -18,6 +18,7 @@
 package com.github.lukesky19.skywelcome.commands.arguments;
 
 import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.api.gui.impl.UUIDGUIManager;
 import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.gui.GUIConfigManager;
 import com.github.lukesky19.skywelcome.config.locale.Locale;
@@ -25,7 +26,6 @@ import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import com.github.lukesky19.skywelcome.gui.JoinGUI;
 import com.github.lukesky19.skywelcome.gui.QuitGUI;
-import com.github.lukesky19.skywelcome.manager.GUIManager;
 import com.github.lukesky19.skywelcome.manager.HeadDatabaseManager;
 import com.github.lukesky19.skywelcome.manager.PlayerDataManager;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -47,12 +47,12 @@ public class GuiCommand {
     private final @NotNull GUIConfigManager guiConfigManager;
     private final @NotNull PlayerDataManager playerDataManager;
     private final @NotNull HeadDatabaseManager headDatabaseManager;
-    private final @NotNull GUIManager guiManager;
+    private final @NotNull UUIDGUIManager guiManager;
 
     /**
      * Default Constructor.
-     * You should use {@link #GuiCommand(SkyWelcome, SettingsManager, LocaleManager, GUIConfigManager, PlayerDataManager, HeadDatabaseManager, GUIManager)} instead.
-     * @deprecated You should use {@link #GuiCommand(SkyWelcome, SettingsManager, LocaleManager, GUIConfigManager, PlayerDataManager, HeadDatabaseManager, GUIManager)} instead.
+     * You should use {@link #GuiCommand(SkyWelcome, SettingsManager, LocaleManager, GUIConfigManager, PlayerDataManager, HeadDatabaseManager, UUIDGUIManager)} instead.
+     * @deprecated You should use {@link #GuiCommand(SkyWelcome, SettingsManager, LocaleManager, GUIConfigManager, PlayerDataManager, HeadDatabaseManager, UUIDGUIManager)} instead.
      * @throws RuntimeException if used.
      */
     @Deprecated
@@ -68,7 +68,7 @@ public class GuiCommand {
      * @param guiConfigManager A {@link GUIConfigManager} instance.
      * @param playerDataManager A {@link PlayerDataManager} instance.
      * @param headDatabaseManager A {@link HeadDatabaseManager} instance.
-     * @param guiManager A {@link GUIManager} instance.
+     * @param guiManager A {@link UUIDGUIManager} instance.
      */
     public GuiCommand(@NotNull SkyWelcome skyWelcome,
                       @NotNull SettingsManager settingsManager,
@@ -76,7 +76,7 @@ public class GuiCommand {
                       @NotNull GUIConfigManager guiConfigManager,
                       @NotNull PlayerDataManager playerDataManager,
                       @NotNull HeadDatabaseManager headDatabaseManager,
-                      @NotNull GUIManager guiManager) {
+                      @NotNull UUIDGUIManager guiManager) {
         this.skyWelcome = skyWelcome;
         this.logger = skyWelcome.getComponentLogger();
         this.settingsManager = settingsManager;
@@ -104,22 +104,22 @@ public class GuiCommand {
                     JoinGUI joinGUI = new JoinGUI(skyWelcome, guiManager, player, settingsManager, guiConfigManager, playerDataManager, headDatabaseManager);
                     boolean creationResult = joinGUI.create();
                     if(!creationResult) {
-                        logger.error(AdventureUtil.serialize("Unable to create the InventoryView for the join GUI for player " + player.getName() + " due to a configuration error."));
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.guiOpenError()));
+                        logger.error(AdventureUtil.deserialize("Unable to create the InventoryView for the join GUI for player " + player.getName() + " due to a configuration error."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.guiOpenError()));
                         return 0;
                     }
 
                     boolean updateResult = joinGUI.update();
                     if(!updateResult) {
-                        logger.error(AdventureUtil.serialize("Unable to decorate the join GUI for player " + player.getName() + " due to a configuration error."));
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.guiOpenError()));
+                        logger.error(AdventureUtil.deserialize("Unable to decorate the join GUI for player " + player.getName() + " due to a configuration error."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.guiOpenError()));
                         return 0;
                     }
 
                     boolean openResult = joinGUI.open();
                     if(!openResult) {
-                        logger.error(AdventureUtil.serialize("Unable to open the join GUI for player " + player.getName() + " due to a configuration error."));
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.guiOpenError()));
+                        logger.error(AdventureUtil.deserialize("Unable to open the join GUI for player " + player.getName() + " due to a configuration error."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.guiOpenError()));
                         return 0;
                     }
 
@@ -135,22 +135,22 @@ public class GuiCommand {
                     QuitGUI quitGUI = new QuitGUI(skyWelcome, guiManager, player, settingsManager, guiConfigManager, playerDataManager, headDatabaseManager);
                     boolean creationResult = quitGUI.create();
                     if(!creationResult) {
-                        logger.error(AdventureUtil.serialize("Unable to create the InventoryView for the quit GUI for player " + player.getName() + " due to a configuration error."));
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.guiOpenError()));
+                        logger.error(AdventureUtil.deserialize("Unable to create the InventoryView for the quit GUI for player " + player.getName() + " due to a configuration error."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.guiOpenError()));
                         return 0;
                     }
 
                     boolean updateResult = quitGUI.update();
                     if(!updateResult) {
-                        logger.error(AdventureUtil.serialize("Unable to decorate the quit GUI for player " + player.getName() + " due to a configuration error."));
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.guiOpenError()));
+                        logger.error(AdventureUtil.deserialize("Unable to decorate the quit GUI for player " + player.getName() + " due to a configuration error."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.guiOpenError()));
                         return 0;
                     }
 
                     boolean openResult = quitGUI.open();
                     if(!openResult) {
-                        logger.error(AdventureUtil.serialize("Unable to open the quit GUI for player " + player.getName() + " due to a configuration error."));
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.guiOpenError()));
+                        logger.error(AdventureUtil.deserialize("Unable to open the quit GUI for player " + player.getName() + " due to a configuration error."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.guiOpenError()));
                         return 0;
                     }
 
@@ -166,22 +166,22 @@ public class GuiCommand {
                     QuitGUI quitGUI = new QuitGUI(skyWelcome, guiManager, player, settingsManager, guiConfigManager, playerDataManager, headDatabaseManager);
                     boolean creationResult = quitGUI.create();
                     if(!creationResult) {
-                        logger.error(AdventureUtil.serialize("Unable to create the InventoryView for the quit GUI for player " + player.getName() + " due to a configuration error."));
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.guiOpenError()));
+                        logger.error(AdventureUtil.deserialize("Unable to create the InventoryView for the quit GUI for player " + player.getName() + " due to a configuration error."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.guiOpenError()));
                         return 0;
                     }
 
                     boolean updateResult = quitGUI.update();
                     if(!updateResult) {
-                        logger.error(AdventureUtil.serialize("Unable to decorate the quit GUI for player " + player.getName() + " due to a configuration error."));
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.guiOpenError()));
+                        logger.error(AdventureUtil.deserialize("Unable to decorate the quit GUI for player " + player.getName() + " due to a configuration error."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.guiOpenError()));
                         return 0;
                     }
 
                     boolean openResult = quitGUI.open();
                     if(!openResult) {
-                        logger.error(AdventureUtil.serialize("Unable to open the quit GUI for player " + player.getName() + " due to a configuration error."));
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.guiOpenError()));
+                        logger.error(AdventureUtil.deserialize("Unable to open the quit GUI for player " + player.getName() + " due to a configuration error."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.guiOpenError()));
                         return 0;
                     }
 

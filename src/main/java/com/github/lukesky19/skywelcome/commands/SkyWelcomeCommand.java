@@ -17,6 +17,7 @@
 */
 package com.github.lukesky19.skywelcome.commands;
 
+import com.github.lukesky19.skylib.api.gui.impl.UUIDGUIManager;
 import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.commands.arguments.GuiCommand;
 import com.github.lukesky19.skywelcome.commands.arguments.HelpCommand;
@@ -25,7 +26,6 @@ import com.github.lukesky19.skywelcome.commands.arguments.ToggleCommand;
 import com.github.lukesky19.skywelcome.config.gui.GUIConfigManager;
 import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
-import com.github.lukesky19.skywelcome.manager.GUIManager;
 import com.github.lukesky19.skywelcome.manager.HeadDatabaseManager;
 import com.github.lukesky19.skywelcome.manager.PlayerDataManager;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -44,7 +44,7 @@ public class SkyWelcomeCommand {
     private final @NotNull GUIConfigManager guiConfigManager;
     private final @NotNull PlayerDataManager playerDataManager;
     private final @NotNull HeadDatabaseManager headDatabaseManager;
-    private final @NotNull GUIManager guiManager;
+    private final @NotNull UUIDGUIManager guiManager;
 
     /**
      * Constructor
@@ -54,7 +54,7 @@ public class SkyWelcomeCommand {
      * @param guiConfigManager A {@link GUIConfigManager} instance.
      * @param playerDataManager A {@link PlayerDataManager} instance.
      * @param headDatabaseManager A {@link HeadDatabaseManager} instance.
-     * @param guiManager A {@link GUIManager} instance.
+     * @param guiManager A {@link UUIDGUIManager} instance.
      */
     public SkyWelcomeCommand(
             @NotNull SkyWelcome skyWelcome,
@@ -63,7 +63,7 @@ public class SkyWelcomeCommand {
             @NotNull GUIConfigManager guiConfigManager,
             @NotNull PlayerDataManager playerDataManager,
             @NotNull HeadDatabaseManager headDatabaseManager,
-            @NotNull GUIManager guiManager) {
+            @NotNull UUIDGUIManager guiManager) {
         this.skyWelcome = skyWelcome;
         this.settingsManager = settingsManager;
         this.localeManager = localeManager;

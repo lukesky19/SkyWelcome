@@ -71,12 +71,12 @@ public class QuitListener implements Listener {
 
         Settings settings = settingsManager.getSettings();
         if(settings == null) {
-            logger.warn(AdventureUtil.serialize("Unable to send a leave message to players due to invalid plugin settings."));
+            logger.warn(AdventureUtil.deserialize("Unable to send a leave message to players due to invalid plugin settings."));
             return;
         }
 
         if(settings.globalQuitToggle() == null) {
-            logger.warn(AdventureUtil.serialize("Unable to send a leave message to players due to an invalid global quit toggle setting."));
+            logger.warn(AdventureUtil.deserialize("Unable to send a leave message to players due to an invalid global quit toggle setting."));
             return;
         }
 
@@ -85,12 +85,12 @@ public class QuitListener implements Listener {
 
         PlayerData playerData = playerDataManager.getPlayerData(uuid);
         if(playerData == null) {
-            logger.warn(AdventureUtil.serialize("Unable to send a leave message to players due due to no player data retrieved."));
+            logger.warn(AdventureUtil.deserialize("Unable to send a leave message to players due due to no player data retrieved."));
             return;
         }
 
         if(settings.globalQuitToggle() && playerData.isSendLeave()) {
-            Component leaveMessage = AdventureUtil.serialize(player, playerData.getLeaveMessage());
+            Component leaveMessage = AdventureUtil.deserialize(player, playerData.getLeaveMessage());
             skyWelcome.getServer().getOnlinePlayers()
                     .forEach(onlinePlayer -> onlinePlayer.sendMessage(leaveMessage));
         }

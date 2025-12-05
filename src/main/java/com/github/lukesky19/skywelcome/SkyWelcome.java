@@ -18,23 +18,23 @@
 package com.github.lukesky19.skywelcome;
 
 import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.api.gui.impl.UUIDGUIListener;
+import com.github.lukesky19.skylib.api.gui.impl.UUIDGUIManager;
 import com.github.lukesky19.skylib.libs.bstats.bukkit.Metrics;
 import com.github.lukesky19.skywelcome.commands.SkyWelcomeCommand;
 import com.github.lukesky19.skywelcome.commands.arguments.ToggleCommand;
 import com.github.lukesky19.skywelcome.config.gui.GUIConfigManager;
 import com.github.lukesky19.skywelcome.config.locale.LocaleManager;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
-import com.github.lukesky19.skywelcome.listener.InventoryListener;
+import com.github.lukesky19.skywelcome.database.ConnectionManager;
+import com.github.lukesky19.skywelcome.database.DatabaseManager;
+import com.github.lukesky19.skywelcome.database.QueueManager;
 import com.github.lukesky19.skywelcome.listener.JoinListener;
 import com.github.lukesky19.skywelcome.listener.QuitListener;
 import com.github.lukesky19.skywelcome.listener.RewardListener;
-import com.github.lukesky19.skywelcome.manager.GUIManager;
 import com.github.lukesky19.skywelcome.manager.HeadDatabaseManager;
 import com.github.lukesky19.skywelcome.manager.PlayerDataManager;
 import com.github.lukesky19.skywelcome.manager.RewardManager;
-import com.github.lukesky19.skywelcome.manager.database.ConnectionManager;
-import com.github.lukesky19.skywelcome.manager.database.DatabaseManager;
-import com.github.lukesky19.skywelcome.manager.database.QueueManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.milkbowl.vault.economy.Economy;
@@ -52,7 +52,7 @@ public class SkyWelcome extends JavaPlugin {
     private PlayerDataManager playerDataManager;
     private GUIConfigManager guiConfigManager;
     private DatabaseManager databaseManager;
-    private GUIManager guiManager;
+    private UUIDGUIManager guiManager;
 
     private Economy economy;
 
@@ -93,7 +93,7 @@ public class SkyWelcome extends JavaPlugin {
 
         HeadDatabaseManager headDatabaseManager = new HeadDatabaseManager();
 
-        guiManager = new GUIManager(this);
+        guiManager = new UUIDGUIManager();
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
                 commands -> {
@@ -108,7 +108,7 @@ public class SkyWelcome extends JavaPlugin {
         if(this.getServer().getPluginManager().getPlugin("HeadDatabase") != null) {
             this.getServer().getPluginManager().registerEvents(headDatabaseManager, this);
         }
-        this.getServer().getPluginManager().registerEvents(new InventoryListener(guiManager), this);
+        this.getServer().getPluginManager().registerEvents(new UUIDGUIListener(guiManager), this);
         this.getServer().getPluginManager().registerEvents(new JoinListener(this, settingsManager, playerDataManager), this);
         this.getServer().getPluginManager().registerEvents(new QuitListener(this, settingsManager, playerDataManager), this);
         this.getServer().getPluginManager().registerEvents(new RewardListener(this, settingsManager, localeManager, rewardManager), this);
@@ -159,12 +159,12 @@ public class SkyWelcome extends JavaPlugin {
             String[] splitVersion = version.split("\\.");
             int second = Integer.parseInt(splitVersion[1]);
 
-            if(second >= 3) {
+            if(second >= 4) {
                 return true;
             }
         }
 
-        this.getComponentLogger().error(AdventureUtil.serialize("SkyLib Version 1.3.0.0 or newer is required to run this plugin."));
+        this.getComponentLogger().error(AdventureUtil.deserialize("SkyLib Version 1.4.0.0 or newer is required to run this plugin."));
         this.getServer().getPluginManager().disablePlugin(this);
         return false;
     }
@@ -182,7 +182,7 @@ public class SkyWelcome extends JavaPlugin {
             }
         }
 
-        this.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>SkyShop has been disabled due to no Vault dependency found!</red>"));
+        this.getComponentLogger().error(MiniMessage.miniMessage().deserialize("<red>SkyWelcome has been disabled due to no Vault dependency found!</red>"));
         this.getServer().getPluginManager().disablePlugin(this);
         return false;
     }

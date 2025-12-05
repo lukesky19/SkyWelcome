@@ -26,8 +26,8 @@ import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import com.github.lukesky19.skywelcome.data.player.PlayerData;
 import com.github.lukesky19.skywelcome.data.player.legacy.PlayerSettings;
-import com.github.lukesky19.skywelcome.manager.database.DatabaseManager;
-import com.github.lukesky19.skywelcome.manager.database.tables.PlayerDataTable;
+import com.github.lukesky19.skywelcome.database.DatabaseManager;
+import com.github.lukesky19.skywelcome.database.tables.PlayerDataTable;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -79,31 +79,31 @@ public class PlayerDataManager {
 
         Settings settings = settingsManager.getSettings();
         if(settings == null) {
-            logger.error(AdventureUtil.serialize("Unable to create player data due to invalid plugin settings."));
+            logger.error(AdventureUtil.deserialize("Unable to create player data due to invalid plugin settings."));
             return null;
         }
 
         if(settings.joinMessages().isEmpty()) {
-            logger.error(AdventureUtil.serialize("Unable to create player data due to no join messages being configured."));
+            logger.error(AdventureUtil.deserialize("Unable to create player data due to no join messages being configured."));
             return null;
         }
 
         if(settings.quitMessages().isEmpty()) {
-            logger.error(AdventureUtil.serialize("Unable to create player data due to no leave messages being configured."));
+            logger.error(AdventureUtil.deserialize("Unable to create player data due to no leave messages being configured."));
             return null;
         }
 
         @Nullable String joinMessage = settings.joinMessages().getFirst().message();
         if(joinMessage == null) {
-            logger.error(AdventureUtil.serialize("Unable to create player data due to an invalid default join message."));
-            logger.error(AdventureUtil.serialize("The plugin chooses the first join message as the default."));
+            logger.error(AdventureUtil.deserialize("Unable to create player data due to an invalid default join message."));
+            logger.error(AdventureUtil.deserialize("The plugin chooses the first join message as the default."));
             return null;
         }
 
         @Nullable String leaveMessage = settings.quitMessages().getFirst().message();
         if(leaveMessage == null) {
-            logger.error(AdventureUtil.serialize("Unable to create player data due to an invalid default leave message."));
-            logger.error(AdventureUtil.serialize("The plugin chooses the first leave message as the default."));
+            logger.error(AdventureUtil.deserialize("Unable to create player data due to an invalid default leave message."));
+            logger.error(AdventureUtil.deserialize("The plugin chooses the first leave message as the default."));
             return null;
         }
 
@@ -130,31 +130,31 @@ public class PlayerDataManager {
             if(playerData == null) {
                 Settings settings = settingsManager.getSettings();
                 if(settings == null) {
-                    logger.error(AdventureUtil.serialize("Unable to create player data due to invalid plugin settings."));
+                    logger.error(AdventureUtil.deserialize("Unable to create player data due to invalid plugin settings."));
                     return null;
                 }
 
                 if(settings.joinMessages().isEmpty()) {
-                    logger.error(AdventureUtil.serialize("Unable to create player data due to no join messages being configured."));
+                    logger.error(AdventureUtil.deserialize("Unable to create player data due to no join messages being configured."));
                     return null;
                 }
 
                 if(settings.quitMessages().isEmpty()) {
-                    logger.error(AdventureUtil.serialize("Unable to create player data due to no leave messages being configured."));
+                    logger.error(AdventureUtil.deserialize("Unable to create player data due to no leave messages being configured."));
                     return null;
                 }
 
                 @Nullable String joinMessage = settings.joinMessages().getFirst().message();
                 if(joinMessage == null) {
-                    logger.error(AdventureUtil.serialize("Unable to create player data due to an invalid default join message."));
-                    logger.error(AdventureUtil.serialize("The plugin chooses the first join message as the default."));
+                    logger.error(AdventureUtil.deserialize("Unable to create player data due to an invalid default join message."));
+                    logger.error(AdventureUtil.deserialize("The plugin chooses the first join message as the default."));
                     return null;
                 }
 
                 @Nullable String leaveMessage = settings.quitMessages().getFirst().message();
                 if(leaveMessage == null) {
-                    logger.error(AdventureUtil.serialize("Unable to create player data due to an invalid default leave message."));
-                    logger.error(AdventureUtil.serialize("The plugin chooses the first leave message as the default."));
+                    logger.error(AdventureUtil.deserialize("Unable to create player data due to an invalid default leave message."));
+                    logger.error(AdventureUtil.deserialize("The plugin chooses the first leave message as the default."));
                     return null;
                 }
 
@@ -189,31 +189,31 @@ public class PlayerDataManager {
     public void migrateLegacyPlayerSettings() {
         Settings settings = settingsManager.getSettings();
         if(settings == null) {
-            logger.error(AdventureUtil.serialize("Unable to migrate legacy player data due to invalid plugin settings."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate legacy player data due to invalid plugin settings."));
             return;
         }
 
         if(settings.joinMessages().isEmpty()) {
-            logger.error(AdventureUtil.serialize("Unable to migrate legacy player data due to no join messages being configured."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate legacy player data due to no join messages being configured."));
             return;
         }
 
         if(settings.quitMessages().isEmpty()) {
-            logger.error(AdventureUtil.serialize("Unable to migrate legacy player data due to no leave messages being configured."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate legacy player data due to no leave messages being configured."));
             return;
         }
 
         @Nullable String defaultJoinMessage = settings.joinMessages().getFirst().message();
         if(defaultJoinMessage == null) {
-            logger.error(AdventureUtil.serialize("Unable to migrate legacy player data due to an invalid default join message."));
-            logger.error(AdventureUtil.serialize("The plugin chooses the first join message as the default."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate legacy player data due to an invalid default join message."));
+            logger.error(AdventureUtil.deserialize("The plugin chooses the first join message as the default."));
             return;
         }
 
         @Nullable String defaultLeaveMessage = settings.quitMessages().getFirst().message();
         if(defaultLeaveMessage == null) {
-            logger.error(AdventureUtil.serialize("Unable to migrate legacy player data due to an invalid default leave message."));
-            logger.error(AdventureUtil.serialize("The plugin chooses the first leave message as the default."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate legacy player data due to an invalid default leave message."));
+            logger.error(AdventureUtil.deserialize("The plugin chooses the first leave message as the default."));
             return;
         }
 
@@ -244,15 +244,15 @@ public class PlayerDataManager {
                                 try {
                                     Files.delete(path);
                                 } catch (IOException e) {
-                                    logger.warn(AdventureUtil.serialize("Failed to delete legacy player data for file: " + path.toFile() + ". Error: " + e.getMessage()));
+                                    logger.warn(AdventureUtil.deserialize("Failed to delete legacy player data for file: " + path.toFile() + ". Error: " + e.getMessage()));
                                 }
                             }
                         } catch (ConfigurateException e) {
-                            logger.warn(AdventureUtil.serialize("Failed to migrate legacy player data for file: " + path.toFile() + ". Error: " + e.getMessage()));
+                            logger.warn(AdventureUtil.deserialize("Failed to migrate legacy player data for file: " + path.toFile() + ". Error: " + e.getMessage()));
                         }
                     });
         } catch (IOException e) {
-            logger.warn(AdventureUtil.serialize("Failed to migrate legacy player data. Error: " + e.getMessage()));
+            logger.warn(AdventureUtil.deserialize("Failed to migrate legacy player data. Error: " + e.getMessage()));
             return;
         }
 

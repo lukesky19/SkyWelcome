@@ -7,31 +7,31 @@ depend: [SkyLib]
 softdepend: [HeadDatabase]
 
 permissions:
-    skywelcome.command.skywelcome.reload:
+    skywelcome.commands.skywelcome.reload:
         description: Permission to reload the plugin.
         default: op
-    skywelcome.command.skywelcome.help:
+    skywelcome.commands.skywelcome.help:
         description: Permission to view the plugin's help message.
         default: op
-    skywelcome.command.skywelcome.toggle.join:
+    skywelcome.commands.skywelcome.toggle.join:
         description: Toggle the individual player's join message.
         default: op
-    skywelcome.command.skywelcome.toggle.leave:
+    skywelcome.commands.skywelcome.toggle.leave:
         description: Toggle the individual player's leave message.
         default: op
-    skywelcome.command.skywelcome.toggle.quit:
+    skywelcome.commands.skywelcome.toggle.quit:
         description: Toggle the individual player's quit message.s
         default: op
-    skywelcome.command.skywelcome.toggle.motd:
+    skywelcome.commands.skywelcome.toggle.motd:
         description: Toggle the individual player's motd message.
         default: op
-    skywelcome.command.skywelcome.gui.join:
+    skywelcome.commands.skywelcome.gui.join:
         description: Permission to open the join message selection GUI.
         default: op
-    skywelcome.command.skywelcome.gui.quit:
+    skywelcome.commands.skywelcome.gui.quit:
         description: Permission to open the quit message selection GUI.
         default: op
-    skywelcome.command.skywelcome.gui.leave:
+    skywelcome.commands.skywelcome.gui.leave:
         description: Permission to open the leave message selection GUI.
         default: op
     skywelcome.invulnerable:

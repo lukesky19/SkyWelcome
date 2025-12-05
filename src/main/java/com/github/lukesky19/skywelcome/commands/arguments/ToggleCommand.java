@@ -85,8 +85,8 @@ public class ToggleCommand {
                     @Nullable PlayerData playerData = playerDataManager.getPlayerData(uuid);
 
                     if(playerData == null) {
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Unable to toggle the sending of your join message due to invalid player data.</red>"));
-                        logger.warn(AdventureUtil.serialize("Unable to toggle the sending of player " + player.getName() + "'s join message due to invalid player data."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Unable to toggle the sending of your join message due to invalid player data.</red>"));
+                        logger.warn(AdventureUtil.deserialize("Unable to toggle the sending of player " + player.getName() + "'s join message due to invalid player data."));
                         return 0;
                     }
 
@@ -94,9 +94,9 @@ public class ToggleCommand {
 
                     if(player.isOnline() && player.isConnected()) {
                         if(playerData.isSendJoin()) {
-                            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.joinEnabled()));
+                            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.joinEnabled()));
                         } else {
-                            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.joinDisabled()));
+                            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.joinDisabled()));
                         }
                     }
 
@@ -114,8 +114,8 @@ public class ToggleCommand {
                     @Nullable PlayerData playerData = playerDataManager.getPlayerData(uuid);
 
                     if(playerData == null) {
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Unable to toggle the sending of the motd message due to invalid player data.</red>"));
-                        logger.warn(AdventureUtil.serialize("Unable to toggle the sending the motd message for player " + player.getName() + " due to invalid player data."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Unable to toggle the sending of the motd message due to invalid player data.</red>"));
+                        logger.warn(AdventureUtil.deserialize("Unable to toggle the sending the motd message for player " + player.getName() + " due to invalid player data."));
                         return 0;
                     }
 
@@ -123,9 +123,9 @@ public class ToggleCommand {
 
                     if(player.isOnline() && player.isConnected()) {
                         if(playerData.isSendMotd()) {
-                            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.motdEnabled()));
+                            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.motdEnabled()));
                         } else {
-                            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.motdDisabled()));
+                            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.motdDisabled()));
                         }
                     }
 
@@ -143,8 +143,8 @@ public class ToggleCommand {
                     @Nullable PlayerData playerData = playerDataManager.getPlayerData(uuid);
 
                     if(playerData == null) {
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Unable to toggle the sending of your leave message due to invalid player data.</red>"));
-                        logger.warn(AdventureUtil.serialize("Unable to toggle the sending of player " + player.getName() + "'s leave message due to invalid player data."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Unable to toggle the sending of your leave message due to invalid player data.</red>"));
+                        logger.warn(AdventureUtil.deserialize("Unable to toggle the sending of player " + player.getName() + "'s leave message due to invalid player data."));
                         return 0;
                     }
 
@@ -152,9 +152,9 @@ public class ToggleCommand {
 
                     if(player.isOnline() && player.isConnected()) {
                         if(playerData.isSendLeave()) {
-                            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.quitEnabled()));
+                            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.quitEnabled()));
                         } else {
-                            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.quitDisabled()));
+                            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.quitDisabled()));
                         }
                     }
 
@@ -172,8 +172,8 @@ public class ToggleCommand {
                     @Nullable PlayerData playerData = playerDataManager.getPlayerData(uuid);
 
                     if(playerData == null) {
-                        player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Unable to toggle the sending of your leave message due to invalid player data.</red>"));
-                        logger.warn(AdventureUtil.serialize("Unable to toggle the sending of player " + player.getName() + "'s leave message due to invalid player data."));
+                        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Unable to toggle the sending of your leave message due to invalid player data.</red>"));
+                        logger.warn(AdventureUtil.deserialize("Unable to toggle the sending of player " + player.getName() + "'s leave message due to invalid player data."));
                         return 0;
                     }
 
@@ -181,9 +181,9 @@ public class ToggleCommand {
 
                     if(player.isOnline() && player.isConnected()) {
                         if(playerData.isSendLeave()) {
-                            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.quitEnabled()));
+                            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.quitEnabled()));
                         } else {
-                            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.quitDisabled()));
+                            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.quitDisabled()));
                         }
                     }
 

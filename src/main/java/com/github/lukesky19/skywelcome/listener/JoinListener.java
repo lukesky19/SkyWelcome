@@ -71,35 +71,35 @@ public class JoinListener implements Listener {
 
         Settings settings = settingsManager.getSettings();
         if(settings == null) {
-            logger.warn(AdventureUtil.serialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to invalid plugin settings."));
+            logger.warn(AdventureUtil.deserialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to invalid plugin settings."));
             return;
         }
 
         if(settings.globalJoinToggle() == null) {
-            logger.warn(AdventureUtil.serialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to an invalid global join toggle setting."));
+            logger.warn(AdventureUtil.deserialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to an invalid global join toggle setting."));
             return;
         }
 
         if(settings.globalMotdToggle() == null) {
-            logger.warn(AdventureUtil.serialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to an invalid global motd toggle setting."));
+            logger.warn(AdventureUtil.deserialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to an invalid global motd toggle setting."));
             return;
         }
 
         @NotNull CompletableFuture<@Nullable PlayerData> future = playerDataManager.loadPlayerData(uuid);
         future.thenAccept(playerData -> {
             if(playerData == null) {
-                logger.warn(AdventureUtil.serialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to no player data retrieved."));
+                logger.warn(AdventureUtil.deserialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to no player data retrieved."));
                 return;
             }
 
             skyWelcome.getServer().getScheduler().runTask(skyWelcome, () -> {
                 if(settings.globalJoinToggle() && playerData.isSendJoin()) {
                     skyWelcome.getServer().getOnlinePlayers().forEach(onlinePlayer ->
-                            onlinePlayer.sendMessage(AdventureUtil.serialize(player, playerData.getJoinMessage())));
+                            onlinePlayer.sendMessage(AdventureUtil.deserialize(player, playerData.getJoinMessage())));
                 }
 
                 if(settings.globalMotdToggle() && playerData.isSendMotd()) {
-                    settings.motd().forEach(message -> player.sendMessage(AdventureUtil.serialize(player, message)));
+                    settings.motd().forEach(message -> player.sendMessage(AdventureUtil.deserialize(player, message)));
                 }
             });
         });

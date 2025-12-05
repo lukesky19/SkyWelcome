@@ -67,7 +67,7 @@ public class RewardManager {
     public void giveReward(@NotNull Player player) {
         Settings settings = settingsManager.getSettings();
         if(settings == null || settings.welcomeRewards().enabled() == null) {
-            logger.warn(AdventureUtil.serialize("Unable to give rewards to " + player.getName() + " due to invalid plugin settings."));
+            logger.warn(AdventureUtil.deserialize("Unable to give rewards to " + player.getName() + " due to invalid plugin settings."));
             return;
         }
         if(!settings.welcomeRewards().enabled()) return;
@@ -77,7 +77,7 @@ public class RewardManager {
         if(!settings.welcomeRewards().commands().isEmpty()) runCommands(player, settings.welcomeRewards().commands());
 
         for(String msg : settings.welcomeRewards().messages()) {
-            player.sendMessage(AdventureUtil.serialize(player, localeManager.getLocale().prefix() + msg));
+            player.sendMessage(AdventureUtil.deserialize(player, localeManager.getLocale().prefix() + msg));
         }
     }
 
@@ -92,7 +92,7 @@ public class RewardManager {
             if(optionalItemStack.isPresent()) {
                 PlayerUtil.giveItem(player.getInventory(), optionalItemStack.get(), optionalItemStack.get().getAmount(), player.getLocation());
             } else {
-                logger.warn(AdventureUtil.serialize("Unable to give reward item to player due to invalid ItemStackConfig."));
+                logger.warn(AdventureUtil.deserialize("Unable to give reward item to player due to invalid ItemStackConfig."));
             }
         }
     }

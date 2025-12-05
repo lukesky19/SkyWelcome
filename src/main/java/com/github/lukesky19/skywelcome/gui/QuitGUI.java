@@ -20,7 +20,8 @@ package com.github.lukesky19.skywelcome.gui;
 import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
 import com.github.lukesky19.skylib.api.gui.GUIButton;
 import com.github.lukesky19.skylib.api.gui.GUIType;
-import com.github.lukesky19.skylib.api.gui.abstracts.ChestGUI;
+import com.github.lukesky19.skylib.api.gui.impl.UUIDGUIManager;
+import com.github.lukesky19.skylib.api.gui.templates.ChestGUI;
 import com.github.lukesky19.skylib.api.itemstack.ItemStackBuilder;
 import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.gui.GUIConfig;
@@ -28,7 +29,6 @@ import com.github.lukesky19.skywelcome.config.gui.GUIConfigManager;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import com.github.lukesky19.skywelcome.data.player.PlayerData;
-import com.github.lukesky19.skywelcome.manager.GUIManager;
 import com.github.lukesky19.skywelcome.manager.HeadDatabaseManager;
 import com.github.lukesky19.skywelcome.manager.PlayerDataManager;
 import org.bukkit.entity.Player;
@@ -46,7 +46,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class creates a gui to allow the selection of a custom leave message.
  */
-public class QuitGUI extends ChestGUI {
+public class QuitGUI extends ChestGUI<UUID> {
     // Plugin Classes
     private final @NotNull SettingsManager settingsManager;
     private final @NotNull PlayerDataManager playerDataManager;
@@ -66,7 +66,7 @@ public class QuitGUI extends ChestGUI {
     /**
      * Constructor
      * @param skyWelcome A {@link SkyWelcome} instance.
-     * @param guiManager A {@link GUIManager} instance.
+     * @param guiManager A {@link UUIDGUIManager} instance.
      * @param player The {@link Player} this GUI is for.
      * @param settingsManager A {@link SettingsManager} instance.
      * @param guiConfigManager A {@link GUIConfigManager} instance.
@@ -75,13 +75,13 @@ public class QuitGUI extends ChestGUI {
      */
     public QuitGUI(
             @NotNull SkyWelcome skyWelcome,
-            @NotNull GUIManager guiManager,
+            @NotNull UUIDGUIManager guiManager,
             @NotNull Player player,
             @NotNull SettingsManager settingsManager,
             @NotNull GUIConfigManager guiConfigManager,
             @NotNull PlayerDataManager playerDataManager,
             @NotNull HeadDatabaseManager headDatabaseManager) {
-        super(skyWelcome, guiManager, player);
+        super(skyWelcome, guiManager, player.getUniqueId(), player);
 
         this.settingsManager = settingsManager;
         this.playerDataManager = playerDataManager;
@@ -96,13 +96,13 @@ public class QuitGUI extends ChestGUI {
      */
     public boolean create() {
         if(guiConfig == null) {
-            logger.warn(AdventureUtil.serialize("Unable to create the InventoryView for the quit message GUI due to invalid gui configuration."));
+            logger.warn(AdventureUtil.deserialize("Unable to create the InventoryView for the quit message GUI due to invalid gui configuration."));
             return false;
         }
 
         GUIType guiType = guiConfig.gui().guiType();
         if(guiType == null) {
-            logger.warn(AdventureUtil.serialize("Unable to create the InventoryView for the quit message GUI due to an invalid GUIType."));
+            logger.warn(AdventureUtil.deserialize("Unable to create the InventoryView for the quit message GUI due to an invalid GUIType."));
             return false;
         }
 
@@ -118,25 +118,25 @@ public class QuitGUI extends ChestGUI {
     @Override
     public boolean update() {
         if(guiConfig == null) {
-            logger.warn(AdventureUtil.serialize("Unable to add buttons to the GUI as the gui configuration is invalid."));
+            logger.warn(AdventureUtil.deserialize("Unable to add buttons to the GUI as the gui configuration is invalid."));
             return false;
         }
 
         // If the InventoryView was not created, log a warning and return false.
         if(inventoryView == null) {
-            logger.warn(AdventureUtil.serialize("Unable to add buttons to the GUI as the InventoryView was not created."));
+            logger.warn(AdventureUtil.deserialize("Unable to add buttons to the GUI as the InventoryView was not created."));
             return false;
         }
 
         Settings settings = settingsManager.getSettings();
         if(settings == null) {
-            logger.warn(AdventureUtil.serialize("Unable to add buttons to the GUI as the plugin's settings are invalid."));
+            logger.warn(AdventureUtil.deserialize("Unable to add buttons to the GUI as the plugin's settings are invalid."));
             return false;
         }
 
         // If the items per page was not configured log a warning and return false.
         if(guiConfig.gui().itemsPerPage() == null) {
-            logger.warn(AdventureUtil.serialize("Unable to add buttons to the GUI as the items per page is not configured."));
+            logger.warn(AdventureUtil.deserialize("Unable to add buttons to the GUI as the items per page is not configured."));
             return false;
         }
         int itemsPerPage = guiConfig.gui().itemsPerPage();
@@ -155,7 +155,7 @@ public class QuitGUI extends ChestGUI {
 
                 case RETURN -> createExitButton(buttonConfig);
 
-                case null -> logger.warn(AdventureUtil.serialize("Unable to add a button due to an invalid button type."));
+                case null -> logger.warn(AdventureUtil.deserialize("Unable to add a button due to an invalid button type."));
 
                 default -> {}
             }
@@ -180,7 +180,7 @@ public class QuitGUI extends ChestGUI {
                     }
                 }
 
-                case null -> logger.warn(AdventureUtil.serialize("Unable to add a button due to an invalid button type."));
+                case null -> logger.warn(AdventureUtil.deserialize("Unable to add a button due to an invalid button type."));
 
                 default -> {}
             }
@@ -278,7 +278,7 @@ public class QuitGUI extends ChestGUI {
     private void createDummyButton(@NotNull GUIConfig.ButtonConfig buttonConfig) {
         // Check if the slot is not configured and send a warning.
         if(buttonConfig.slot() == null) {
-            logger.warn(AdventureUtil.serialize("Unable to add a dummy button due to a slot not being configured."));
+            logger.warn(AdventureUtil.deserialize("Unable to add a dummy button due to a slot not being configured."));
             return;
         }
 
@@ -321,13 +321,13 @@ public class QuitGUI extends ChestGUI {
 
             Settings.QuitMessageConfig quitMessageConfig = settings.quitMessages().get(currentMessageKey);
             if(quitMessageConfig.permission() == null) {
-                logger.warn(AdventureUtil.serialize("Unable to add quit message to the gui due to an invalid permission."));
+                logger.warn(AdventureUtil.deserialize("Unable to add quit message to the gui due to an invalid permission."));
                 handleMessageError();
                 continue;
             }
 
             if(quitMessageConfig.message() == null) {
-                logger.warn(AdventureUtil.serialize("Unable to add quit message to the gui due to an invalid quit message."));
+                logger.warn(AdventureUtil.deserialize("Unable to add quit message to the gui due to an invalid quit message."));
                 handleMessageError();
                 continue;
             }
@@ -336,7 +336,7 @@ public class QuitGUI extends ChestGUI {
                 ItemStackBuilder itemStackBuilder = new ItemStackBuilder(logger);
                 if(playerData.getLeaveMessage().equals(quitMessageConfig.message())) {
                     itemStackBuilder.fromItemStackConfig(guiConfig.gui().placeholders().selected(), player, null, List.of());
-                    itemStackBuilder.setName(AdventureUtil.serialize(player, quitMessageConfig.message()));
+                    itemStackBuilder.setName(AdventureUtil.deserialize(player, quitMessageConfig.message()));
 
                     Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
                     optionalItemStack.ifPresentOrElse(itemStack -> {
@@ -351,7 +351,7 @@ public class QuitGUI extends ChestGUI {
                     }, this::handleMessageError);
                 } else {
                     itemStackBuilder.fromItemStackConfig(guiConfig.gui().placeholders().available(), player, null, List.of());
-                    itemStackBuilder.setName(AdventureUtil.serialize(player, quitMessageConfig.message()));
+                    itemStackBuilder.setName(AdventureUtil.deserialize(player, quitMessageConfig.message()));
 
                     Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
                     optionalItemStack.ifPresentOrElse(itemStack -> {
@@ -375,7 +375,7 @@ public class QuitGUI extends ChestGUI {
             } else {
                 ItemStackBuilder itemStackBuilder = new ItemStackBuilder(logger);
                 itemStackBuilder.fromItemStackConfig(guiConfig.gui().placeholders().noPermission(), player, null, List.of());
-                itemStackBuilder.setName(AdventureUtil.serialize(player, quitMessageConfig.message()));
+                itemStackBuilder.setName(AdventureUtil.deserialize(player, quitMessageConfig.message()));
 
                 Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
                 optionalItemStack.ifPresentOrElse(itemStack -> {
@@ -398,7 +398,7 @@ public class QuitGUI extends ChestGUI {
     private void createPreviousPageButton(@NotNull GUIConfig.ButtonConfig buttonConfig) {
         // Check if the slot is not configured and send a warning.
         if(buttonConfig.slot() == null) {
-            logger.warn(AdventureUtil.serialize("Unable to add a previous page button due to a slot not being configured."));
+            logger.warn(AdventureUtil.deserialize("Unable to add a previous page button due to a slot not being configured."));
             return;
         }
 
@@ -444,7 +444,7 @@ public class QuitGUI extends ChestGUI {
     private void createNextPageButton(@NotNull GUIConfig.ButtonConfig buttonConfig) {
         // Check if the slot is not configured and send a warning.
         if(buttonConfig.slot() == null) {
-            logger.warn(AdventureUtil.serialize("Unable to add a previous page button due to a slot not being configured."));
+            logger.warn(AdventureUtil.deserialize("Unable to add a previous page button due to a slot not being configured."));
             return;
         }
 
@@ -483,7 +483,7 @@ public class QuitGUI extends ChestGUI {
     private void createExitButton(@NotNull GUIConfig.ButtonConfig buttonConfig) {
         // Check if the slot is not configured and send a warning.
         if(buttonConfig.slot() == null) {
-            logger.warn(AdventureUtil.serialize("Unable to add a exit button due to a slot not being configured."));
+            logger.warn(AdventureUtil.deserialize("Unable to add a exit button due to a slot not being configured."));
             return;
         }
 

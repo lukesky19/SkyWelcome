@@ -95,11 +95,11 @@ public class LocaleManager {
 
         Settings settings = settingsManager.getSettings();
         if(settings == null) {
-            logger.error(AdventureUtil.serialize("Unable to load the plugin's locale due to invalid plugin settings. The default locale will be used."));
+            logger.error(AdventureUtil.deserialize("Unable to load the plugin's locale due to invalid plugin settings. The default locale will be used."));
             return;
         }
         if(settings.locale() == null) {
-            logger.error(AdventureUtil.serialize("Unable to load the plugin's locale due to a locale not being configured in settings.yml. The default locale will be used."));
+            logger.error(AdventureUtil.deserialize("Unable to load the plugin's locale due to a locale not being configured in settings.yml. The default locale will be used."));
             return;
         }
 
@@ -115,7 +115,7 @@ public class LocaleManager {
         try {
             locale = loader.load().get(Locale.class);
         } catch (ConfigurateException e) {
-            logger.error(AdventureUtil.serialize("Failed to load the locale configuration. Error: " + e.getMessage()));
+            logger.error(AdventureUtil.deserialize("Failed to load the locale configuration. Error: " + e.getMessage()));
         }
 
         migrateLocale();
@@ -138,80 +138,80 @@ public class LocaleManager {
     private void validateLocale() {
         ComponentLogger logger = skyWelcome.getComponentLogger();
         if(locale == null) {
-            logger.warn(AdventureUtil.serialize("Unable to validate locale as the locale configuration failed to load. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("Unable to validate locale as the locale configuration failed to load. The default locale will be used."));
             return;
         }
 
         if(locale.configVersion() == null) {
-            logger.warn(AdventureUtil.serialize("The locale's config version is invalid. The default locale will be used. This means your config did not migrate properly or you modified the config-version setting."));
+            logger.warn(AdventureUtil.deserialize("The locale's config version is invalid. The default locale will be used. This means your config did not migrate properly or you modified the config-version setting."));
             locale = null;
             return;
         }
 
         if(locale.prefix() == null) {
-            logger.warn(AdventureUtil.serialize("The prefix in the locale is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The prefix in the locale is invalid. The default locale will be used."));
             locale = null;
             return;
         }
 
         for(String msg : locale.help()) {
             if(msg == null) {
-                logger.warn(AdventureUtil.serialize("A line in the help message is invalid. The default locale will be used."));
+                logger.warn(AdventureUtil.deserialize("A line in the help message is invalid. The default locale will be used."));
                 locale = null;
                 return;
             }
         }
 
         if(locale.reload() == null) {
-            logger.warn(AdventureUtil.serialize("The reload message is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The reload message is invalid. The default locale will be used."));
             locale = null;
             return;
         }
 
         if(locale.guiOpenError() == null) {
-            logger.warn(AdventureUtil.serialize("The gui open error message is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The gui open error message is invalid. The default locale will be used."));
             locale = null;
             return;
         }
 
         if(locale.joinEnabled() == null) {
-            logger.warn(AdventureUtil.serialize("The join enabled message is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The join enabled message is invalid. The default locale will be used."));
             locale = null;
             return;
         }
 
         if(locale.joinDisabled() == null) {
-            logger.warn(AdventureUtil.serialize("The join disabled message is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The join disabled message is invalid. The default locale will be used."));
             locale = null;
             return;
         }
 
         if(locale.quitEnabled() == null) {
-            logger.warn(AdventureUtil.serialize("The quit enabled message is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The quit enabled message is invalid. The default locale will be used."));
             locale = null;
             return;
         }
 
         if (locale.quitDisabled() == null) {
-            logger.warn(AdventureUtil.serialize("The quit disabled message is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The quit disabled message is invalid. The default locale will be used."));
             locale = null;
             return;
         }
 
         if(locale.motdEnabled() == null) {
-            logger.warn(AdventureUtil.serialize("The motd enabled message is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The motd enabled message is invalid. The default locale will be used."));
             locale = null;
             return;
         }
 
         if(locale.motdDisabled() == null) {
-            logger.warn(AdventureUtil.serialize("The motd disabled message is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The motd disabled message is invalid. The default locale will be used."));
             locale = null;
             return;
         }
 
         if(locale.welcomeBroadcast() == null) {
-            logger.warn(AdventureUtil.serialize("The welcome broadcast message is invalid. The default locale will be used."));
+            logger.warn(AdventureUtil.deserialize("The welcome broadcast message is invalid. The default locale will be used."));
             locale = null;
         }
     }
@@ -223,11 +223,11 @@ public class LocaleManager {
         ComponentLogger logger = skyWelcome.getComponentLogger();
         Settings settings = settingsManager.getSettings();
         if(settings == null) {
-            logger.error(AdventureUtil.serialize("Unable to migrate the plugin's locale due to invalid plugin settings. The default locale will be used."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate the plugin's locale due to invalid plugin settings. The default locale will be used."));
             return;
         }
         if(locale == null) {
-            logger.error(AdventureUtil.serialize("Unable to migrate the plugin's locale due to invalid locale. The default locale will be used."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate the plugin's locale due to invalid locale. The default locale will be used."));
             return;
         }
 

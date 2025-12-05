@@ -85,7 +85,7 @@ public class GUIConfigManager {
 
             validateGUIConfig(joinConfig, "join");
         } catch (ConfigurateException e) {
-            logger.error(AdventureUtil.serialize("Failed to load the join gui config. Error: " + e.getMessage()));
+            logger.error(AdventureUtil.deserialize("Failed to load the join gui config. Error: " + e.getMessage()));
         }
 
         YamlConfigurationLoader quitLoader = ConfigurationUtility.getYamlConfigurationLoader(quitPath);
@@ -94,7 +94,7 @@ public class GUIConfigManager {
 
             validateGUIConfig(quitConfig, "quit");
         } catch (ConfigurateException e) {
-            logger.error(AdventureUtil.serialize("Failed to load the quit gui config. Error: " + e.getMessage()));
+            logger.error(AdventureUtil.deserialize("Failed to load the quit gui config. Error: " + e.getMessage()));
         }
     }
 
@@ -108,12 +108,12 @@ public class GUIConfigManager {
         if(guiConfig == null) return;
 
         if(guiConfig.configVersion() == null) {
-            logger.error(AdventureUtil.serialize("The gui config version for " + fileName + ".yml is invalid."));
+            logger.error(AdventureUtil.deserialize("The gui config version for " + fileName + ".yml is invalid."));
             return;
         }
 
         if(!guiConfig.configVersion().equals("1.5.0.0")) {
-            logger.error(AdventureUtil.serialize("The config version for " + fileName + ".yml is outdated and the config needs to be regenerated or updated."));
+            logger.error(AdventureUtil.deserialize("The config version for " + fileName + ".yml is outdated and the config needs to be regenerated or updated."));
         }
     }
 }
