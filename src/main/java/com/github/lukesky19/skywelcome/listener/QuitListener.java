@@ -22,10 +22,12 @@ import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import com.github.lukesky19.skywelcome.data.player.PlayerData;
+import com.github.lukesky19.skywelcome.events.SkyWelcomeQuitEvent;
 import com.github.lukesky19.skywelcome.manager.PlayerDataManager;
 import com.github.lukesky19.skywelcome.util.PluginUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -91,8 +93,12 @@ public class QuitListener implements Listener {
 
         if(settings.globalQuitToggle() && playerData.isSendLeave()) {
             Component leaveMessage = AdventureUtil.deserialize(player, playerData.getLeaveMessage());
-            skyWelcome.getServer().getOnlinePlayers()
-                    .forEach(onlinePlayer -> onlinePlayer.sendMessage(leaveMessage));
+
+            skyWelcome.getServer().getPluginManager().callEvent(new SkyWelcomeQuitEvent(
+                    player, leaveMessage, PlainTextComponentSerializer.plainText().serialize(leaveMessage)));
+
+            skyWelcome.getServer().getOnlinePlayers().forEach(onlinePlayer ->
+                    onlinePlayer.sendMessage(leaveMessage));
         }
     }
 }

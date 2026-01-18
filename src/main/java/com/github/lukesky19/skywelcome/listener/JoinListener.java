@@ -22,8 +22,11 @@ import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.settings.Settings;
 import com.github.lukesky19.skywelcome.config.settings.SettingsManager;
 import com.github.lukesky19.skywelcome.data.player.PlayerData;
+import com.github.lukesky19.skywelcome.events.SkyWelcomeJoinEvent;
 import com.github.lukesky19.skywelcome.manager.PlayerDataManager;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -94,8 +97,13 @@ public class JoinListener implements Listener {
 
             skyWelcome.getServer().getScheduler().runTask(skyWelcome, () -> {
                 if(settings.globalJoinToggle() && playerData.isSendJoin()) {
+                    Component joinMessage = AdventureUtil.deserialize(player, playerData.getJoinMessage());
+
+                    skyWelcome.getServer().getPluginManager().callEvent(new SkyWelcomeJoinEvent(
+                            player, joinMessage, PlainTextComponentSerializer.plainText().serialize(joinMessage)));
+
                     skyWelcome.getServer().getOnlinePlayers().forEach(onlinePlayer ->
-                            onlinePlayer.sendMessage(AdventureUtil.deserialize(player, playerData.getJoinMessage())));
+                            onlinePlayer.sendMessage(joinMessage));
                 }
 
                 if(settings.globalMotdToggle() && playerData.isSendMotd()) {
