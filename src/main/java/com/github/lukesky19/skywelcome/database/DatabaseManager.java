@@ -19,20 +19,20 @@ package com.github.lukesky19.skywelcome.database;
 
 import com.github.lukesky19.skylib.api.database.AbstractDatabaseManager;
 import com.github.lukesky19.skywelcome.database.tables.PlayerDataTable;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class manages access to the database table classes.
  */
 public class DatabaseManager extends AbstractDatabaseManager {
-    private final @NotNull PlayerDataTable playerDataTable;
+    private final @NonNull PlayerDataTable playerDataTable;
 
     /**
      * Constructor
      * @param connectionManager Α {@link ConnectionManager} instance.
      * @param queueManager A {@link QueueManager} instance.
      */
-    public DatabaseManager(@NotNull ConnectionManager connectionManager, @NotNull QueueManager queueManager) {
+    public DatabaseManager(@NonNull ConnectionManager connectionManager, @NonNull QueueManager queueManager) {
         super(connectionManager, queueManager);
 
         playerDataTable = new PlayerDataTable(queueManager);
@@ -43,7 +43,7 @@ public class DatabaseManager extends AbstractDatabaseManager {
      * Get the {@link PlayerDataTable}.
      * @return The {@link PlayerDataTable}.
      */
-    public @NotNull PlayerDataTable getPlayerDataTable() {
+    public @NonNull PlayerDataTable getPlayerDataTable() {
         return playerDataTable;
     }
 }

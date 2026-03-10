@@ -29,8 +29,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.UUID;
 
@@ -38,9 +37,9 @@ import java.util.UUID;
  * This class is used to create the gui command argument.
  */
 public class ToggleCommand {
-    private final @NotNull ComponentLogger logger;
-    private final @NotNull LocaleManager localeManager;
-    private final @NotNull PlayerDataManager playerDataManager;
+    private final @NonNull ComponentLogger logger;
+    private final @NonNull LocaleManager localeManager;
+    private final @NonNull PlayerDataManager playerDataManager;
 
     /**
      * Default Constructor.
@@ -60,9 +59,9 @@ public class ToggleCommand {
      * @param playerDataManager A {@link PlayerDataManager} instance.
      */
     public ToggleCommand(
-            @NotNull SkyWelcome skyWelcome,
-            @NotNull LocaleManager localeManager,
-            @NotNull PlayerDataManager playerDataManager) {
+            @NonNull SkyWelcome skyWelcome,
+            @NonNull LocaleManager localeManager,
+            @NonNull PlayerDataManager playerDataManager) {
         this.logger = skyWelcome.getComponentLogger();
         this.localeManager = localeManager;
         this.playerDataManager = playerDataManager;
@@ -72,17 +71,17 @@ public class ToggleCommand {
      * Creates the {@link LiteralCommandNode} of type {@link CommandSourceStack} for the gui command argument.
      * @return A {@link LiteralCommandNode} of type {@link CommandSourceStack} for the gui command argument.
      */
-    public @NotNull LiteralCommandNode<CommandSourceStack> createCommand() {
+    public @NonNull LiteralCommandNode<CommandSourceStack> createCommand() {
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("toggle")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.toggle") && ctx.getSender() instanceof Player);
 
         builder.then(Commands.literal("join")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.toggle.join"))
                 .executes(ctx -> {
-                    Locale locale = localeManager.getLocale();
+                    Locale locale = localeManager.getConfiguration();
                     Player player = (Player) ctx.getSource().getSender();
                     UUID uuid = player.getUniqueId();
-                    @Nullable PlayerData playerData = playerDataManager.getPlayerData(uuid);
+                    PlayerData playerData = playerDataManager.getPlayerData(uuid);
 
                     if(playerData == null) {
                         player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Unable to toggle the sending of your join message due to invalid player data.</red>"));
@@ -108,10 +107,10 @@ public class ToggleCommand {
         builder.then(Commands.literal("motd")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.toggle.motd"))
                 .executes(ctx -> {
-                    Locale locale = localeManager.getLocale();
+                    Locale locale = localeManager.getConfiguration();
                     Player player = (Player) ctx.getSource().getSender();
                     UUID uuid = player.getUniqueId();
-                    @Nullable PlayerData playerData = playerDataManager.getPlayerData(uuid);
+                    PlayerData playerData = playerDataManager.getPlayerData(uuid);
 
                     if(playerData == null) {
                         player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Unable to toggle the sending of the motd message due to invalid player data.</red>"));
@@ -137,10 +136,10 @@ public class ToggleCommand {
         builder.then(Commands.literal("leave")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.toggle.leave"))
                 .executes(ctx -> {
-                    Locale locale = localeManager.getLocale();
+                    Locale locale = localeManager.getConfiguration();
                     Player player = (Player) ctx.getSource().getSender();
                     UUID uuid = player.getUniqueId();
-                    @Nullable PlayerData playerData = playerDataManager.getPlayerData(uuid);
+                    PlayerData playerData = playerDataManager.getPlayerData(uuid);
 
                     if(playerData == null) {
                         player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Unable to toggle the sending of your leave message due to invalid player data.</red>"));
@@ -166,10 +165,10 @@ public class ToggleCommand {
         builder.then(Commands.literal("quit")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.toggle.quit"))
                 .executes(ctx -> {
-                    Locale locale = localeManager.getLocale();
+                    Locale locale = localeManager.getConfiguration();
                     Player player = (Player) ctx.getSource().getSender();
                     UUID uuid = player.getUniqueId();
-                    @Nullable PlayerData playerData = playerDataManager.getPlayerData(uuid);
+                    PlayerData playerData = playerDataManager.getPlayerData(uuid);
 
                     if(playerData == null) {
                         player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Unable to toggle the sending of your leave message due to invalid player data.</red>"));

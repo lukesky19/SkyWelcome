@@ -32,19 +32,19 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to create the skywelcome command.
  */
 public class SkyWelcomeCommand {
-    private final @NotNull SkyWelcome skyWelcome;
-    private final @NotNull SettingsManager settingsManager;
-    private final @NotNull LocaleManager localeManager;
-    private final @NotNull GUIConfigManager guiConfigManager;
-    private final @NotNull PlayerDataManager playerDataManager;
-    private final @NotNull HeadDatabaseManager headDatabaseManager;
-    private final @NotNull UUIDGUIManager guiManager;
+    private final @NonNull SkyWelcome skyWelcome;
+    private final @NonNull SettingsManager settingsManager;
+    private final @NonNull LocaleManager localeManager;
+    private final @NonNull GUIConfigManager guiConfigManager;
+    private final @NonNull PlayerDataManager playerDataManager;
+    private final @NonNull HeadDatabaseManager headDatabaseManager;
+    private final @NonNull UUIDGUIManager guiManager;
 
     /**
      * Constructor
@@ -57,13 +57,13 @@ public class SkyWelcomeCommand {
      * @param guiManager A {@link UUIDGUIManager} instance.
      */
     public SkyWelcomeCommand(
-            @NotNull SkyWelcome skyWelcome,
-            @NotNull SettingsManager settingsManager,
-            @NotNull LocaleManager localeManager,
-            @NotNull GUIConfigManager guiConfigManager,
-            @NotNull PlayerDataManager playerDataManager,
-            @NotNull HeadDatabaseManager headDatabaseManager,
-            @NotNull UUIDGUIManager guiManager) {
+            @NonNull SkyWelcome skyWelcome,
+            @NonNull SettingsManager settingsManager,
+            @NonNull LocaleManager localeManager,
+            @NonNull GUIConfigManager guiConfigManager,
+            @NonNull PlayerDataManager playerDataManager,
+            @NonNull HeadDatabaseManager headDatabaseManager,
+            @NonNull UUIDGUIManager guiManager) {
         this.skyWelcome = skyWelcome;
         this.settingsManager = settingsManager;
         this.localeManager = localeManager;
@@ -77,7 +77,7 @@ public class SkyWelcomeCommand {
      * Creates the {@link LiteralCommandNode} of type {@link CommandSourceStack} for the skywelcome command.
      * @return A {@link LiteralCommandNode} of type {@link CommandSourceStack} for the skywelcome command.
      */
-    public @NotNull LiteralCommandNode<CommandSourceStack> createCommand() {
+    public @NonNull LiteralCommandNode<CommandSourceStack> createCommand() {
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("skywelcome")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome"));
 

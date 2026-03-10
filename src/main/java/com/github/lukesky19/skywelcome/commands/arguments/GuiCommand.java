@@ -34,20 +34,20 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to create the gui command argument.
  */
 public class GuiCommand {
-    private final @NotNull SkyWelcome skyWelcome;
-    private final @NotNull ComponentLogger logger;
-    private final @NotNull SettingsManager settingsManager;
-    private final @NotNull LocaleManager localeManager;
-    private final @NotNull GUIConfigManager guiConfigManager;
-    private final @NotNull PlayerDataManager playerDataManager;
-    private final @NotNull HeadDatabaseManager headDatabaseManager;
-    private final @NotNull UUIDGUIManager guiManager;
+    private final @NonNull SkyWelcome skyWelcome;
+    private final @NonNull ComponentLogger logger;
+    private final @NonNull SettingsManager settingsManager;
+    private final @NonNull LocaleManager localeManager;
+    private final @NonNull GUIConfigManager guiConfigManager;
+    private final @NonNull PlayerDataManager playerDataManager;
+    private final @NonNull HeadDatabaseManager headDatabaseManager;
+    private final @NonNull UUIDGUIManager guiManager;
 
     /**
      * Default Constructor.
@@ -70,13 +70,13 @@ public class GuiCommand {
      * @param headDatabaseManager A {@link HeadDatabaseManager} instance.
      * @param guiManager A {@link UUIDGUIManager} instance.
      */
-    public GuiCommand(@NotNull SkyWelcome skyWelcome,
-                      @NotNull SettingsManager settingsManager,
-                      @NotNull LocaleManager localeManager,
-                      @NotNull GUIConfigManager guiConfigManager,
-                      @NotNull PlayerDataManager playerDataManager,
-                      @NotNull HeadDatabaseManager headDatabaseManager,
-                      @NotNull UUIDGUIManager guiManager) {
+    public GuiCommand(@NonNull SkyWelcome skyWelcome,
+                      @NonNull SettingsManager settingsManager,
+                      @NonNull LocaleManager localeManager,
+                      @NonNull GUIConfigManager guiConfigManager,
+                      @NonNull PlayerDataManager playerDataManager,
+                      @NonNull HeadDatabaseManager headDatabaseManager,
+                      @NonNull UUIDGUIManager guiManager) {
         this.skyWelcome = skyWelcome;
         this.logger = skyWelcome.getComponentLogger();
         this.settingsManager = settingsManager;
@@ -91,14 +91,14 @@ public class GuiCommand {
      * Creates the {@link LiteralCommandNode} of type {@link CommandSourceStack} for the gui command argument.
      * @return A {@link LiteralCommandNode} of type {@link CommandSourceStack} for the gui command argument.
      */
-    public @NotNull LiteralCommandNode<CommandSourceStack> createCommand() {
+    public @NonNull LiteralCommandNode<CommandSourceStack> createCommand() {
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("gui")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.gui") && ctx.getSender() instanceof Player);
 
         builder.then(Commands.literal("join")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.gui.join"))
                 .executes(ctx -> {
-                    Locale locale = localeManager.getLocale();
+                    Locale locale = localeManager.getConfiguration();
                     Player player = (Player) ctx.getSource().getSender();
 
                     JoinGUI joinGUI = new JoinGUI(skyWelcome, guiManager, player, settingsManager, guiConfigManager, playerDataManager, headDatabaseManager);
@@ -129,7 +129,7 @@ public class GuiCommand {
         builder.then(Commands.literal("leave")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.gui.leave"))
                 .executes(ctx -> {
-                    Locale locale = localeManager.getLocale();
+                    Locale locale = localeManager.getConfiguration();
                     Player player = (Player) ctx.getSource().getSender();
 
                     QuitGUI quitGUI = new QuitGUI(skyWelcome, guiManager, player, settingsManager, guiConfigManager, playerDataManager, headDatabaseManager);
@@ -160,7 +160,7 @@ public class GuiCommand {
         builder.then(Commands.literal("quit")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.gui.quit"))
                 .executes(ctx -> {
-                    Locale locale = localeManager.getLocale();
+                    Locale locale = localeManager.getConfiguration();
                     Player player = (Player) ctx.getSource().getSender();
 
                     QuitGUI quitGUI = new QuitGUI(skyWelcome, guiManager, player, settingsManager, guiConfigManager, playerDataManager, headDatabaseManager);

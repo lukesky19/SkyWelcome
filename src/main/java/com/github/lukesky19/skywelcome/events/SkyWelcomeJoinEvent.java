@@ -21,7 +21,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class event is fired when a player joins and a custom join message is sent.
@@ -38,7 +38,7 @@ public class SkyWelcomeJoinEvent extends Event {
      * @param componentJoinMessage The join message as a {@link Component}.
      * @param plainJoinMessage The plain join message. This doesn't include any formatting tags.
      */
-    public SkyWelcomeJoinEvent(@NotNull Player player, @NotNull Component componentJoinMessage, @NotNull String plainJoinMessage) {
+    public SkyWelcomeJoinEvent(@NonNull Player player, @NonNull Component componentJoinMessage, @NonNull String plainJoinMessage) {
         this.player = player;
         this.componentJoinMessage = componentJoinMessage;
         this.plainJoinMessage = plainJoinMessage;
@@ -48,7 +48,7 @@ public class SkyWelcomeJoinEvent extends Event {
      * The {@link Player}.
      * @return A {@link Player}.
      */
-    public @NotNull Player getPlayer() {
+    public @NonNull Player getPlayer() {
         return player;
     }
 
@@ -56,7 +56,7 @@ public class SkyWelcomeJoinEvent extends Event {
      * Get the join message as a {@link Component}.
      * @return A {@link Component} containing the join message.
      */
-    public @NotNull Component getComponentJoinMessage() {
+    public @NonNull Component getComponentJoinMessage() {
         return componentJoinMessage;
     }
 
@@ -64,7 +64,7 @@ public class SkyWelcomeJoinEvent extends Event {
      * Get the join message as a {@link String} without any formatting.
      * @return A {@link String} containing the join message.
      */
-    public @NotNull String getPlainJoinMessage() {
+    public @NonNull String getPlainJoinMessage() {
         return plainJoinMessage;
     }
 
@@ -72,7 +72,7 @@ public class SkyWelcomeJoinEvent extends Event {
      * Get the {@link HandlerList} for this event.
      * @return A {@link HandlerList}
      */
-    public static @NotNull HandlerList getHandlerList() {
+    public static @NonNull HandlerList getHandlerList() {
         return HANDLERS;
     }
 
@@ -81,7 +81,7 @@ public class SkyWelcomeJoinEvent extends Event {
      * @return A {@link HandlerList}
      */
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public @NonNull HandlerList getHandlers() {
         return HANDLERS;
     }
 }

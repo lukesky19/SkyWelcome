@@ -1,4 +1,4 @@
-config-version: 1.5.0.0
+config-version: 6
 # The name of the locale file to use in skywelcome/locale, minus the file extension (.yml)
 locale: en_US
 # Should join messages be enabled globally?

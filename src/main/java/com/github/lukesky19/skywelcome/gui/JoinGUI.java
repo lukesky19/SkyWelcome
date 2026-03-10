@@ -37,8 +37,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -47,9 +47,9 @@ import java.util.*;
  */
 public class JoinGUI extends ChestGUI<UUID> {
     // Plugin Classes
-    private final @NotNull SettingsManager settingsManager;
-    private final @NotNull PlayerDataManager playerDataManager;
-    private final @NotNull HeadDatabaseManager headDatabaseManager;
+    private final @NonNull SettingsManager settingsManager;
+    private final @NonNull PlayerDataManager playerDataManager;
+    private final @NonNull HeadDatabaseManager headDatabaseManager;
 
     // GUI Config
     private final @Nullable GUIConfig guiConfig;
@@ -59,8 +59,8 @@ public class JoinGUI extends ChestGUI<UUID> {
     private int currentMessageKey = 0;
     private int numOfMessagesAdded = 0;
     private int numOfMessagesErrored = 0;
-    private final @NotNull Map<Integer, Integer> messagesAddedPerPage = new HashMap<>();
-    private final @NotNull Map<Integer, Integer> messagesErroredPerPage = new HashMap<>();
+    private final @NonNull Map<Integer, Integer> messagesAddedPerPage = new HashMap<>();
+    private final @NonNull Map<Integer, Integer> messagesErroredPerPage = new HashMap<>();
 
     /**
      * Constructor
@@ -73,13 +73,13 @@ public class JoinGUI extends ChestGUI<UUID> {
      * @param headDatabaseManager A  {@link HeadDatabaseManager} instance.
      */
     public JoinGUI(
-            @NotNull SkyWelcome skyWelcome,
-            @NotNull UUIDGUIManager guiManager,
-            @NotNull Player player,
-            @NotNull SettingsManager settingsManager,
-            @NotNull GUIConfigManager guiConfigManager,
-            @NotNull PlayerDataManager playerDataManager,
-            @NotNull HeadDatabaseManager headDatabaseManager) {
+            @NonNull SkyWelcome skyWelcome,
+            @NonNull UUIDGUIManager guiManager,
+            @NonNull Player player,
+            @NonNull SettingsManager settingsManager,
+            @NonNull GUIConfigManager guiConfigManager,
+            @NonNull PlayerDataManager playerDataManager,
+            @NonNull HeadDatabaseManager headDatabaseManager) {
         super(skyWelcome, guiManager, player.getUniqueId(), player);
 
         this.settingsManager = settingsManager;
@@ -127,7 +127,7 @@ public class JoinGUI extends ChestGUI<UUID> {
             return false;
         }
 
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) {
             logger.warn(AdventureUtil.deserialize("Unable to add buttons to the GUI as the plugin's settings are invalid."));
             return false;
@@ -213,7 +213,7 @@ public class JoinGUI extends ChestGUI<UUID> {
      * @param inventoryCloseEvent An {@link InventoryCloseEvent}
      */
     @Override
-    public void handleClose(@NotNull InventoryCloseEvent inventoryCloseEvent) {
+    public void handleClose(@NonNull InventoryCloseEvent inventoryCloseEvent) {
         if(inventoryCloseEvent.getReason().equals(InventoryCloseEvent.Reason.UNLOADED) || inventoryCloseEvent.getReason().equals(InventoryCloseEvent.Reason.OPEN_NEW)) return;
 
         guiManager.removeOpenGUI(uuid);
@@ -224,38 +224,38 @@ public class JoinGUI extends ChestGUI<UUID> {
      * @param inventoryDragEvent An {@link InventoryDragEvent}
      */
     @Override
-    public void handleBottomDrag(@NotNull InventoryDragEvent inventoryDragEvent) {}
+    public void handleBottomDrag(@NonNull InventoryDragEvent inventoryDragEvent) {}
 
     /**
      * This method does nothing.
      * @param inventoryDragEvent An {@link InventoryDragEvent}
      */
     @Override
-    public void handleGlobalDrag(@NotNull InventoryDragEvent inventoryDragEvent) {}
+    public void handleGlobalDrag(@NonNull InventoryDragEvent inventoryDragEvent) {}
 
     /**
      * This method does nothing.
      * @param inventoryClickEvent An {@link InventoryClickEvent}
      */
     @Override
-    public void handleBottomClick(@NotNull InventoryClickEvent inventoryClickEvent) {}
+    public void handleBottomClick(@NonNull InventoryClickEvent inventoryClickEvent) {}
 
     /**
      * This method does nothing.
      * @param inventoryClickEvent An {@link InventoryClickEvent}
      */
     @Override
-    public void handleGlobalClick(@NotNull InventoryClickEvent inventoryClickEvent) {}
+    public void handleGlobalClick(@NonNull InventoryClickEvent inventoryClickEvent) {}
 
     /**
      * Create and add the filler buttons.
      * @param buttonConfig The {@link GUIConfig.ButtonConfig} to use.
      * @param guiSize The size of the Inventory/GUI.
      */
-    private void createFillerButtons(@NotNull GUIConfig.ButtonConfig buttonConfig, int guiSize) {
+    private void createFillerButtons(GUIConfig.ButtonConfig buttonConfig, int guiSize) {
         // Create the ItemStackBuilder and pass the ItemStackConfig.
         ItemStackBuilder itemStackBuilder = new ItemStackBuilder(logger);
-        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player, null, List.of());
+        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player, List.of());
 
         // If an ItemStack was created, create the GUIButton and add it to the GUI.
         Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
@@ -275,7 +275,7 @@ public class JoinGUI extends ChestGUI<UUID> {
      * Create and add the dummy button's ItemStack. This is similar to filler buttons.
      * @param buttonConfig The {@link GUIConfig.ButtonConfig} to use.
      */
-    private void createDummyButton(@NotNull GUIConfig.ButtonConfig buttonConfig) {
+    private void createDummyButton(GUIConfig.ButtonConfig buttonConfig) {
         // Check if the slot is not configured and send a warning.
         if(buttonConfig.slot() == null) {
             logger.warn(AdventureUtil.deserialize("Unable to add a dummy button due to a slot not being configured."));
@@ -292,7 +292,7 @@ public class JoinGUI extends ChestGUI<UUID> {
             }
         }
 
-        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player, null, List.of());
+        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player, List.of());
 
         // If an ItemStack was created, create the GUIButton and add it to the GUI.
         Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
@@ -310,7 +310,7 @@ public class JoinGUI extends ChestGUI<UUID> {
      */
     private void createMessageButtons(int itemsPerPage) {
         assert guiConfig != null;
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) return;
         PlayerData playerData = playerDataManager.getPlayerData(uuid);
         if(playerData == null) return;
@@ -335,7 +335,7 @@ public class JoinGUI extends ChestGUI<UUID> {
             if(player.hasPermission(joinMessageConfig.permission())) {
                 ItemStackBuilder itemStackBuilder = new ItemStackBuilder(logger);
                 if(playerData.getJoinMessage().equals(joinMessageConfig.message())) {
-                    itemStackBuilder.fromItemStackConfig(guiConfig.gui().placeholders().selected(), player, null, List.of());
+                    itemStackBuilder.fromItemStackConfig(guiConfig.gui().placeholders().selected(), player, List.of());
                     itemStackBuilder.setName(AdventureUtil.deserialize(player, joinMessageConfig.message()));
 
                     Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
@@ -350,7 +350,7 @@ public class JoinGUI extends ChestGUI<UUID> {
                         numOfMessagesAdded++;
                     }, this::handleMessageError);
                 } else {
-                    itemStackBuilder.fromItemStackConfig(guiConfig.gui().placeholders().available(), player, null, List.of());
+                    itemStackBuilder.fromItemStackConfig(guiConfig.gui().placeholders().available(), player, List.of());
                     itemStackBuilder.setName(AdventureUtil.deserialize(player, joinMessageConfig.message()));
 
                     Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
@@ -374,7 +374,7 @@ public class JoinGUI extends ChestGUI<UUID> {
                 }
             } else {
                 ItemStackBuilder itemStackBuilder = new ItemStackBuilder(logger);
-                itemStackBuilder.fromItemStackConfig(guiConfig.gui().placeholders().noPermission(), player, null, List.of());
+                itemStackBuilder.fromItemStackConfig(guiConfig.gui().placeholders().noPermission(), player, List.of());
                 itemStackBuilder.setName(AdventureUtil.deserialize(player, joinMessageConfig.message()));
 
                 Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
@@ -395,7 +395,7 @@ public class JoinGUI extends ChestGUI<UUID> {
     /**
      * Create the button to go to the previous page.
      */
-    private void createPreviousPageButton(@NotNull GUIConfig.ButtonConfig buttonConfig) {
+    private void createPreviousPageButton(GUIConfig.ButtonConfig buttonConfig) {
         // Check if the slot is not configured and send a warning.
         if(buttonConfig.slot() == null) {
             logger.warn(AdventureUtil.deserialize("Unable to add a previous page button due to a slot not being configured."));
@@ -412,7 +412,7 @@ public class JoinGUI extends ChestGUI<UUID> {
             }
         }
 
-        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player, null, List.of());
+        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player,List.of());
 
         // If an ItemStack was created, create the GUIButton and add it to the GUI.
         Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
@@ -441,7 +441,7 @@ public class JoinGUI extends ChestGUI<UUID> {
     /**
      * Create the button to go to the next page.
      */
-    private void createNextPageButton(@NotNull GUIConfig.ButtonConfig buttonConfig) {
+    private void createNextPageButton(GUIConfig.ButtonConfig buttonConfig) {
         // Check if the slot is not configured and send a warning.
         if(buttonConfig.slot() == null) {
             logger.warn(AdventureUtil.deserialize("Unable to add a previous page button due to a slot not being configured."));
@@ -458,7 +458,7 @@ public class JoinGUI extends ChestGUI<UUID> {
             }
         }
 
-        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player, null, List.of());
+        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player, List.of());
 
         // If an ItemStack was created, create the GUIButton and add it to the GUI.
         Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();
@@ -480,7 +480,7 @@ public class JoinGUI extends ChestGUI<UUID> {
     /**
      * Create the button to exit the GUI.
      */
-    private void createExitButton(@NotNull GUIConfig.ButtonConfig buttonConfig) {
+    private void createExitButton(GUIConfig.ButtonConfig buttonConfig) {
         // Check if the slot is not configured and send a warning.
         if(buttonConfig.slot() == null) {
             logger.warn(AdventureUtil.deserialize("Unable to add a exit button due to a slot not being configured."));
@@ -497,7 +497,7 @@ public class JoinGUI extends ChestGUI<UUID> {
             }
         }
 
-        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player, null, List.of());
+        itemStackBuilder.fromItemStackConfig(buttonConfig.item(), player, List.of());
 
         // If an ItemStack was created, create the GUIButton and add it to the GUI.
         Optional<ItemStack> optionalItemStack = itemStackBuilder.buildItemStack();

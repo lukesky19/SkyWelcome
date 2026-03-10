@@ -18,18 +18,18 @@
 package com.github.lukesky19.skywelcome.util;
 
 import com.github.lukesky19.skylib.api.database.parameter.Parameter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Takes a String for storage in a database.
  */
 public class MessageParameter implements Parameter<String> {
-    private final @NotNull String message;
+    private final @NonNull String message;
     /**
      * Stores a join or leave message as a {@link String}.
      * @param message The join or leave message as a {@link String}.
      */
-    public MessageParameter(@NotNull String message) {
+    public MessageParameter(@NonNull String message) {
         this.message = message;
     }
 
@@ -38,7 +38,7 @@ public class MessageParameter implements Parameter<String> {
      * @return The {@link String} representing the join or leave message.
      */
     @Override
-    public @NotNull String getValue() {
+    public @NonNull String getValue() {
         return message;
     }
 }

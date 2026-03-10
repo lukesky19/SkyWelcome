@@ -32,8 +32,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -42,10 +42,10 @@ import java.util.concurrent.CompletableFuture;
  * This class listens to when a player joins the server and sends the join message and motd depending on server and player settings.
  */
 public class JoinListener implements Listener {
-    private final @NotNull SkyWelcome skyWelcome;
-    private final @NotNull ComponentLogger logger;
-    private final @NotNull SettingsManager settingsManager;
-    private final @NotNull PlayerDataManager playerDataManager;
+    private final @NonNull SkyWelcome skyWelcome;
+    private final @NonNull ComponentLogger logger;
+    private final @NonNull SettingsManager settingsManager;
+    private final @NonNull PlayerDataManager playerDataManager;
 
     /**
      * Constructor
@@ -54,9 +54,9 @@ public class JoinListener implements Listener {
      * @param playerDataManager A {@link PlayerDataManager} instance.
      */
     public JoinListener(
-            @NotNull SkyWelcome skyWelcome,
-            @NotNull SettingsManager settingsManager,
-            @NotNull PlayerDataManager playerDataManager) {
+            @NonNull SkyWelcome skyWelcome,
+            @NonNull SettingsManager settingsManager,
+            @NonNull PlayerDataManager playerDataManager) {
         this.skyWelcome = skyWelcome;
         this.logger = skyWelcome.getComponentLogger();
         this.settingsManager = settingsManager;
@@ -72,7 +72,7 @@ public class JoinListener implements Listener {
         Player player = playerJoinEvent.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) {
             logger.warn(AdventureUtil.deserialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to invalid plugin settings."));
             return;
@@ -88,7 +88,7 @@ public class JoinListener implements Listener {
             return;
         }
 
-        @NotNull CompletableFuture<@Nullable PlayerData> future = playerDataManager.loadPlayerData(uuid);
+        CompletableFuture<@Nullable PlayerData> future = playerDataManager.loadPlayerData(uuid);
         future.thenAccept(playerData -> {
             if(playerData == null) {
                 logger.warn(AdventureUtil.deserialize("Unable to send a join message to online players and the motd to player " + player.getName() + " due to no player data retrieved."));

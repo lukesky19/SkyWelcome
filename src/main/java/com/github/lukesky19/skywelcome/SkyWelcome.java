@@ -18,6 +18,7 @@
 package com.github.lukesky19.skywelcome;
 
 import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.api.common.abstracts.SkyPlugin;
 import com.github.lukesky19.skylib.api.gui.impl.UUIDGUIListener;
 import com.github.lukesky19.skylib.api.gui.impl.UUIDGUIManager;
 import com.github.lukesky19.skylib.libs.bstats.bukkit.Metrics;
@@ -41,12 +42,11 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * The plugin's main class.
  */
-public class SkyWelcome extends JavaPlugin {
+public class SkyWelcome extends SkyPlugin {
     private SettingsManager settingsManager;
     private LocaleManager localeManager;
     private PlayerDataManager playerDataManager;
@@ -131,10 +131,10 @@ public class SkyWelcome extends JavaPlugin {
      * Main reload method that reloads all plugin data.
      */
     public void reload() {
-        if(guiManager != null) guiManager.closeOpenGUIs(false);
+        guiManager.closeOpenGUIs(false);
 
-        settingsManager.reload();
-        localeManager.reload();
+        settingsManager.loadConfiguration();
+        localeManager.loadConfiguration();
         guiConfigManager.reload();
         playerDataManager.migrateLegacyPlayerSettings();
     }
@@ -159,12 +159,12 @@ public class SkyWelcome extends JavaPlugin {
             String[] splitVersion = version.split("\\.");
             int second = Integer.parseInt(splitVersion[1]);
 
-            if(second >= 4) {
+            if(second >= 5) {
                 return true;
             }
         }
 
-        this.getComponentLogger().error(AdventureUtil.deserialize("SkyLib Version 1.4.0.0 or newer is required to run this plugin."));
+        this.getComponentLogger().error(AdventureUtil.deserialize("SkyLib Version 1.5.0.0 or newer is required to run this plugin."));
         this.getServer().getPluginManager().disablePlugin(this);
         return false;
     }

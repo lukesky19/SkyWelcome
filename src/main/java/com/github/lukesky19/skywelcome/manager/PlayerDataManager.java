@@ -29,8 +29,8 @@ import com.github.lukesky19.skywelcome.data.player.legacy.PlayerSettings;
 import com.github.lukesky19.skywelcome.database.DatabaseManager;
 import com.github.lukesky19.skywelcome.database.tables.PlayerDataTable;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +46,12 @@ import java.util.stream.Stream;
  * This class manages player data.
  */
 public class PlayerDataManager {
-    private final @NotNull SkyWelcome skyWelcome;
-    private final @NotNull ComponentLogger logger;
-    private final @NotNull SettingsManager settingsManager;
-    private final @NotNull DatabaseManager databaseManager;
+    private final @NonNull SkyWelcome skyWelcome;
+    private final @NonNull ComponentLogger logger;
+    private final @NonNull SettingsManager settingsManager;
+    private final @NonNull DatabaseManager databaseManager;
 
-    private final @NotNull Map<UUID, PlayerData> playerDataMap = new HashMap<>();
+    private final @NonNull Map<UUID, PlayerData> playerDataMap = new HashMap<>();
 
     /**
      * Constructor
@@ -60,9 +60,9 @@ public class PlayerDataManager {
      * @param databaseManager A {@link DatabaseManager} instance.
      */
     public PlayerDataManager(
-            @NotNull SkyWelcome skyWelcome,
-            @NotNull SettingsManager settingsManager,
-            @NotNull DatabaseManager databaseManager) {
+            @NonNull SkyWelcome skyWelcome,
+            @NonNull SettingsManager settingsManager,
+            @NonNull DatabaseManager databaseManager) {
         this.skyWelcome = skyWelcome;
         this.logger = skyWelcome.getComponentLogger();
         this.settingsManager = settingsManager;
@@ -74,10 +74,10 @@ public class PlayerDataManager {
      * @param uuid The {@link UUID} for the player.
      * @return The {@link PlayerData}. May be null.
      */
-    public @Nullable PlayerData getPlayerData(@NotNull UUID uuid) {
+    public @Nullable PlayerData getPlayerData(@NonNull UUID uuid) {
         if(playerDataMap.containsKey(uuid)) return playerDataMap.get(uuid);
 
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) {
             logger.error(AdventureUtil.deserialize("Unable to create player data due to invalid plugin settings."));
             return null;
@@ -93,14 +93,14 @@ public class PlayerDataManager {
             return null;
         }
 
-        @Nullable String joinMessage = settings.joinMessages().getFirst().message();
+        String joinMessage = settings.joinMessages().getFirst().message();
         if(joinMessage == null) {
             logger.error(AdventureUtil.deserialize("Unable to create player data due to an invalid default join message."));
             logger.error(AdventureUtil.deserialize("The plugin chooses the first join message as the default."));
             return null;
         }
 
-        @Nullable String leaveMessage = settings.quitMessages().getFirst().message();
+        String leaveMessage = settings.quitMessages().getFirst().message();
         if(leaveMessage == null) {
             logger.error(AdventureUtil.deserialize("Unable to create player data due to an invalid default leave message."));
             logger.error(AdventureUtil.deserialize("The plugin chooses the first leave message as the default."));
@@ -123,12 +123,12 @@ public class PlayerDataManager {
      * @param uuid The {@link UUID} of the player.
      * @return A {@link CompletableFuture} containing {@link PlayerData}, which may be null.
      */
-    public @NotNull CompletableFuture<@Nullable PlayerData> loadPlayerData(@NotNull UUID uuid) {
+    public @NonNull CompletableFuture<@Nullable PlayerData> loadPlayerData(@NonNull UUID uuid) {
         PlayerDataTable playerDataTable = databaseManager.getPlayerDataTable();
 
         return playerDataTable.loadPlayerData(uuid).thenApply(playerData -> {
             if(playerData == null) {
-                Settings settings = settingsManager.getSettings();
+                Settings settings = settingsManager.getConfiguration();
                 if(settings == null) {
                     logger.error(AdventureUtil.deserialize("Unable to create player data due to invalid plugin settings."));
                     return null;
@@ -144,14 +144,14 @@ public class PlayerDataManager {
                     return null;
                 }
 
-                @Nullable String joinMessage = settings.joinMessages().getFirst().message();
+                String joinMessage = settings.joinMessages().getFirst().message();
                 if(joinMessage == null) {
                     logger.error(AdventureUtil.deserialize("Unable to create player data due to an invalid default join message."));
                     logger.error(AdventureUtil.deserialize("The plugin chooses the first join message as the default."));
                     return null;
                 }
 
-                @Nullable String leaveMessage = settings.quitMessages().getFirst().message();
+                String leaveMessage = settings.quitMessages().getFirst().message();
                 if(leaveMessage == null) {
                     logger.error(AdventureUtil.deserialize("Unable to create player data due to an invalid default leave message."));
                     logger.error(AdventureUtil.deserialize("The plugin chooses the first leave message as the default."));
@@ -178,7 +178,7 @@ public class PlayerDataManager {
      * @param uuid The {@link UUID} of the player.
      * @param playerData The {@link PlayerData}.
      */
-    public void savePlayerData(@NotNull UUID uuid, PlayerData playerData) {
+    public void savePlayerData(@NonNull UUID uuid, PlayerData playerData) {
         PlayerDataTable playerDataTable = databaseManager.getPlayerDataTable();
         playerDataTable.savePlayerData(uuid, playerData);
     }
@@ -187,7 +187,7 @@ public class PlayerDataManager {
      * Load all legacy player settings and migrate it to legacy player data and save the updated player data to the database.
      */
     public void migrateLegacyPlayerSettings() {
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) {
             logger.error(AdventureUtil.deserialize("Unable to migrate legacy player data due to invalid plugin settings."));
             return;
@@ -203,14 +203,14 @@ public class PlayerDataManager {
             return;
         }
 
-        @Nullable String defaultJoinMessage = settings.joinMessages().getFirst().message();
+        String defaultJoinMessage = settings.joinMessages().getFirst().message();
         if(defaultJoinMessage == null) {
             logger.error(AdventureUtil.deserialize("Unable to migrate legacy player data due to an invalid default join message."));
             logger.error(AdventureUtil.deserialize("The plugin chooses the first join message as the default."));
             return;
         }
 
-        @Nullable String defaultLeaveMessage = settings.quitMessages().getFirst().message();
+        String defaultLeaveMessage = settings.quitMessages().getFirst().message();
         if(defaultLeaveMessage == null) {
             logger.error(AdventureUtil.deserialize("Unable to migrate legacy player data due to an invalid default leave message."));
             logger.error(AdventureUtil.deserialize("The plugin chooses the first leave message as the default."));
@@ -233,7 +233,7 @@ public class PlayerDataManager {
                         String nameWithoutExtension = fileName.replaceAll("\\.yml$", "");
                         UUID uuid = UUID.fromString(nameWithoutExtension);
 
-                        @NotNull YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
+                        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
                         try {
                             PlayerSettings playerSettings = loader.load().get(PlayerSettings.class);
                             if(playerSettings != null) {
@@ -274,7 +274,7 @@ public class PlayerDataManager {
      * @param playerSettings The legacy {@link PlayerSettings}.
      * @return The migrated {@link PlayerData}.
      */
-    private @NotNull PlayerData migrateLegacyPlayerSettings(@NotNull String defaultJoinMessage, @NotNull String defaultLeaveMessage, PlayerSettings playerSettings) {
+    private @NonNull PlayerData migrateLegacyPlayerSettings(@NonNull String defaultJoinMessage, @NonNull String defaultLeaveMessage, PlayerSettings playerSettings) {
         boolean sendJoin = true;
         boolean sendMotd = true;
         boolean sendLeave = true;

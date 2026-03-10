@@ -18,7 +18,7 @@
 package com.github.lukesky19.skywelcome.data.player.legacy;
 
 import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This contains the legacy player settings from when player data was loaded from files rather than a database.

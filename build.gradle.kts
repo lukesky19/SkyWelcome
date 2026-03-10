@@ -23,7 +23,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.github.lukesky19:SkyLib:1.4.0.0")
+    compileOnly("com.github.lukesky19:SkyLib:1.5.0.0")
 }
 
 java {

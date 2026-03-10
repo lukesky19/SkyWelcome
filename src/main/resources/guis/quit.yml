@@ -1,4 +1,4 @@
-config-version: 1.5.0.0
+config-version: 3
 gui:
     gui-type: CHEST_54
     gui-name: "Choose a Leave Message"

@@ -18,8 +18,8 @@
 package com.github.lukesky19.skywelcome.config.settings.legacy;
 
 import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ import java.util.List;
  * @param quit The leave message configuration.
  */
 @ConfigSerializable
-public record LegacySettings(@NotNull Join join, @NotNull Motd motd, @NotNull Quit quit) {
+public record LegacySettings(@NonNull Join join, @NonNull Motd motd, @NonNull Quit quit) {
     /**
      * Contains the join message.
      * @param content The join message.
@@ -43,12 +43,12 @@ public record LegacySettings(@NotNull Join join, @NotNull Motd motd, @NotNull Qu
      * @param contents The {@link List} of {@link String}s for the motd messages.
      */
     @ConfigSerializable
-    public record Motd(@NotNull List<String> contents) { }
+    public record Motd(@NonNull List<String> contents) { }
 
     /**
      * Contains the leave message.
      * @param content The leave message.
      */
     @ConfigSerializable
-    public record Quit(@NotNull String content) { }
+    public record Quit(@NonNull String content) { }
 }

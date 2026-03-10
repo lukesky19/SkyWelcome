@@ -21,7 +21,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class event is fired when a player quits and a custom quit message is sent.
@@ -38,7 +38,7 @@ public class SkyWelcomeQuitEvent extends Event {
      * @param componentQuitMessage The quit message as a {@link Component}.
      * @param plainQuitMessage The plain quit message. This doesn't include any formatting tags.
      */
-    public SkyWelcomeQuitEvent(@NotNull Player player, @NotNull Component componentQuitMessage, @NotNull String plainQuitMessage) {
+    public SkyWelcomeQuitEvent(@NonNull Player player, @NonNull Component componentQuitMessage, @NonNull String plainQuitMessage) {
         this.player = player;
         this.componentQuitMessage = componentQuitMessage;
         this.plainQuitMessage = plainQuitMessage;
@@ -48,7 +48,7 @@ public class SkyWelcomeQuitEvent extends Event {
      * The {@link Player}.
      * @return A {@link Player}.
      */
-    public @NotNull Player getPlayer() {
+    public @NonNull Player getPlayer() {
         return player;
     }
 
@@ -56,7 +56,7 @@ public class SkyWelcomeQuitEvent extends Event {
      * Get the quit message as a {@link Component}.
      * @return A {@link Component} containing the quit message.
      */
-    public @NotNull Component getComponentQuitMessage() {
+    public @NonNull Component getComponentQuitMessage() {
         return componentQuitMessage;
     }
 
@@ -64,7 +64,7 @@ public class SkyWelcomeQuitEvent extends Event {
      * Get the quit message as a {@link String} without any formatting.
      * @return A {@link String} containing the quit message.
      */
-    public @NotNull String getPlainQuitMessage() {
+    public @NonNull String getPlainQuitMessage() {
         return plainQuitMessage;
     }
 
@@ -72,7 +72,7 @@ public class SkyWelcomeQuitEvent extends Event {
      * Get the {@link HandlerList} for this event.
      * @return A {@link HandlerList}
      */
-    public static @NotNull HandlerList getHandlerList() {
+    public static @NonNull HandlerList getHandlerList() {
         return HANDLERS;
     }
 
@@ -81,7 +81,7 @@ public class SkyWelcomeQuitEvent extends Event {
      * @return A {@link HandlerList}
      */
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public @NonNull HandlerList getHandlers() {
         return HANDLERS;
     }
 }

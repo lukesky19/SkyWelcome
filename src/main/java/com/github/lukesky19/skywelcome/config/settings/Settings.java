@@ -19,14 +19,14 @@ package com.github.lukesky19.skywelcome.config.settings;
 
 import com.github.lukesky19.skylib.api.itemstack.ItemStackConfig;
 import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 /**
  * This record contains the plugin's settings.
- * @param configVersion The config version of the file.
+ * @param version The config version.
  * @param locale The plugin's locale to use.
  * @param globalJoinToggle Should join messages be enabled globally?
  * @param globalQuitToggle Should leave messages be enabled globally?
@@ -38,15 +38,15 @@ import java.util.List;
  */
 @ConfigSerializable
 public record Settings(
-        @Nullable String configVersion,
+        int version,
         @Nullable String locale,
         @Nullable Boolean globalJoinToggle,
         @Nullable Boolean globalQuitToggle,
         @Nullable Boolean globalMotdToggle,
-        @NotNull List<JoinMessageConfig> joinMessages,
-        @NotNull List<String> motd,
-        @NotNull List<QuitMessageConfig> quitMessages,
-        @NotNull WelcomeRewards welcomeRewards) {
+        @NonNull List<JoinMessageConfig> joinMessages,
+        @NonNull List<String> motd,
+        @NonNull List<QuitMessageConfig> quitMessages,
+        @NonNull WelcomeRewards welcomeRewards) {
     /**
      * This record contains the configuration for an individual join message.
      * @param permission The join message's permission.
@@ -75,8 +75,7 @@ public record Settings(
             @Nullable Boolean enabled,
             @Nullable Boolean rewardOfflineJoins,
             @Nullable Double cash,
-            @NotNull List<ItemStackConfig> items,
-            @NotNull List<String> commands,
-            @NotNull List<String> messages) {}
+            @NonNull List<ItemStackConfig> items,
+            @NonNull List<String> commands,
+            @NonNull List<String> messages) {}
 }
-

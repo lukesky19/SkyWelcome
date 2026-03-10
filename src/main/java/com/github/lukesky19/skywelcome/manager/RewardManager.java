@@ -30,7 +30,7 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,10 +39,10 @@ import java.util.Optional;
  * This class manages the distribution of rewards to players.
  */
 public class RewardManager {
-    private final @NotNull SkyWelcome skyWelcome;
-    private final @NotNull ComponentLogger logger;
-    private final @NotNull SettingsManager settingsManager;
-    private final @NotNull LocaleManager localeManager;
+    private final @NonNull SkyWelcome skyWelcome;
+    private final @NonNull ComponentLogger logger;
+    private final @NonNull SettingsManager settingsManager;
+    private final @NonNull LocaleManager localeManager;
 
     /**
      * Constructor
@@ -51,9 +51,9 @@ public class RewardManager {
      * @param localeManager A {@link LocaleManager} instance.
      */
     public RewardManager(
-            @NotNull SkyWelcome skyWelcome,
-            @NotNull SettingsManager settingsManager,
-            @NotNull LocaleManager localeManager) {
+            @NonNull SkyWelcome skyWelcome,
+            @NonNull SettingsManager settingsManager,
+            @NonNull LocaleManager localeManager) {
         this.skyWelcome = skyWelcome;
         this.logger = skyWelcome.getComponentLogger();
         this.settingsManager = settingsManager;
@@ -64,8 +64,8 @@ public class RewardManager {
      * Give welcome rewards to the player provided.
      * @param player The {@link Player}.
      */
-    public void giveReward(@NotNull Player player) {
-        Settings settings = settingsManager.getSettings();
+    public void giveReward(@NonNull Player player) {
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null || settings.welcomeRewards().enabled() == null) {
             logger.warn(AdventureUtil.deserialize("Unable to give rewards to " + player.getName() + " due to invalid plugin settings."));
             return;
@@ -77,7 +77,7 @@ public class RewardManager {
         if(!settings.welcomeRewards().commands().isEmpty()) runCommands(player, settings.welcomeRewards().commands());
 
         for(String msg : settings.welcomeRewards().messages()) {
-            player.sendMessage(AdventureUtil.deserialize(player, localeManager.getLocale().prefix() + msg));
+            player.sendMessage(AdventureUtil.deserialize(player, localeManager.getConfiguration().prefix() + msg));
         }
     }
 
@@ -86,9 +86,11 @@ public class RewardManager {
      * @param player The {@link Player}.
      * @param itemStackConfigList The {@link List} of {@link ItemStackConfig}s.
      */
-    private void giveItems(@NotNull Player player, @NotNull List<ItemStackConfig> itemStackConfigList) {
+    private void giveItems(@NonNull Player player, @NonNull List<ItemStackConfig> itemStackConfigList) {
         for(ItemStackConfig itemStackConfig : itemStackConfigList) {
-            Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger).fromItemStackConfig(itemStackConfig, null, null, List.of()).buildItemStack();
+            Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger)
+                    .fromItemStackConfig(itemStackConfig, null, List.of())
+                    .buildItemStack();
             if(optionalItemStack.isPresent()) {
                 PlayerUtil.giveItem(player.getInventory(), optionalItemStack.get(), optionalItemStack.get().getAmount(), player.getLocation());
             } else {
@@ -102,7 +104,7 @@ public class RewardManager {
      * @param player The {@link Player}.
      * @param money The money to give.
      */
-    private void giveMoney(@NotNull Player player, double money) {
+    private void giveMoney(@NonNull Player player, double money) {
         skyWelcome.getEconomy().depositPlayer(player, money);
     }
 
@@ -111,7 +113,7 @@ public class RewardManager {
      * @param player The {@link Player}.
      * @param commands The {@link List} of {@link String}s for commands.
      */
-    private void runCommands(@NotNull Player player, @NotNull List<String> commands) {
+    private void runCommands(@NonNull Player player, @NonNull List<String> commands) {
         ConsoleCommandSender commandSender = skyWelcome.getServer().getConsoleSender();
         for(String command : commands) {
             skyWelcome.getServer().dispatchCommand(commandSender, PlaceholderAPIUtil.parsePlaceholders(player, command));

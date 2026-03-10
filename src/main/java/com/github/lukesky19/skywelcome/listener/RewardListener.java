@@ -35,7 +35,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -43,11 +43,11 @@ import java.util.List;
  * This class listens to when a new player joins and when a player says welcome to distribute rewards.
  */
 public class RewardListener implements Listener {
-    private final @NotNull SkyWelcome skyWelcome;
-    private final @NotNull ComponentLogger logger;
-    private final @NotNull SettingsManager settingsManager;
-    private final @NotNull LocaleManager localeManager;
-    private final @NotNull RewardManager rewardManager;
+    private final @NonNull SkyWelcome skyWelcome;
+    private final @NonNull ComponentLogger logger;
+    private final @NonNull SettingsManager settingsManager;
+    private final @NonNull LocaleManager localeManager;
+    private final @NonNull RewardManager rewardManager;
     private boolean reward = false;
     private String newPlayerName;
 
@@ -59,10 +59,10 @@ public class RewardListener implements Listener {
      * @param rewardManager A {@link RewardManager} instance.
      */
     public RewardListener(
-            @NotNull SkyWelcome skyWelcome,
-            @NotNull SettingsManager settingsManager,
-            @NotNull LocaleManager localeManager,
-            @NotNull RewardManager rewardManager) {
+            @NonNull SkyWelcome skyWelcome,
+            @NonNull SettingsManager settingsManager,
+            @NonNull LocaleManager localeManager,
+            @NonNull RewardManager rewardManager) {
         this.skyWelcome = skyWelcome;
         this.logger = skyWelcome.getComponentLogger();
         this.settingsManager = settingsManager;
@@ -76,7 +76,7 @@ public class RewardListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChat(AsyncChatEvent asyncChatEvent) {
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) {
             logger.error(AdventureUtil.deserialize("Unable to process welcome reward for new player due to invalid plugin settings."));
             return;
@@ -98,7 +98,7 @@ public class RewardListener implements Listener {
 
                 rewardManager.giveReward(asyncChatEvent.getPlayer());
 
-                Locale locale = localeManager.getLocale();
+                Locale locale = localeManager.getConfiguration();
                 for(Player player : skyWelcome.getServer().getOnlinePlayers()) {
                     if(player.isOnline() && player.isConnected()) {
                         player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.welcomeBroadcast(), placeholders));
@@ -114,7 +114,7 @@ public class RewardListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onNewPlayerJoin(PlayerJoinEvent playerJoinEvent) {
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) {
             logger.error(AdventureUtil.deserialize("Unable to process new player due to invalid plugin settings."));
             return;
@@ -138,7 +138,7 @@ public class RewardListener implements Listener {
     public void onNewPlayerQuit(PlayerQuitEvent playerQuitEvent) {
         if(!playerQuitEvent.getPlayer().getName().equals(newPlayerName)) return;
 
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) return;
         if(settings.welcomeRewards().enabled() == null) return;
 

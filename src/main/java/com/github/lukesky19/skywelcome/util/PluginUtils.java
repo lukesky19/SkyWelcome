@@ -19,7 +19,7 @@ package com.github.lukesky19.skywelcome.util;
 
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class contains a method to check if the player is vanished.
@@ -41,7 +41,7 @@ public class PluginUtils {
      * @return true if vanished, false if not.
      */
     @SuppressWarnings("deprecation")
-    public static boolean isPlayerVanished(@NotNull Player player) {
+    public static boolean isPlayerVanished(@NonNull Player player) {
         for(MetadataValue meta : player.getMetadata("vanished")) {
             if (meta.asBoolean()) return true;
         }

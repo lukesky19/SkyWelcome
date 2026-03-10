@@ -25,14 +25,16 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to create the reload command argument.
  */
 public class ReloadCommand {
-    private final @NotNull SkyWelcome skyWelcome;
-    private final @NotNull LocaleManager localeManager;
+    private final @NonNull SkyWelcome skyWelcome;
+    private final @NonNull LocaleManager localeManager;
     /**
      * Default Constructor.
      * You should use {@link #ReloadCommand(SkyWelcome, LocaleManager)} instead.
@@ -49,7 +51,7 @@ public class ReloadCommand {
      * @param skyWelcome A {@link SkyWelcome} instance.
      * @param localeManager A {@link LocaleManager} instance.
      */
-    public ReloadCommand(@NotNull SkyWelcome skyWelcome, @NotNull LocaleManager localeManager) {
+    public ReloadCommand(@NonNull SkyWelcome skyWelcome, @NonNull LocaleManager localeManager) {
         this.skyWelcome = skyWelcome;
         this.localeManager = localeManager;
     }
@@ -58,15 +60,20 @@ public class ReloadCommand {
      * Creates the {@link LiteralCommandNode} of type {@link CommandSourceStack} for the reload command.
      * @return A {@link LiteralCommandNode} of type {@link CommandSourceStack} for the reload command.
      */
-    public @NotNull LiteralCommandNode<CommandSourceStack> createCommand() {
+    public @NonNull LiteralCommandNode<CommandSourceStack> createCommand() {
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("reload")
                 .requires(ctx -> ctx.getSender().hasPermission("skywelcome.commands.skywelcome.reload"))
                 .executes(ctx -> {
-                    Locale locale = localeManager.getLocale();
+                    Locale locale = localeManager.getConfiguration();
 
                     skyWelcome.reload();
 
-                    ctx.getSource().getSender().sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.reload()));
+                    CommandSender sender = ctx.getSource().getSender();
+                    if(sender instanceof Player) {
+                        sender.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.reload()));
+                    } else {
+                        sender.sendMessage(AdventureUtil.deserialize(locale.reload()));
+                    }
 
                     return 1;
                 });

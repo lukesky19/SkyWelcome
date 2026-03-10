@@ -17,7 +17,7 @@
 */
 package com.github.lukesky19.skywelcome.data.player;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class contains a player's data.
@@ -26,8 +26,8 @@ public class PlayerData {
     private boolean sendJoin;
     private boolean sendMotd;
     private boolean sendLeave;
-    private @NotNull String joinMessage;
-    private @NotNull String leaveMessage;
+    private @NonNull String joinMessage;
+    private @NonNull String leaveMessage;
 
     /**
      * Constructor
@@ -41,8 +41,8 @@ public class PlayerData {
             boolean sendJoin,
             boolean sendMotd,
             boolean sendLeave,
-            @NotNull String joinMessage,
-            @NotNull String leaveMessage) {
+            @NonNull String joinMessage,
+            @NonNull String leaveMessage) {
         this.sendJoin = sendJoin;
         this.sendMotd = sendMotd;
         this.sendLeave = sendLeave;
@@ -102,7 +102,7 @@ public class PlayerData {
      * Get the player's join message.
      * @return The player's join message as a {@link String}.
      */
-    public @NotNull String getJoinMessage() {
+    public @NonNull String getJoinMessage() {
         return joinMessage;
     }
 
@@ -110,7 +110,7 @@ public class PlayerData {
      * Set the player's join message.
      * @param joinMessage The new join message.
      */
-    public void setJoinMessage(@NotNull String joinMessage) {
+    public void setJoinMessage(@NonNull String joinMessage) {
         this.joinMessage = joinMessage;
     }
 
@@ -118,7 +118,7 @@ public class PlayerData {
      * Get the player's leave message.
      * @return The player's leave message as a {@link String}.
      */
-    public @NotNull String getLeaveMessage() {
+    public @NonNull String getLeaveMessage() {
         return leaveMessage;
     }
 
@@ -126,7 +126,7 @@ public class PlayerData {
      * Set the player's leave message.
      * @param leaveMessage The new leave message.
      */
-    public void setLeaveMessage(@NotNull String leaveMessage) {
+    public void setLeaveMessage(@NonNull String leaveMessage) {
         this.leaveMessage = leaveMessage;
     }
 }

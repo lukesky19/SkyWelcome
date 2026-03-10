@@ -20,8 +20,8 @@ package com.github.lukesky19.skywelcome.config.settings.legacy;
 import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,13 +36,13 @@ import java.util.List;
  * @param welcomeRewards The {@link WelcomeRewards} config.
  */
 @ConfigSerializable
-public record SettingsV110ToV130(
+public record SettingsV2ToV4(
         @Nullable String configVersion,
-        @NotNull Options options,
-        @NotNull LinkedHashMap<String, Join> join,
-        @NotNull Motd motd,
-        @NotNull LinkedHashMap<String, Quit> quit,
-        @NotNull WelcomeRewards welcomeRewards) {
+        @NonNull Options options,
+        @NonNull LinkedHashMap<String, Join> join,
+        @NonNull Motd motd,
+        @NonNull LinkedHashMap<String, Quit> quit,
+        @NonNull WelcomeRewards welcomeRewards) {
     /**
      * This record contains the configuration for an individual join message.
      * @param permission The join message's permission.
@@ -55,7 +55,7 @@ public record SettingsV110ToV130(
      * @param contents The {@link List} of {@link String}s to send for the server's motd.
      */
     @ConfigSerializable
-    public record Motd(@NotNull List<String> contents) { }
+    public record Motd(@NonNull List<String> contents) { }
     /**
      * This record contains the configuration for an individual leave message.
      * @param permission The leave message's permission.

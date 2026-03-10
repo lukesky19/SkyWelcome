@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * This record contains the plugin's locale messages.
- * @param configVersion The config version of the file.
+ * @param version The config version.
  * @param prefix The plugin's prefix.
  * @param help The {@link List} of {@link String}s for the help message.
  * @param reload The message sent when the plugin is reloaded.
@@ -38,7 +38,7 @@ import java.util.List;
  */
 @ConfigSerializable
 public record Locale(
-        String configVersion,
+        int version,
         String prefix,
         List<String> help,
         String reload,

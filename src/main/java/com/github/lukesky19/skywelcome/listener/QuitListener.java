@@ -33,7 +33,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.UUID;
 
@@ -41,10 +41,10 @@ import java.util.UUID;
  * Listens to when a player disconnects from the server and sends their leave message if appropriate.
  */
 public class QuitListener implements Listener {
-    private final @NotNull SkyWelcome skyWelcome;
-    private final @NotNull ComponentLogger logger;
-    private final @NotNull PlayerDataManager playerDataManager;
-    private final @NotNull SettingsManager settingsManager;
+    private final @NonNull SkyWelcome skyWelcome;
+    private final @NonNull ComponentLogger logger;
+    private final @NonNull PlayerDataManager playerDataManager;
+    private final @NonNull SettingsManager settingsManager;
 
     /**
      * Constructor
@@ -53,9 +53,9 @@ public class QuitListener implements Listener {
      * @param playerDataManager A {@link PlayerDataManager} instance.
      */
     public QuitListener(
-            @NotNull SkyWelcome skyWelcome,
-            @NotNull SettingsManager settingsManager,
-        @NotNull PlayerDataManager playerDataManager) {
+            @NonNull SkyWelcome skyWelcome,
+            @NonNull SettingsManager settingsManager,
+        @NonNull PlayerDataManager playerDataManager) {
         this.skyWelcome = skyWelcome;
         this.logger = skyWelcome.getComponentLogger();
         this.playerDataManager = playerDataManager;
@@ -71,7 +71,7 @@ public class QuitListener implements Listener {
         Player player = playerQuitEvent.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) {
             logger.warn(AdventureUtil.deserialize("Unable to send a leave message to players due to invalid plugin settings."));
             return;

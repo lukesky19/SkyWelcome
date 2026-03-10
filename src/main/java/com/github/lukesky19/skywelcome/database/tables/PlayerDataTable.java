@@ -23,8 +23,8 @@ import com.github.lukesky19.skylib.api.database.parameter.impl.UUIDParameter;
 import com.github.lukesky19.skywelcome.data.player.PlayerData;
 import com.github.lukesky19.skywelcome.database.QueueManager;
 import com.github.lukesky19.skywelcome.util.MessageParameter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -35,8 +35,8 @@ import java.util.concurrent.CompletableFuture;
  * This class manages access to the player data table in the database.
  */
 public class PlayerDataTable {
-    private final @NotNull QueueManager queueManager;
-    private final @NotNull String tableName = "skywelcome_player_data";
+    private final @NonNull QueueManager queueManager;
+    private final @NonNull String tableName = "skywelcome_player_data";
 
     /**
      * Default Constructor.
@@ -52,7 +52,7 @@ public class PlayerDataTable {
      * Constructor
      * @param queueManager A {@link QueueManager} instance.
      */
-    public PlayerDataTable(@NotNull QueueManager queueManager) {
+    public PlayerDataTable(@NonNull QueueManager queueManager) {
         this.queueManager = queueManager;
     }
 
@@ -79,7 +79,7 @@ public class PlayerDataTable {
      * @param uuid The {@link UUID} of the player.
      * @return A {@link CompletableFuture} containing {@link PlayerData}. May be null.
      */
-    public @NotNull CompletableFuture<@Nullable PlayerData> loadPlayerData(@NotNull UUID uuid) {
+    public @NonNull CompletableFuture<@Nullable PlayerData> loadPlayerData(@NonNull UUID uuid) {
         String selectSql = "SELECT send_join, send_motd, send_leave, join_message, leave_message FROM " + tableName + " WHERE player_id = ? AND last_updated < ?";
         UUIDParameter uuidParameter = new UUIDParameter(uuid);
         LongParameter lastUpdatedParameter = new LongParameter(System.currentTimeMillis());
@@ -106,7 +106,7 @@ public class PlayerDataTable {
      * @param uuid The {@link UUID} the {@link PlayerData} belongs to.
      * @param playerData The {@link PlayerData} to save.
      */
-    public void savePlayerData(@NotNull UUID uuid, @NotNull PlayerData playerData) {
+    public void savePlayerData(@NonNull UUID uuid, @NonNull PlayerData playerData) {
         String insertOrUpdateSql = "INSERT INTO " + tableName + " (player_id, send_join, send_motd, send_leave, join_message, leave_message, last_updated) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?) " +
                 "ON CONFLICT (player_id) DO UPDATE SET " +

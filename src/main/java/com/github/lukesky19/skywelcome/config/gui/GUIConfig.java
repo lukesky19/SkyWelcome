@@ -22,20 +22,20 @@ import com.github.lukesky19.skylib.api.itemstack.ItemStackConfig;
 import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
 import com.github.lukesky19.skywelcome.enums.ButtonType;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 /**
  * This record contains the configuration for SkyWelcome's GUIs.
- * @param configVersion The config version of the file.
+ * @param version The config version.
  * @param gui The {@link GuiData}.
  */
 @ConfigSerializable
 public record GUIConfig(
-        @Nullable String configVersion,
-        @NotNull GuiData gui) {
+        int version,
+        @NonNull GuiData gui) {
     /**
      * This record contains the gui data for the gui.
      * @param guiType The {@link GUIType}.
@@ -50,9 +50,9 @@ public record GUIConfig(
             @Nullable GUIType guiType,
             @Nullable String guiName,
             @Nullable Integer itemsPerPage,
-            @NotNull PlaceholderButtons placeholders,
-            @NotNull List<ButtonConfig> buttons,
-            @NotNull List<Integer> slots) {}
+            @NonNull PlaceholderButtons placeholders,
+            @NonNull List<ButtonConfig> buttons,
+            @NonNull List<Integer> slots) {}
     /**
      * This record contains the item configuration used to display selectable join or quit messages.
      * @param selected The {@link ItemStackConfig} used to create the {@link ItemStack} that displays the message the player has selected.
@@ -61,9 +61,9 @@ public record GUIConfig(
      */
     @ConfigSerializable
     public record PlaceholderButtons(
-            @NotNull ItemStackConfig selected,
-            @NotNull ItemStackConfig available,
-            @NotNull ItemStackConfig noPermission) {}
+            @NonNull ItemStackConfig selected,
+            @NonNull ItemStackConfig available,
+            @NonNull ItemStackConfig noPermission) {}
     /**
      * This record contains the configuration for a single button.
      * @param buttonType The {@link ButtonType}.
@@ -76,5 +76,5 @@ public record GUIConfig(
             @Nullable ButtonType buttonType,
             @Nullable Integer slot,
             @Nullable String hdbId,
-            @NotNull ItemStackConfig item) { }
+            @NonNull ItemStackConfig item) { }
 }

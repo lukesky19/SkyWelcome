@@ -18,19 +18,20 @@
 package com.github.lukesky19.skywelcome.config.settings;
 
 import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.api.common.abstracts.config.SimpleConfigManager;
 import com.github.lukesky19.skylib.api.configurate.ConfigurationUtility;
 import com.github.lukesky19.skylib.api.itemstack.ItemStackConfig;
-import com.github.lukesky19.skylib.libs.configurate.CommentedConfigurationNode;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
+import com.github.lukesky19.skylib.libs.configurate.ConfigurationNode;
+import com.github.lukesky19.skylib.libs.configurate.serialize.SerializationException;
 import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
 import com.github.lukesky19.skywelcome.SkyWelcome;
 import com.github.lukesky19.skywelcome.config.settings.legacy.LegacySettings;
-import com.github.lukesky19.skywelcome.config.settings.legacy.SettingsV110ToV130;
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import com.github.lukesky19.skywelcome.config.settings.legacy.SettingsV2ToV4;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -42,218 +43,218 @@ import java.util.regex.Pattern;
 /**
  * This class manages the plugin's settings.
  */
-public class SettingsManager {
-    private final @NotNull SkyWelcome skyWelcome;
-    private @Nullable Settings settings;
-
+public class SettingsManager extends SimpleConfigManager<Settings> {
     /**
      * Constructor
      * @param skyWelcome A {@link SkyWelcome} instance.
      */
-    public SettingsManager(@NotNull SkyWelcome skyWelcome) {
-        this.skyWelcome = skyWelcome;
+    public SettingsManager(@NonNull SkyWelcome skyWelcome) {
+        super(skyWelcome, Path.of(skyWelcome.getDataFolder() + File.separator + "settings.yml"), Settings.class);
+    }
+
+    @Override
+    public void loadConfiguration() {
+        configuration = null;
+
+        if(configurationPath == null) return;
+
+        saveBundledConfig();
+
+        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(configurationPath);
+        try {
+            ConfigurationNode root = loader.load();
+            int version = getVersion(root);
+
+            Settings settings;
+            if(version >= 6) {
+                settings = root.get(Settings.class);
+            } else {
+                settings = loadAndMigrate(version, root);
+            }
+
+            if(settings == null) {
+                logger.warn(AdventureUtil.deserialize("Failed to load and or migrate settings.yml."));
+                return;
+            }
+
+            Settings migratedConfiguration = migrateConfiguration(settings);
+
+            if(!settings.equals(migratedConfiguration)) {
+                saveConfiguration(migratedConfiguration);
+            }
+
+            // Check if the configuration is invalid
+            if(!validateConfiguration(migratedConfiguration)) {
+                logger.warn(AdventureUtil.deserialize("Settings configuration validation failed."));
+                return;
+            }
+
+            this.configuration = migratedConfiguration;
+        } catch (ConfigurateException configurateException) {
+            logger.error(AdventureUtil.deserialize("Failed to load configuration. Error: " + configurateException.getMessage()));
+        }
+    }
+
+    @Override
+    protected void saveBundledConfig() {
+        if(configurationPath == null) return;
+
+        if(!configurationPath.toFile().exists()) {
+            plugin.saveResource("settings.yml", false);
+        }
     }
 
     /**
-     * Get the plugin's settings.
-     * @return The plugin's {@link Settings}.
+     * Migrate the configuration from v6 and beyond.
+     * Currently, version 6 is the lastest version so the passed settings are returned.
+     * @param settings The {@link Settings}.
+     * @return The passed {@link Settings}.
      */
-    public @Nullable Settings getSettings() {
+    @Override
+    public @NonNull Settings migrateConfiguration(@NonNull Settings settings) {
         return settings;
     }
 
     /**
-     * Reload the plugin's settings.
+     * Load the configuration and migrate if necessary.
+     * @param version The configuration version.
+     * @param root The root {@link ConfigurationNode}.
+     * @return The migrated {@link Settings} or null.
      */
-    public void reload() {
-        settings = null;
-
-        Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "settings.yml");
-        if(!path.toFile().exists()) {
-            skyWelcome.saveResource("settings.yml", false);
-        }
-
-        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
+    private @Nullable Settings loadAndMigrate(int version, @NonNull ConfigurationNode root) {
         try {
-            SettingsVersionOnly settingsVersionOnly = loader.load().get(SettingsVersionOnly.class);
-            if(settingsVersionOnly == null) return;
-            if(settingsVersionOnly.configVersion() != null && settingsVersionOnly.configVersion().equals("1.5.0.0")) {
-                settings = loader.load().get(Settings.class);
-            } else {
-                migrateSettings(settingsVersionOnly.configVersion());
-            }
-        } catch (ConfigurateException e) {
-            skyWelcome.getComponentLogger().error(AdventureUtil.deserialize("Failed to load plugin settings: " + e.getMessage()));
-            return;
-        }
+            Settings settings = null;
+            switch (version) {
+                case 5 -> {
+                    Settings oldSettings = root.get(Settings.class);
+                    if (oldSettings == null) {
+                        logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load for version: " + version));
+                        return null;
+                    }
 
-        //  Validate settings
-        validateSettings();
-    }
+                    settings = updateSettingsV5ToV6(oldSettings);
 
-    /**
-     * Checks if the plugin's settings are outdated.
-     */
-    private void validateSettings() {
-        ComponentLogger logger = skyWelcome.getComponentLogger();
-        if(settings == null) return;
-
-        if(settings.configVersion() == null) {
-            logger.error(AdventureUtil.deserialize("The config version in settings.yml is invalid."));
-            settings = null;
-            return;
-        }
-
-        if(!settings.configVersion().equals("1.5.0.0")) {
-            logger.error(AdventureUtil.deserialize("Your settings.yml configuration is outdated and needs to be updated."));
-            settings = null;
-        }
-    }
-
-    /**
-     * Migrate legacy settings versions to the latest if possible.
-     */
-    private void migrateSettings(@Nullable String configVersion) {
-        ComponentLogger logger = skyWelcome.getComponentLogger();
-
-        Path path = Path.of(skyWelcome.getDataFolder() + File.separator + "settings.yml");
-        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
-
-        switch(configVersion) {
-            case "1.5.0.0" -> {
-                // Current Version, do nothing
-            }
-
-            case "1.3.0" -> {
-                SettingsV110ToV130 oldSettings;
-                try {
-                    oldSettings = loader.load().get(SettingsV110ToV130.class);
-                } catch (ConfigurateException e) {
-                    throw new RuntimeException(e);
+                    saveConfiguration(settings);
                 }
 
-                if(oldSettings == null) {
-                    logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load."));
-                    return;
+                case 4 -> {
+                    try {
+                        SettingsV2ToV4 oldSettings = root.get(SettingsV2ToV4.class);
+                        if(oldSettings == null) {
+                            logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load for version: " + version));
+                            return null;
+                        }
+
+                        settings = updateSettingsV4ToV6(oldSettings);
+
+                        if(settings != null) {
+                            saveConfiguration(settings);
+                        }
+                    } catch (ConfigurateException e) {
+                        logger.error(AdventureUtil.deserialize("Failed to load legacy settings for version: " + version));
+                    }
                 }
 
-                Settings newSettings = updateSettings130To1500(oldSettings);
-                if(newSettings == null) return;
+                case 3 -> {
+                    SettingsV2ToV4 oldSettings = root.get(SettingsV2ToV4.class);
+                    if(oldSettings == null) {
+                        logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load for version: " + version));
+                        return null;
+                    }
 
-                CommentedConfigurationNode node = loader.createNode();
-                try {
-                    node.set(newSettings);
-                    loader.save(node);
-                    settings = newSettings;
-                } catch (ConfigurateException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+                    settings = updateSettingsV3ToV6(oldSettings);
 
-            case "1.2.0" -> {
-                SettingsV110ToV130 oldSettings;
-                try {
-                    oldSettings = loader.load().get(SettingsV110ToV130.class);
-                } catch (ConfigurateException e) {
-                    throw new RuntimeException(e);
+                    if(settings != null) {
+                        saveConfiguration(settings);
+                    }
                 }
 
-                if(oldSettings == null) {
-                    logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load."));
-                    return;
+                case 2 -> {
+                    SettingsV2ToV4 oldSettings = root.get(SettingsV2ToV4.class);
+                    if(oldSettings == null) {
+                        logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load for version: " + version));
+                        return null;
+                    }
+
+                    settings = updateSettingsV2ToV6(oldSettings);
+
+                    saveConfiguration(settings);
                 }
 
-                Settings newSettings = updateSettings120To1500(oldSettings);
-                if(newSettings == null) return;
+                case 1 -> {
+                    LegacySettings oldSettings = root.get(LegacySettings.class);
+                    if(oldSettings == null) {
+                        logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load for version: " + version));
+                        return null;
+                    }
 
-                CommentedConfigurationNode node = loader.createNode();
-                try {
-                    node.set(newSettings);
-                    loader.save(node);
-                    settings = newSettings;
-                } catch (ConfigurateException e) {
-                    throw new RuntimeException(e);
+                    settings = updateSettingsV1ToV6(oldSettings);
+
+                    saveConfiguration(settings);
+                }
+
+                default -> {
+                    logger.warn(AdventureUtil.deserialize("Failed to load configuration file settings.yml due to an unsupported config version. Version: " + version + " Class name: " + this.getClass().getName()));
+                    return null;
                 }
             }
 
-            case "1.1.0" -> {
-                SettingsV110ToV130 oldSettings;
-                try {
-                    oldSettings = loader.load().get(SettingsV110ToV130.class);
-                } catch (ConfigurateException e) {
-                    throw new RuntimeException(e);
-                }
-
-                if(oldSettings == null) {
-                    logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the old settings failing to load."));
-                    return;
-                }
-
-                Settings newSettings = updateSettings110To1500(oldSettings);
-                CommentedConfigurationNode node = loader.createNode();
-                try {
-                    node.set(newSettings);
-                    loader.save(node);
-                    settings = newSettings;
-                } catch (ConfigurateException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            case null -> {
-                LegacySettings legacySettings;
-                try {
-                    legacySettings = loader.load().get(LegacySettings.class);
-                } catch (ConfigurateException e) {
-                    throw new RuntimeException(e);
-                }
-
-                if(legacySettings == null) {
-                    logger.warn(AdventureUtil.deserialize("Unable to migrate settings due to the legacy settings failing to load."));
-                    return;
-                }
-                Settings newSettings = migrateLegacySettings(legacySettings);
-
-                CommentedConfigurationNode node = loader.createNode();
-                try {
-                    node.set(newSettings);
-                    loader.save(node);
-                    settings = newSettings;
-                } catch (ConfigurateException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            default -> throw new IllegalStateException("Unexpected value: " + configVersion);
+            return settings;
+        } catch (SerializationException e) {
+            logger.error(AdventureUtil.deserialize("Failed to load and migrate configuration file settings.yml. Error: " + e.getMessage()));
+            return null;
         }
     }
 
+    @Override
+    public boolean validateConfiguration(@Nullable Settings settings) {
+        return settings != null;
+    }
+
     /**
-     * Migrate the {@link SettingsV110ToV130} for version 1.3.0 to {@link Settings} 1.5.0.0.
-     * @param oldSettings The {@link SettingsV110ToV130}
+     * Migrate the settings for version V5 to V6.
+     * @param oldSettings The {@link SettingsV2ToV4}
      * @return The updated {@link Settings}.
      */
-    private @Nullable Settings updateSettings130To1500(@NotNull SettingsV110ToV130 oldSettings) {
-        ComponentLogger logger = skyWelcome.getComponentLogger();
+    private @NonNull Settings updateSettingsV5ToV6(@NonNull Settings oldSettings) {
+        return new Settings(
+                6,
+                oldSettings.locale(),
+                oldSettings.globalJoinToggle(),
+                oldSettings.globalQuitToggle(),
+                oldSettings.globalMotdToggle(),
+                oldSettings.joinMessages(),
+                oldSettings.motd(),
+                oldSettings.quitMessages(),
+                oldSettings.welcomeRewards());
+    }
 
+    /**
+     * Migrate the settings for version V4 to V6.
+     * @param oldSettings The {@link SettingsV2ToV4}
+     * @return The updated {@link Settings}.
+     */
+    private @Nullable Settings updateSettingsV4ToV6(@NonNull SettingsV2ToV4 oldSettings) {
         Material material = Material.getMaterial(oldSettings.welcomeRewards().item().material());
         if(material == null) {
-            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.3.0 to 1.5.0.0 due to the reward item material being invalid."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings v4 to v6 due to the reward item material being invalid."));
             return null;
         }
+
         ItemType itemType = material.asItemType();
         if(itemType == null) {
-            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.3.0 to 1.5.0.0 due to being unable to find the ItemType that corresponds to the Material."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings v4 to v6 due to being unable to find the ItemType that corresponds to the Material."));
             return null;
         }
+
         Integer amount = oldSettings.welcomeRewards().item().amount();
         if(amount == null || amount <= 0) {
-            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.3.0 to 1.5.0.0 due to the amount being invalid."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings v4 to v6 due to the amount being invalid."));
             return null;
         }
 
         ItemStackConfig welcomeItem = new ItemStackConfig(
-                itemType.getKey().getKey(),
+                itemType,
                 amount,
                 null,
                 null,
@@ -270,43 +271,51 @@ public class SettingsManager {
                 List.of(),
                 new ItemStackConfig.OptionsConfig(null, null, null, null, null));
 
-        return new Settings("1.5.0.0", oldSettings.options().locale(), oldSettings.options().joins(),
-                oldSettings.options().motd(), oldSettings.options().quits(),
-                oldSettings.join().values().stream().map(join -> new Settings.JoinMessageConfig(join.permission(), join.message())).toList(),
+        return new Settings(6,
+                oldSettings.options().locale(),
+                oldSettings.options().joins(),
+                oldSettings.options().motd(),
+                oldSettings.options().quits(),
+                oldSettings.join().values().stream()
+                        .map(join -> new Settings.JoinMessageConfig(join.permission(), join.message()))
+                        .toList(),
                 oldSettings.motd().contents(),
-                oldSettings.quit().values().stream().map(quit -> new Settings.QuitMessageConfig(quit.permission(), quit.message())).toList(),
-                new Settings.WelcomeRewards(oldSettings.welcomeRewards().enabled(),
-                        false, oldSettings.welcomeRewards().cash(),
-                        List.of(welcomeItem), oldSettings.welcomeRewards().commands(),
+                oldSettings.quit().values().stream()
+                        .map(quit -> new Settings.QuitMessageConfig(quit.permission(), quit.message()))
+                        .toList(),
+                new Settings.WelcomeRewards(
+                        oldSettings.welcomeRewards().enabled(),
+                        false,
+                        oldSettings.welcomeRewards().cash(),
+                        List.of(welcomeItem),
+                        oldSettings.welcomeRewards().commands(),
                         oldSettings.welcomeRewards().messages()));
     }
 
     /**
-     * Migrate the {@link SettingsV110ToV130} for version 1.2.0 to {@link Settings} 1.5.0.0.
-     * @param oldSettings The {@link SettingsV110ToV130}
+     * Migrate the settings for version V3 to V6.
+     * @param oldSettings The {@link SettingsV2ToV4}
      * @return The updated {@link Settings}.
      */
-    private @Nullable Settings updateSettings120To1500(@NotNull SettingsV110ToV130 oldSettings) {
-        ComponentLogger logger = skyWelcome.getComponentLogger();
-
+    private @Nullable Settings updateSettingsV3ToV6(@NonNull SettingsV2ToV4 oldSettings) {
         Material material = Material.getMaterial(oldSettings.welcomeRewards().item().material());
         if(material == null) {
-            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.2.0 to 1.5.0.0 due to the reward item material being invalid."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings V3 to V6 due to the reward item material being invalid."));
             return null;
         }
         ItemType itemType = material.asItemType();
         if(itemType == null) {
-            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.2.0 to 1.5.0.0 due to being unable to find the ItemType that corresponds to the Material."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings V3 to V6 due to being unable to find the ItemType that corresponds to the Material."));
             return null;
         }
         Integer amount = oldSettings.welcomeRewards().item().amount();
         if(amount == null || amount <= 0) {
-            logger.error(AdventureUtil.deserialize("Unable to migrate settings 1.2.0 to 1.5.0.0 due to the amount being invalid."));
+            logger.error(AdventureUtil.deserialize("Unable to migrate settings V3 to V6 due to the amount being invalid."));
             return null;
         }
 
         ItemStackConfig welcomeItem = new ItemStackConfig(
-                itemType.getKey().getKey(),
+                itemType,
                 amount,
                 null,
                 null,
@@ -323,25 +332,35 @@ public class SettingsManager {
                 List.of(),
                 new ItemStackConfig.OptionsConfig(null, null, null, null, null));
 
-        return new Settings("1.5.0.0", oldSettings.options().locale(), oldSettings.options().joins(),
-                oldSettings.options().motd(), oldSettings.options().quits(),
-                oldSettings.join().values().stream().map(join -> new Settings.JoinMessageConfig(join.permission(), join.message())).toList(),
+        return new Settings(6,
+                oldSettings.options().locale(),
+                oldSettings.options().joins(),
+                oldSettings.options().motd(),
+                oldSettings.options().quits(),
+                oldSettings.join().values().stream()
+                        .map(join -> new Settings.JoinMessageConfig(join.permission(), join.message()))
+                        .toList(),
                 oldSettings.motd().contents(),
-                oldSettings.quit().values().stream().map(quit -> new Settings.QuitMessageConfig(quit.permission(), quit.message())).toList(),
-                new Settings.WelcomeRewards(oldSettings.welcomeRewards().enabled(),
-                false, oldSettings.welcomeRewards().cash(),
-                List.of(welcomeItem), oldSettings.welcomeRewards().commands(),
-                oldSettings.welcomeRewards().messages()));
+                oldSettings.quit().values().stream()
+                        .map(quit -> new Settings.QuitMessageConfig(quit.permission(), quit.message()))
+                        .toList(),
+                new Settings.WelcomeRewards(
+                        oldSettings.welcomeRewards().enabled(),
+                        false,
+                        oldSettings.welcomeRewards().cash(),
+                        List.of(welcomeItem),
+                        oldSettings.welcomeRewards().commands(),
+                        oldSettings.welcomeRewards().messages()));
     }
 
     /**
-     * Migrate the {@link SettingsV110ToV130} for version 1.1.0 to {@link Settings} 1.5.0.0.
-     * @param oldSettings The {@link SettingsV110ToV130}
+     * Migrate the settings for version V2 to V6.
+     * @param oldSettings The {@link SettingsV2ToV4}
      * @return The updated {@link Settings}.
      */
-    private @NotNull Settings updateSettings110To1500(@NotNull SettingsV110ToV130 oldSettings) {
+    private @NonNull Settings updateSettingsV2ToV6(@NonNull SettingsV2ToV4 oldSettings) {
         ItemStackConfig welcomeItem = new ItemStackConfig(
-                ItemType.DIAMOND.getKey().getKey(),
+                ItemType.DIAMOND,
                 1,
                 null,
                 null,
@@ -363,18 +382,35 @@ public class SettingsManager {
         rewardCommands.add("give %player_name% emerald 1");
         rewardMessages.add("<aqua>Thanks for welcoming a new player. Enjoy this reward: $50</aqua>");
 
-        return new Settings("1.5.0.0", oldSettings.options().locale(), oldSettings.options().joins(),
-                oldSettings.options().motd(), oldSettings.options().quits(),
-                oldSettings.join().values().stream().map(join -> new Settings.JoinMessageConfig(join.permission(), join.message())).toList(),
+        return new Settings(6,
+                oldSettings.options().locale(),
+                oldSettings.options().joins(),
+                oldSettings.options().motd(),
+                oldSettings.options().quits(),
+                oldSettings.join().values().stream()
+                        .map(join -> new Settings.JoinMessageConfig(join.permission(), join.message()))
+                        .toList(),
                 oldSettings.motd().contents(),
-                oldSettings.quit().values().stream().map(quit -> new Settings.QuitMessageConfig(quit.permission(), quit.message())).toList(),
-                new Settings.WelcomeRewards(true, false,
-                50.0, List.of(welcomeItem), rewardCommands, rewardMessages));
+                oldSettings.quit().values().stream()
+                        .map(quit -> new Settings.QuitMessageConfig(quit.permission(), quit.message()))
+                        .toList(),
+                new Settings.WelcomeRewards(
+                        true,
+                        false,
+                        50.0,
+                        List.of(welcomeItem),
+                        rewardCommands,
+                        rewardMessages));
     }
 
-    private @NotNull Settings migrateLegacySettings(@NotNull LegacySettings legacySettings) {
+    /**
+     * Migrate the legacy settings (V1) to V6.
+     * @param legacySettings The {@link LegacySettings} to migrate.
+     * @return The migrated {@link Settings}
+     */
+    private @NonNull Settings updateSettingsV1ToV6(@NonNull LegacySettings legacySettings) {
         ItemStackConfig welcomeItem = new ItemStackConfig(
-                ItemType.DIAMOND.getKey().getKey(),
+                ItemType.DIAMOND,
                 1,
                 null,
                 null,
@@ -393,8 +429,12 @@ public class SettingsManager {
 
         List<Settings.JoinMessageConfig> joinMessageConfigList = new ArrayList<>();
         List<Settings.QuitMessageConfig> quitMessageConfigList = new ArrayList<>();
-        joinMessageConfigList.add(new Settings.JoinMessageConfig("skywelcome.join.default", migratePlaceholderAPIFormat(legacySettings.join().content())));
-        quitMessageConfigList.add(new Settings.QuitMessageConfig("skywelcome.quit.default", migratePlaceholderAPIFormat(legacySettings.quit().content())));
+        joinMessageConfigList.add(new Settings.JoinMessageConfig(
+                "skywelcome.join.default",
+                migratePlaceholderAPIFormat(legacySettings.join().content())));
+        quitMessageConfigList.add(new Settings.QuitMessageConfig(
+                "skywelcome.quit.default",
+                migratePlaceholderAPIFormat(legacySettings.quit().content())));
 
         List<String> rewardCommands = new ArrayList<>();
         List<String> rewardMessages = new ArrayList<>();
@@ -407,7 +447,7 @@ public class SettingsManager {
         }
 
         return new Settings(
-                "1.5.0.0",
+                6,
                 "en_US",
                 true,
                 true,
@@ -415,7 +455,13 @@ public class SettingsManager {
                 joinMessageConfigList,
                 motdList,
                 quitMessageConfigList,
-                new Settings.WelcomeRewards(true, false,50.0, List.of(welcomeItem), rewardCommands, rewardMessages));
+                new Settings.WelcomeRewards(
+                        true,
+                        false,
+                        50.0,
+                        List.of(welcomeItem),
+                        rewardCommands,
+                        rewardMessages));
     }
 
     /**
@@ -423,7 +469,7 @@ public class SettingsManager {
      * @param msg The String to find and convert PlaceholderAPI formats for.
      * @return A String with the new PlaceholderAPI format.
      */
-    private String migratePlaceholderAPIFormat(String msg) {
+    private @NonNull String migratePlaceholderAPIFormat(String msg) {
         Pattern pattern = Pattern.compile("%([^%]+)%");
         Matcher matcher = pattern.matcher(msg);
 
@@ -437,5 +483,57 @@ public class SettingsManager {
         } else {
             return msg;
         }
+    }
+
+    /**
+     * Get the version number.
+     * @param root The root {@link ConfigurationNode}.
+     * @return The config version.
+     */
+    private int getVersion(@NonNull ConfigurationNode root) {
+        ConfigurationNode versionNode = root.node("version");
+        int version = versionNode.getInt();
+        if(version > 0) return version;
+
+        ConfigurationNode legacyVersionNode = root.node("config-version");
+        String legacyVersion = legacyVersionNode.virtual() ? null : legacyVersionNode.getString();
+        try {
+            switch(legacyVersion) {
+                case "1.5.0.0" -> {
+                    versionNode.set(5);
+                    version = 5;
+                }
+
+                case "1.3.0" -> {
+                    versionNode.set(4);
+                    version = 4;
+                }
+
+                case "1.2.0" -> {
+                    versionNode.set(3);
+                    version = 3;
+                }
+
+                case "1.1.0" -> {
+                    versionNode.set(2);
+                    version = 2;
+                }
+
+                case null -> {
+                    versionNode.set(1);
+                    version = 1;
+                }
+
+                default -> {
+                    logger.warn(AdventureUtil.deserialize("Failed to convert String-based version to numeric version due to an unrecognized version."));
+                    version = 0;
+                }
+            }
+        } catch (SerializationException e) {
+            logger.warn(AdventureUtil.deserialize("Failed to convert String-based version to numeric version"));
+            version = 0;
+        }
+
+        return version;
     }
 }
