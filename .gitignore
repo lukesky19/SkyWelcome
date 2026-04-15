@@ -1,2 +1,8 @@
 /build/
 /.gradle/
+/common/.gradle/
+/common/build/
+/paper/.gradle/
+/paper/build/
+/velocity/.gradle/
+/velocity/build/

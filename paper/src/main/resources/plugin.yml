@@ -1,0 +1,45 @@
+name: SkyWelcome
+version: '${version}'
+main: com.github.lukesky19.skywelcome.paper.SkyWelcomePaper
+api-version: '1.21'
+author: lukeskywlker19
+depend: [SkyLib, Vault]
+softdepend: [Essentials, HeadDatabase, PremiumVanish, SuperVanish, RoseChat]
+
+permissions:
+    skywelcome.commands.skywelcome.reload:
+        description: Permission to reload the plugin.
+        default: op
+    skywelcome.commands.skywelcome.help:
+        description: Permission to view the plugin's help message.
+        default: op
+    skywelcome.commands.skywelcome.toggle.join:
+        description: Toggle the individual player's join message.
+        default: op
+    skywelcome.commands.skywelcome.toggle.leave:
+        description: Toggle the individual player's leave message.
+        default: op
+    skywelcome.commands.skywelcome.toggle.quit:
+        description: Toggle the individual player's quit message.
+        default: op
+    skywelcome.commands.skywelcome.toggle.change:
+        description: Toggle the individual player's server change message.
+        default: op
+    skywelcome.commands.skywelcome.toggle.motd:
+        description: Toggle the individual player's motd message.
+        default: op
+    skywelcome.commands.skywelcome.gui.join:
+        description: Permission to open the join message selection GUI.
+        default: op
+    skywelcome.commands.skywelcome.gui.quit:
+        description: Permission to open the quit message selection GUI.
+        default: op
+    skywelcome.commands.skywelcome.gui.leave:
+        description: Permission to open the leave message selection GUI.
+        default: op
+    skywelcome.commands.skywelcome.gui.change:
+        description: Permission to open the server change message selection GUI.
+        default: op
+    skywelcome.invulnerable:
+        description: Permission to make the player invulnerable on login.
+        default: op
