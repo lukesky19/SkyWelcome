@@ -17,7 +17,7 @@ subprojects {
         compileOnly("org.jspecify:jspecify:1.0.0")
 
         // SkyLib
-        compileOnly("com.github.lukesky19:SkyLib:2.0.1.0")
+        compileOnly("com.github.lukesky19:SkyLib:2.0.2.0")
 
         // Google
         compileOnly("com.google.code.gson:gson:2.13.2")
