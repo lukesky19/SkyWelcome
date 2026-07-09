@@ -200,6 +200,14 @@ public class SkyWelcomeVelocity implements ISkyPlugin {
         Player player = disconnectEvent.getPlayer();
         UUID playerId = player.getUniqueId();
 
+        DisconnectEvent.LoginStatus status = disconnectEvent.getLoginStatus();
+        boolean validEvent = switch(status) {
+            case SUCCESSFUL_LOGIN -> true;
+            case CONFLICTING_LOGIN, CANCELLED_BY_USER, CANCELLED_BY_PROXY,
+                 CANCELLED_BY_USER_BEFORE_COMPLETE, PRE_SERVER_JOIN -> false;
+        };
+        if(!validEvent) return;
+
         PlayerData playerData = playerDataManager.getPlayerData(playerId);
         if(playerData == null) {
             logger.info(AdventureUtility.plain("No player data found on player disconnect."));
